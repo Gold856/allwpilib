@@ -1,0 +1,3 @@
+[submodule "simulation/halsim_socketcan"]
+	path = simulation/halsim_socketcan
+	url = https://github.com/Gold856/HALSIM_SocketCAN
