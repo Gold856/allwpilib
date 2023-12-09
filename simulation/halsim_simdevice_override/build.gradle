@@ -1,0 +1,34 @@
+if (project.hasProperty('onlylinuxathena')) {
+    return;
+}
+
+description = "HALSIM extension to prevent SimDevices from being created"
+
+ext {
+    includeWpiutil = true
+    pluginName = 'halsim_simdevice_override'
+}
+
+apply plugin: 'google-test-test-suite'
+
+ext {
+    staticGtestConfigs = [:]
+}
+
+staticGtestConfigs["${pluginName}Test"] = []
+apply from: "${rootDir}/shared/googletest.gradle"
+
+apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
+
+model {
+    binaries {
+        all {
+            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                it.buildable = false
+                return
+            }
+        }
+    }
+}
