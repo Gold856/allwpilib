@@ -119,17 +119,6 @@ static void CopyTcp(uv::Stream& in, std::shared_ptr<uv::Stream> out) {
 }
 // NOLINTEND
 
-static void CopyStream(uv::Stream& in, std::shared_ptr<uv::Stream> out) {
-  in.data.connect([out](uv::Buffer& buf, size_t len) {
-    uv::Buffer buf2 = buf.Dup();
-    buf2.len = len;
-    out->Write({buf2}, [](auto bufs, uv::Error) {
-      for (auto buf : bufs) {
-        buf.Deallocate();
-      }
-    });
-  });
-}
 
 int main(int argc, char* argv[]) {
   // parse arguments
@@ -179,16 +168,10 @@ int main(int argc, char* argv[]) {
 
   // create ttys
   auto stdinTty = uv::Tty::Create(loop, 0, true);
-  auto stdoutTty = uv::Tty::Create(loop, 1, false);
 
   // don't bother continuing if we don't have a stdin
   if (!stdinTty) {
     return EXIT_SUCCESS;
-  }
-
-  // pass through our input to output
-  if (stdoutTty) {
-    CopyStream(*stdinTty, stdoutTty);
   }
 
   // when our stdin closes, exit
