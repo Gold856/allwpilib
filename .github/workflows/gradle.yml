@@ -58,9 +58,11 @@ jobs:
         with:
           name: ${{ matrix.artifact-name }}
           path: simulation/halsim_simdevice_override/build/libs/halsim_simdevice_override/shared/release
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.artifact-name }}
           path: simulation/halsim_socketcan/build/libs/halsim_socketcan/shared/release
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.artifact-name }}
           path: simulation/halsim_ds_socket/build/libs/halsim_ds_socket/shared/release
