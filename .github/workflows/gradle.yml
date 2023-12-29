@@ -52,11 +52,16 @@ jobs:
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
       - name: Check free disk space
         run: df .
+      - name: Copy artifacts
+        run: cp simulation/halsim_simdevice_override/build/libs/halsim_simdevice_override/shared/release/libhalsim_simdevice_override.so .
+        run: cp simulation/halsim_socketcan/build/libs/halsim_socketcan/shared/release/libhalsim_socketcan.so .
+        run: cp simulation/halsim_ds_socket/build/libs/halsim_ds_socket/shared/release/libhalsim_ds_socket.so .
+        run: cp wpinet/build/exe/netconsoleTee/release/netconsoleTee .
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact-name }}
           path: |
-            simulation/halsim_simdevice_override/build/libs/halsim_simdevice_override/shared/release/libhalsim_simdevice_override.so
-            simulation/halsim_socketcan/build/libs/halsim_socketcan/shared/release/libhalsim_socketcan.so
-            simulation/halsim_ds_socket/build/libs/halsim_ds_socket/shared/release/libhalsim_ds_socket.so
-            wpinet/build/exe/netconsoleTee/release/netconsoleTee
+            libhalsim_simdevice_override.so
+            libhalsim_socketcan.so
+            libhalsim_ds_socket.so
+            netconsoleTee
