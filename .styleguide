@@ -21,6 +21,7 @@ generatedFileExclude {
   fieldImages/src/main/native/resources/
   apriltag/src/test/resources/
   wpilibc/src/generated/
+  wpilibj/src/generated/main/java/edu/wpi/first/wpilibj/proto
 }
 
 repoRootNameOverride {

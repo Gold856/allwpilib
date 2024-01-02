@@ -5,6 +5,18 @@ include(AddTest)
 
 configure_file(src/generate/WPILibVersion.cpp.in WPILibVersion.cpp)
 
+# workaround for makefiles - for some reason parent directories aren't created.
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/protobuf")
+file(GLOB wpilibc_proto_src src/main/proto/*.proto)
+protobuf_generate_cpp(
+    WPILIBC_PROTO_SRCS
+    WPILIBC_PROTO_HDRS
+    PROTOC_OUT_DIR
+    "${CMAKE_CURRENT_BINARY_DIR}/protobuf"
+    PROTOS
+    ${wpilibc_proto_src}
+)
+
 file(
     GLOB_RECURSE wpilibc_native_src
     src/main/native/cpp/*.cpp
@@ -12,7 +24,7 @@ file(
     src/generated/main/native/cpp/*.cpp
 )
 
-add_library(wpilibc ${wpilibc_native_src} ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)
+add_library(wpilibc ${wpilibc_native_src} ${WPILIBC_PROTO_SRCS} ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)
 set_target_properties(wpilibc PROPERTIES DEBUG_POSTFIX "d")
 
 target_include_directories(
@@ -20,6 +32,7 @@ target_include_directories(
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/protobuf>
         $<INSTALL_INTERFACE:${include_dest}/wpilibc>
 )
 wpilib_target_warnings(wpilibc)

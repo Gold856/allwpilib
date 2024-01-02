@@ -21,6 +21,8 @@ if(WITH_JAVA)
     file(GLOB EJML_JARS "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml/*.jar")
     file(GLOB JACKSON_JARS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar")
 
+    file(GLOB QUICKBUF_JAR ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/quickbuf/*.jar)
+
     add_jar(
         wpilibj_jar
         ${JAVA_SOURCES}
@@ -31,6 +33,7 @@ if(WITH_JAVA)
             ${EJML_JARS}
             ${JACKSON_JARS}
             ${OPENCV_JAR_FILE}
+            ${QUICKBUF_JAR}
             cscore_jar
             cameraserver_jar
             wpimath_jar
@@ -59,6 +62,7 @@ if(WITH_JAVA_SOURCE)
     file(GLOB WPILIBJ_EVENT_SOURCES src/main/java/edu/wpi/first/wpilibj/event/*.java)
     file(GLOB WPILIBJ_INTERFACES_SOURCES src/main/java/edu/wpi/first/wpilibj/interfaces/*.java)
     file(GLOB WPILIBJ_MOTORCONTROL_SOURCES src/main/java/edu/wpi/first/wpilibj/motorcontrol*.java)
+    file(GLOB WPILIBJ_PROTO_SOURCES src/generated/main/java/edu/wpi/first/wpilibj/proto/*.java)
     file(GLOB WPILIBJ_SHUFFLEBOARD_SOURCES src/main/java/edu/wpi/first/wpilibj/shuffleboard*.java)
     file(
         GLOB WPILIBJ_SIMULATION_SOURCES
@@ -66,6 +70,10 @@ if(WITH_JAVA_SOURCE)
         src/generated/main/java/edu/wpi/first/wpilibj/simulation/*.java
     )
     file(GLOB WPILIBJ_SMARTDASHBOARD_SOURCES src/main/java/edu/wpi/first/wpilibj/*.java)
+    file(
+        GLOB WPILIBJ_SMARTDASHBOARD_PROTO_SOURCES
+        src/main/java/edu/wpi/first/wpilibj/smartdashboard/proto/*.java
+    )
     file(
         GLOB WPILIBJ_UTIL_SOURCES
         src/main/java/edu/wpi/first/wpilibj/*.java
@@ -86,9 +94,13 @@ if(WITH_JAVA_SOURCE)
             "edu/wpi/first/wpilibj/livewindow"
             src/main/java/edu/wpi/first/wpilibj/livewindow/LiveWindow.java
         NAMESPACE "edu/wpi/first/wpilibj/motorcontrol" ${WPILIBJ_MOTORCONTROL_SOURCES}
+        NAMESPACE "edu/wpi/first/wpilibj/proto" ${WPILIBJ_SMARTDASHBOARD_PROTO_SOURCES}
         NAMESPACE "edu/wpi/first/wpilibj/shuffleboard" ${WPILIBJ_SHUFFLEBOARD_SOURCES}
         NAMESPACE "edu/wpi/first/wpilibj/simulation" ${WPILIBJ_SIMULATION_SOURCES}
         NAMESPACE "edu/wpi/first/wpilibj/smartdashboard" ${WPILIBJ_SMARTDASHBOARD_SOURCES}
+        NAMESPACE
+            "edu/wpi/first/wpilibj/smartdashboard/proto"
+            ${WPILIBJ_SMARTDASHBOARD_PROTO_SOURCES}
         NAMESPACE "edu/wpi/first/wpilibj/util" ${WPILIBJ_UTIL_SOURCES}
         OUTPUT_NAME wpilibj-sources
     )
