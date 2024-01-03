@@ -83,6 +83,11 @@ public abstract class MechanismObject2d implements AutoCloseable {
     return m_name;
   }
 
+  /**
+   * Returns the internal map used to store MechanismObject2d's.
+   * 
+   * @return the map.
+   */
   public final Map<String, MechanismObject2d> getObjects() {
     return m_objects;
   }
