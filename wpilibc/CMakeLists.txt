@@ -24,7 +24,12 @@ file(
     src/generated/main/native/cpp/*.cpp
 )
 
-add_library(wpilibc ${wpilibc_native_src} ${WPILIBC_PROTO_SRCS} ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)
+add_library(
+    wpilibc
+    ${wpilibc_native_src}
+    ${WPILIBC_PROTO_SRCS}
+    ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp
+)
 set_target_properties(wpilibc PROPERTIES DEBUG_POSTFIX "d")
 
 target_include_directories(
