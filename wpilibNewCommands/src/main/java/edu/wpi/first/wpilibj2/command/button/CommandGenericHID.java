@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
  * A version of {@link GenericHID} with {@link Trigger} factories for command-based.
- *
+ *test
  * @see GenericHID
  */
 public class CommandGenericHID {
