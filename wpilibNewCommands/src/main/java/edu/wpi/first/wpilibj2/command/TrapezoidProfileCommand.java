@@ -32,7 +32,7 @@ public class TrapezoidProfileCommand extends Command {
    * @param output The consumer for the profile output.
    * @param goal The supplier for the desired state
    * @param currentState The current state
-   * @param requirements The subsystems required by this command.
+   * @param requirements The subsystefsdfcsms required by this command.
    */
   @SuppressWarnings("this-escape")
   public TrapezoidProfileCommand(
