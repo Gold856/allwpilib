@@ -2,6 +2,9 @@ project(wpilibc)
 
 include(CompileWarnings)
 include(AddTest)
+if(BUILD_MAVEN)
+    include(BuildMaven)
+endif()
 
 configure_file(src/generate/WPILibVersion.cpp.in WPILibVersion.cpp)
 
@@ -39,14 +42,17 @@ target_link_libraries(wpilibc PUBLIC hal ntcore wpimath wpiutil)
 
 set_property(TARGET wpilibc PROPERTY FOLDER "libraries")
 
-install(TARGETS wpilibc EXPORT wpilibc)
-export(TARGETS wpilibc FILE wpilibc.cmake NAMESPACE wpilibc::)
+configure_file(wpilibc-config.cmake.in ${WPILIB_BINARY_DIR}/wpilibc-config.cmake)
+if(BUILD_MAVEN)
+    config_maven_build(wpilibc CONFIG_FILE wpilibc-config.cmake)
+else()
+    install(TARGETS wpilibc EXPORT wpilibc)
+    export(TARGETS wpilibc FILE wpilibc.cmake NAMESPACE wpilibc::)
+    install(FILES ${WPILIB_BINARY_DIR}/wpilibc-config.cmake DESTINATION share/wpilibc)
+    install(EXPORT wpilibc DESTINATION share/wpilibc)
+endif()
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpilibc")
 install(DIRECTORY src/generated/main/native/include/ DESTINATION "${include_dest}/wpilibc")
-
-configure_file(wpilibc-config.cmake.in ${WPILIB_BINARY_DIR}/wpilibc-config.cmake)
-install(FILES ${WPILIB_BINARY_DIR}/wpilibc-config.cmake DESTINATION share/wpilibc)
-install(EXPORT wpilibc DESTINATION share/wpilibc)
 
 if(WITH_TESTS)
     wpilib_add_test(wpilibc src/test/native/cpp)

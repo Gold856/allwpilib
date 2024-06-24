@@ -3,6 +3,9 @@ project(xrpVendordep)
 include(SubDirList)
 include(CompileWarnings)
 include(AddTest)
+if(BUILD_MAVEN)
+    include(BuildMaven)
+endif()
 
 if(WITH_JAVA)
     include(UseJava)
@@ -63,13 +66,16 @@ target_include_directories(
         $<INSTALL_INTERFACE:${include_dest}/xrpVendordep>
 )
 
-install(TARGETS xrpVendordep EXPORT xrpvendordep)
-export(TARGETS xrpVendordep FILE xrpvendordep.cmake NAMESPACE xrpvendordep::)
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/xrpVendordep")
-
 configure_file(xrpvendordep-config.cmake.in ${WPILIB_BINARY_DIR}/xrpvendordep-config.cmake)
-install(FILES ${WPILIB_BINARY_DIR}/xrpvendordep-config.cmake DESTINATION share/xrpVendordep)
-install(EXPORT xrpvendordep DESTINATION share/xrpVendordep)
+if(BUILD_MAVEN)
+    config_maven_build(xrpVendordep CONFIG_FILE xrpvendordep-config.cmake)
+else()
+    install(TARGETS xrpVendordep EXPORT xrpvendordep)
+    export(TARGETS xrpVendordep FILE xrpvendordep.cmake NAMESPACE xrpvendordep::)
+    install(FILES ${WPILIB_BINARY_DIR}/xrpvendordep-config.cmake DESTINATION share/xrpVendordep)
+    install(EXPORT xrpvendordep DESTINATION share/xrpVendordep)
+endif()
+install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/xrpVendordep")
 
 if(WITH_TESTS)
     wpilib_add_test(xrpVendordep src/test/native/cpp)
