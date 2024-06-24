@@ -3,6 +3,9 @@ project(romiVendordep)
 include(SubDirList)
 include(CompileWarnings)
 include(AddTest)
+if(BUILD_MAVEN)
+    include(BuildMaven)
+endif()
 
 if(WITH_JAVA)
     include(UseJava)
@@ -63,13 +66,16 @@ target_include_directories(
         $<INSTALL_INTERFACE:${include_dest}/romiVendordep>
 )
 
-install(TARGETS romiVendordep EXPORT romivendordep)
-export(TARGETS romiVendordep FILE romivendordep.cmake NAMESPACE romivendordep::)
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/romiVendordep")
-
 configure_file(romivendordep-config.cmake.in ${WPILIB_BINARY_DIR}/romivendordep-config.cmake)
-install(FILES ${WPILIB_BINARY_DIR}/romivendordep-config.cmake DESTINATION share/romiVendordep)
-install(EXPORT romivendordep DESTINATION share/romiVendordep)
+if(BUILD_MAVEN)
+    config_maven_build(romiVendordep CONFIG_FILE romivendordep-config.cmake)
+else()
+    install(TARGETS romiVendordep EXPORT romivendordep)
+    export(TARGETS romiVendordep FILE romivendordep.cmake NAMESPACE romivendordep::)
+    install(FILES ${WPILIB_BINARY_DIR}/romivendordep-config.cmake DESTINATION share/romiVendordep)
+    install(EXPORT romivendordep DESTINATION share/romiVendordep)
+endif()
+install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/romiVendordep")
 
 if(WITH_TESTS)
     wpilib_add_test(romiVendordep src/test/native/cpp)

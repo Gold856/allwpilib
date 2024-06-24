@@ -3,6 +3,9 @@ project(wpilibNewCommands)
 include(SubDirList)
 include(CompileWarnings)
 include(AddTest)
+if(BUILD_MAVEN)
+    include(BuildMaven)
+endif()
 
 if(WITH_JAVA)
     include(UseJava)
@@ -72,23 +75,27 @@ target_include_directories(
         $<INSTALL_INTERFACE:${include_dest}/wpilibNewCommands>
 )
 
-install(TARGETS wpilibNewCommands EXPORT wpilibnewcommands)
-export(TARGETS wpilibNewCommands FILE wpilibnewcommands.cmake NAMESPACE wpilibnewcommands::)
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpilibNewCommands")
-install(
-    DIRECTORY src/generated/main/native/include/
-    DESTINATION "${include_dest}/wpilibNewCommands"
-)
 
 configure_file(
     wpilibnewcommands-config.cmake.in
     ${WPILIB_BINARY_DIR}/wpilibnewcommands-config.cmake
 )
+if(BUILD_MAVEN)
+    config_maven_build(wpilibNewCommands CONFIG_FILE wpilibnewcommands-config.cmake)
+else()
+    install(TARGETS wpilibNewCommands EXPORT wpilibnewcommands)
+    export(TARGETS wpilibNewCommands FILE wpilibnewcommands.cmake NAMESPACE wpilibnewcommands::)
+    install(
+        FILES ${WPILIB_BINARY_DIR}/wpilibnewcommands-config.cmake
+        DESTINATION share/wpilibNewCommands
+    )
+    install(EXPORT wpilibnewcommands DESTINATION share/wpilibNewCommands)
+endif()
+install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpilibNewCommands")
 install(
-    FILES ${WPILIB_BINARY_DIR}/wpilibnewcommands-config.cmake
-    DESTINATION share/wpilibNewCommands
+    DIRECTORY src/generated/main/native/include/
+    DESTINATION "${include_dest}/wpilibNewCommands"
 )
-install(EXPORT wpilibnewcommands DESTINATION share/wpilibNewCommands)
 
 if(WITH_TESTS)
     wpilib_add_test(wpilibNewCommands src/test/native/cpp)
