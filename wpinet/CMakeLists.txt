@@ -4,6 +4,9 @@ include(SubDirList)
 include(GenResources)
 include(CompileWarnings)
 include(AddTest)
+if(BUILD_MAVEN)
+    include(BuildMaven)
+endif()
 
 file(GLOB wpinet_jni_src src/main/native/cpp/jni/WPINetJNI.cpp)
 
@@ -38,8 +41,12 @@ if(WITH_JAVA)
     target_link_libraries(wpinetjni PRIVATE wpinet_jni_headers)
     add_dependencies(wpinetjni wpinet_jar)
 
-    install(TARGETS wpinetjni EXPORT wpinetjni)
-    export(TARGETS wpinetjni FILE wpinetjni.cmake NAMESPACE wpinetjni::)
+    if(BUILD_MAVEN)
+        config_maven_build(wpinetjni)
+    else()
+        install(TARGETS wpinetjni EXPORT wpinetjni)
+        export(TARGETS wpinetjni FILE wpinetjni.cmake NAMESPACE wpinetjni::)
+    endif()
 endif()
 
 if(WITH_JAVA_SOURCE)
@@ -196,12 +203,15 @@ target_include_directories(
         $<INSTALL_INTERFACE:${include_dest}/wpinet>
 )
 
-install(TARGETS wpinet EXPORT wpinet)
-export(TARGETS wpinet FILE wpinet.cmake NAMESPACE wpinet::)
-
 configure_file(wpinet-config.cmake.in ${WPILIB_BINARY_DIR}/wpinet-config.cmake)
-install(FILES ${WPILIB_BINARY_DIR}/wpinet-config.cmake DESTINATION share/wpinet)
-install(EXPORT wpinet DESTINATION share/wpinet)
+if(BUILD_MAVEN)
+    config_maven_build(wpinet CONFIG_FILE wpinet-config.cmake)
+else()
+    install(TARGETS wpinet EXPORT wpinet)
+    export(TARGETS wpinet FILE wpinet.cmake NAMESPACE wpinet::)
+    install(FILES ${WPILIB_BINARY_DIR}/wpinet-config.cmake DESTINATION share/wpinet)
+    install(EXPORT wpinet DESTINATION share/wpinet)
+endif()
 
 subdir_list(wpinet_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
 foreach(example ${wpinet_examples})

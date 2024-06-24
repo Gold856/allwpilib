@@ -2,6 +2,9 @@ project(wpigui)
 
 include(CompileWarnings)
 include(LinkMacOSGUI)
+if(BUILD_MAVEN)
+    include(BuildMaven)
+endif()
 
 file(GLOB wpigui_src src/main/native/cpp/*.cpp)
 file(GLOB wpigui_windows_src src/main/native/directx11/*.cpp)
@@ -15,6 +18,9 @@ else()
 endif()
 set_target_properties(wpigui PROPERTIES DEBUG_POSTFIX "d")
 set_property(TARGET wpigui PROPERTY POSITION_INDEPENDENT_CODE ON)
+if(BUILD_MAVEN)
+    config_maven_build(wpigui)
+endif()
 
 set_property(TARGET wpigui PROPERTY FOLDER "libraries")
 

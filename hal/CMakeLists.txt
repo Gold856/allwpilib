@@ -2,6 +2,9 @@ project(hal)
 
 include(CompileWarnings)
 include(AddTest)
+if(BUILD_MAVEN)
+    include(BuildMaven)
+endif()
 
 file(
     GLOB hal_shared_native_src
@@ -44,14 +47,17 @@ target_link_libraries(hal PUBLIC wpiutil)
 
 set_property(TARGET hal PROPERTY FOLDER "libraries")
 
-install(TARGETS hal EXPORT hal)
-export(TARGETS hal FILE hal.cmake NAMESPACE hal::)
+configure_file(hal-config.cmake.in ${WPILIB_BINARY_DIR}/hal-config.cmake)
+if(BUILD_MAVEN)
+    config_maven_build(hal CONFIG_FILE hal-config.cmake)
+else()
+    install(TARGETS hal EXPORT hal)
+    export(TARGETS hal FILE hal.cmake NAMESPACE hal::)
+    install(FILES ${WPILIB_BINARY_DIR}/hal-config.cmake DESTINATION share/hal)
+    install(EXPORT hal DESTINATION share/hal)
+endif()
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/hal")
 install(DIRECTORY src/generated/main/native/include/ DESTINATION "${include_dest}/hal")
-
-configure_file(hal-config.cmake.in ${WPILIB_BINARY_DIR}/hal-config.cmake)
-install(FILES ${WPILIB_BINARY_DIR}/hal-config.cmake DESTINATION share/hal)
-install(EXPORT hal DESTINATION share/hal)
 
 # Java bindings
 if(WITH_JAVA)
@@ -92,8 +98,12 @@ if(WITH_JAVA)
     target_link_libraries(haljni PRIVATE hal_jni_headers)
     add_dependencies(haljni hal_jar)
 
-    install(TARGETS haljni EXPORT haljni)
-    export(TARGETS haljni FILE haljni.cmake NAMESPACE haljni::)
+    if(BUILD_MAVEN)
+        config_maven_build(haljni)
+    else()
+        install(TARGETS haljni EXPORT haljni)
+        export(TARGETS haljni FILE haljni.cmake NAMESPACE haljni::)
+    endif()
 endif()
 
 if(WITH_JAVA_SOURCE)

@@ -5,6 +5,9 @@ include(GenResources)
 include(CompileWarnings)
 include(AddTest)
 include(DownloadAndCheck)
+if(BUILD_MAVEN)
+    include(BuildMaven)
+endif()
 
 file(
     GLOB wpiutil_jni_src
@@ -85,8 +88,12 @@ if(WITH_JAVA)
     target_link_libraries(wpiutiljni PRIVATE wpiutil_jni_headers)
     add_dependencies(wpiutiljni wpiutil_jar)
 
-    install(TARGETS wpiutiljni EXPORT wpiutiljni)
-    export(TARGETS wpiutiljni FILE wpiutiljni.cmake NAMESPACE wpiutiljni::)
+    if(BUILD_MAVEN)
+        config_maven_build(wpiutiljni)
+    else()
+        install(TARGETS wpiutiljni EXPORT wpiutiljni)
+        export(TARGETS wpiutiljni FILE wpiutiljni.cmake NAMESPACE wpiutiljni::)
+    endif()
 endif()
 
 if(WITH_JAVA_SOURCE)
@@ -261,12 +268,15 @@ target_include_directories(
         $<INSTALL_INTERFACE:${include_dest}/wpiutil>
 )
 
-install(TARGETS wpiutil EXPORT wpiutil)
-export(TARGETS wpiutil FILE wpiutil.cmake NAMESPACE wpiutil::)
-
 configure_file(wpiutil-config.cmake.in ${WPILIB_BINARY_DIR}/wpiutil-config.cmake)
-install(FILES ${WPILIB_BINARY_DIR}/wpiutil-config.cmake DESTINATION share/wpiutil)
-install(EXPORT wpiutil DESTINATION share/wpiutil)
+if(BUILD_MAVEN)
+    config_maven_build(wpiutil CONFIG_FILE wpiutil-config.cmake)
+else()
+    install(TARGETS wpiutil EXPORT wpiutil)
+    export(TARGETS wpiutil FILE wpiutil.cmake NAMESPACE wpiutil::)
+    install(FILES ${WPILIB_BINARY_DIR}/wpiutil-config.cmake DESTINATION share/wpiutil)
+    install(EXPORT wpiutil DESTINATION share/wpiutil)
+endif()
 
 subdir_list(wpiutil_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
 foreach(example ${wpiutil_examples})

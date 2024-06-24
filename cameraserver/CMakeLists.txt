@@ -2,6 +2,9 @@ project(cameraserver)
 
 include(CompileWarnings)
 include(AddTest)
+if(BUILD_MAVEN)
+    include(BuildMaven)
+endif()
 
 find_package(OpenCV REQUIRED)
 
@@ -76,13 +79,16 @@ target_link_libraries(cameraserver PUBLIC ntcore cscore wpiutil ${OpenCV_LIBS})
 
 set_property(TARGET cameraserver PROPERTY FOLDER "libraries")
 
-install(TARGETS cameraserver EXPORT cameraserver)
-export(TARGETS cameraserver FILE cameraserver.cmake NAMESPACE cameraserver::)
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/cameraserver")
-
 configure_file(cameraserver-config.cmake.in ${WPILIB_BINARY_DIR}/cameraserver-config.cmake)
-install(FILES ${WPILIB_BINARY_DIR}/cameraserver-config.cmake DESTINATION share/cameraserver)
-install(EXPORT cameraserver DESTINATION share/cameraserver)
+if(BUILD_MAVEN)
+    config_maven_build(cameraserver CONFIG_FILE cameraserver-config.cmake)
+else()
+    install(TARGETS cameraserver EXPORT cameraserver)
+    export(TARGETS cameraserver FILE cameraserver.cmake NAMESPACE cameraserver::)
+    install(FILES ${WPILIB_BINARY_DIR}/cameraserver-config.cmake DESTINATION share/cameraserver)
+    install(EXPORT cameraserver DESTINATION share/cameraserver)
+endif()
+install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/cameraserver")
 
 file(GLOB multiCameraServer_src multiCameraServer/src/main/native/cpp/*.cpp)
 add_executable(multiCameraServer ${multiCameraServer_src})

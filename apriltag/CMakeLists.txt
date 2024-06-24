@@ -3,6 +3,9 @@ project(apriltag)
 include(CompileWarnings)
 include(GenResources)
 include(FetchContent)
+if(BUILD_MAVEN)
+    include(BuildMaven)
+endif()
 
 fetchcontent_declare(
     apriltaglib
@@ -78,8 +81,12 @@ if(WITH_JAVA)
     target_link_libraries(apriltagjni PRIVATE apriltag_jni_headers)
     add_dependencies(apriltagjni apriltag_jar)
 
-    install(TARGETS apriltagjni EXPORT apriltagjni)
-    export(TARGETS apriltagjni FILE apriltagjni.cmake NAMESPACE apriltagjni::)
+    if(BUILD_MAVEN)
+        config_maven_build(apriltagjni)
+    else()
+        install(TARGETS apriltagjni EXPORT apriltagjni)
+        export(TARGETS apriltagjni FILE apriltagjni.cmake NAMESPACE apriltagjni::)
+    endif()
 endif()
 
 if(WITH_JAVA_SOURCE)
@@ -145,13 +152,16 @@ target_include_directories(
         $<INSTALL_INTERFACE:${include_dest}/apriltag>
 )
 
-install(TARGETS apriltag EXPORT apriltag)
-export(TARGETS apriltag FILE apriltag.cmake NAMESPACE apriltag::)
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/apriltag")
-
 configure_file(apriltag-config.cmake.in ${WPILIB_BINARY_DIR}/apriltag-config.cmake)
-install(FILES ${WPILIB_BINARY_DIR}/apriltag-config.cmake DESTINATION share/apriltag)
-install(EXPORT apriltag DESTINATION share/apriltag)
+if(BUILD_MAVEN)
+    config_maven_build(apriltag CONFIG_FILE apriltag-config.cmake)
+else()
+    install(TARGETS apriltag EXPORT apriltag)
+    export(TARGETS apriltag FILE apriltag.cmake NAMESPACE apriltag::)
+    install(FILES ${WPILIB_BINARY_DIR}/apriltag-config.cmake DESTINATION share/apriltag)
+    install(EXPORT apriltag DESTINATION share/apriltag)
+endif()
+install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/apriltag")
 
 if(WITH_TESTS)
     wpilib_add_test(apriltag src/test/native/cpp)

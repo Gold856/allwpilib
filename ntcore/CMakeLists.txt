@@ -2,6 +2,9 @@ project(ntcore)
 
 include(CompileWarnings)
 include(AddTest)
+if(BUILD_MAVEN)
+    include(BuildMaven)
+endif()
 
 file(
     GLOB ntcore_native_src
@@ -28,14 +31,17 @@ target_link_libraries(ntcore PUBLIC wpinet wpiutil)
 
 set_property(TARGET ntcore PROPERTY FOLDER "libraries")
 
-install(TARGETS ntcore EXPORT ntcore)
-export(TARGETS ntcore FILE ntcore.cmake NAMESPACE ntcore::)
+configure_file(ntcore-config.cmake.in ${WPILIB_BINARY_DIR}/ntcore-config.cmake)
+if(BUILD_MAVEN)
+    config_maven_build(ntcore CONFIG_FILE ntcore-config.cmake)
+else()
+    install(TARGETS ntcore EXPORT ntcore)
+    export(TARGETS ntcore FILE ntcore.cmake NAMESPACE ntcore::)
+    install(FILES ${WPILIB_BINARY_DIR}/ntcore-config.cmake DESTINATION share/ntcore)
+    install(EXPORT ntcore DESTINATION share/ntcore)
+endif()
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/ntcore")
 install(DIRECTORY src/generated/main/native/include/ DESTINATION "${include_dest}/ntcore")
-
-configure_file(ntcore-config.cmake.in ${WPILIB_BINARY_DIR}/ntcore-config.cmake)
-install(FILES ${WPILIB_BINARY_DIR}/ntcore-config.cmake DESTINATION share/ntcore)
-install(EXPORT ntcore DESTINATION share/ntcore)
 
 # Java bindings
 if(WITH_JAVA)
@@ -77,8 +83,12 @@ if(WITH_JAVA)
     target_link_libraries(ntcorejni PRIVATE ntcore_jni_headers)
     add_dependencies(ntcorejni ntcore_jar)
 
-    install(TARGETS ntcorejni EXPORT ntcorejni)
-    export(TARGETS ntcorejni FILE ntcorejni.cmake NAMESPACE ntcorejni::)
+    if(BUILD_MAVEN)
+        config_maven_build(ntcorejni)
+    else()
+        install(TARGETS ntcorejni EXPORT ntcorejni)
+        export(TARGETS ntcorejni FILE ntcorejni.cmake NAMESPACE ntcorejni::)
+    endif()
 endif()
 
 if(WITH_JAVA_SOURCE)

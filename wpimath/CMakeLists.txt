@@ -4,6 +4,9 @@ include(SubDirList)
 include(CompileWarnings)
 include(AddTest)
 include(DownloadAndCheck)
+if(BUILD_MAVEN)
+    include(BuildMaven)
+endif()
 
 # workaround for makefiles - for some reason parent directories aren't created.
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/protobuf")
@@ -104,8 +107,12 @@ if(WITH_JAVA)
     target_link_libraries(wpimathjni PRIVATE wpimath_jni_headers)
     add_dependencies(wpimathjni wpimath_jar)
 
-    install(TARGETS wpimathjni EXPORT wpimathjni)
-    export(TARGETS wpimathjni FILE wpimathjni.cmake NAMESPACE wpimathjni::)
+    if(BUILD_MAVEN)
+        config_maven_build(wpimathjni)
+    else()
+        install(TARGETS wpimathjni EXPORT wpimathjni)
+        export(TARGETS wpimathjni FILE wpimathjni.cmake NAMESPACE wpimathjni::)
+    endif()
 endif()
 
 if(WITH_JAVA_SOURCE)
@@ -225,12 +232,15 @@ target_include_directories(
         $<INSTALL_INTERFACE:${include_dest}/wpimath>
 )
 
-install(TARGETS wpimath EXPORT wpimath)
-export(TARGETS wpimath FILE wpimath.cmake NAMESPACE wpimath::)
-
 configure_file(wpimath-config.cmake.in ${WPILIB_BINARY_DIR}/wpimath-config.cmake)
-install(FILES ${WPILIB_BINARY_DIR}/wpimath-config.cmake DESTINATION share/wpimath)
-install(EXPORT wpimath DESTINATION share/wpimath)
+if(BUILD_MAVEN)
+    config_maven_build(wpimath CONFIG_FILE wpimath-config.cmake)
+else()
+    install(TARGETS wpimath EXPORT wpimath)
+    export(TARGETS wpimath FILE wpimath.cmake NAMESPACE wpimath::)
+    install(FILES ${WPILIB_BINARY_DIR}/wpimath-config.cmake DESTINATION share/wpimath)
+    install(EXPORT wpimath DESTINATION share/wpimath)
+endif()
 
 if(WITH_TESTS)
     wpilib_add_test(wpimath src/test/native/cpp)
