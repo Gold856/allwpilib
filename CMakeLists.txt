@@ -58,6 +58,7 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # Options for building certain parts of the repo. Everything is built by default.
 option(BUILD_SHARED_LIBS "Build with shared libs (needed for JNI)" ON)
+option(BUILD_MAVEN "Build Maven artifacts")
 option(WITH_JAVA "Include Java and JNI in the build" OFF)
 option(WITH_JAVA_SOURCE "Build Java source jars" ${WITH_JAVA})
 option(WITH_CSCORE "Build cscore (needs OpenCV)" ON)
@@ -132,32 +133,50 @@ find_package(LIBSSH 0.7.1)
 
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
 set(protobuf_MODULE_COMPATIBLE ON CACHE BOOL "" FORCE)
-find_package(Protobuf REQUIRED)
+if(BUILD_MAVEN)
+    find_package(Protobuf MODULE REQUIRED)
+    if(MSVC)
+        set_target_properties(
+            protobuf::protoc
+            PROPERTIES
+                IMPORTED_LOCATION_DEBUG ${Protobuf_PROTOC_EXECUTABLE}
+                IMPORTED_LOCATION_RELWITHDEBINFO ${Protobuf_PROTOC_EXECUTABLE}
+        )
+    endif()
+else()
+    find_package(Protobuf REQUIRED)
+endif()
 find_program(PROTOC_COMPILER protoc REQUIRED)
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG OFF)
 
 get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 
 if(isMultiConfig)
-    if(NOT "Asan" IN_LIST CMAKE_CONFIGURATION_TYPES)
-        list(APPEND CMAKE_CONFIGURATION_TYPES Asan)
-    endif()
-    if(NOT "Tsan" IN_LIST CMAKE_CONFIGURATION_TYPES)
-        list(APPEND CMAKE_CONFIGURATION_TYPES Tsan)
-    endif()
-    if(NOT "Ubsan" IN_LIST CMAKE_CONFIGURATION_TYPES)
-        list(APPEND CMAKE_CONFIGURATION_TYPES Ubsan)
+    if(BUILD_MAVEN)
+        list(REMOVE_ITEM CMAKE_CONFIGURATION_TYPES MinSizeRel Release)
+    else()
+        if(NOT "Asan" IN_LIST CMAKE_CONFIGURATION_TYPES)
+            list(APPEND CMAKE_CONFIGURATION_TYPES Asan)
+        endif()
+        if(NOT "Tsan" IN_LIST CMAKE_CONFIGURATION_TYPES)
+            list(APPEND CMAKE_CONFIGURATION_TYPES Tsan)
+        endif()
+        if(NOT "Ubsan" IN_LIST CMAKE_CONFIGURATION_TYPES)
+            list(APPEND CMAKE_CONFIGURATION_TYPES Ubsan)
+        endif()
     endif()
 else()
-    set(allowedBuildTypes
+    set(allowedBuildTypes Debug RelWithDebInfo)
+    set(cmake_only_build_types
         Asan
         Tsan
         Ubsan
-        Debug
         Release
-        RelWithDebInfo
         MinSizeRel
     )
+    if(NOT BUILD_MAVEN)
+        set(allowedBuildTypes ${allowedBuildTypes} ${cmake_only_build_types})
+    endif()
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "${allowedBuildTypes}")
 
     if(CMAKE_BUILD_TYPE AND NOT CMAKE_BUILD_TYPE IN_LIST allowedBuildTypes)
@@ -165,6 +184,28 @@ else()
     endif()
 endif()
 
+if(BUILD_MAVEN AND MSVC)
+    string(
+        REGEX REPLACE
+        "/INCREMENTAL( |$)"
+        "/INCREMENTAL:NO "
+        CMAKE_SHARED_LINKER_FLAGS_DEBUG
+        ${CMAKE_SHARED_LINKER_FLAGS_DEBUG}
+    )
+    string(
+        REGEX REPLACE
+        "/INCREMENTAL( |$)"
+        "/INCREMENTAL:NO "
+        CMAKE_EXE_LINKER_FLAGS_DEBUG
+        ${CMAKE_EXE_LINKER_FLAGS_DEBUG}
+    )
+
+    string(APPEND CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO " /OPT:REF,ICF")
+    string(APPEND CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO " /OPT:REF,ICF")
+
+    string(APPEND CMAKE_SHARED_LINKER_FLAGS "/PDBALTPATH:%_PDB% /DEPENDENTLOADFLAG:0x1100")
+    string(APPEND CMAKE_EXE_LINKER_FLAGS "/PDBALTPATH:%_PDB% /DEPENDENTLOADFLAG:0x1100")
+endif()
 set(CMAKE_C_FLAGS_ASAN
     "${CMAKE_C_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer"
     CACHE STRING

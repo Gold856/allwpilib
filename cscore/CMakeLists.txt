@@ -4,6 +4,9 @@ include(SubDirList)
 include(CompileWarnings)
 include(AddTest)
 include(LinkMacOSGUI)
+if(BUILD_MAVEN)
+    include(BuildMaven)
+endif()
 
 file(GLOB cscore_native_src src/main/native/cpp/*.cpp)
 file(GLOB cscore_linux_src src/main/native/linux/*.cpp)
@@ -31,25 +34,36 @@ else()
     target_sources(cscore PRIVATE ${cscore_linux_src})
 endif()
 
-target_include_directories(
-    cscore
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
-        $<INSTALL_INTERFACE:${include_dest}/cscore>
-    PRIVATE src/main/native/cpp
-)
 wpilib_target_warnings(cscore)
 target_link_libraries(cscore PUBLIC wpinet wpiutil ${OpenCV_LIBS})
 
 set_property(TARGET cscore PROPERTY FOLDER "libraries")
 
-install(TARGETS cscore EXPORT cscore)
-export(TARGETS cscore FILE cscore.cmake NAMESPACE cscore::)
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/cscore")
-
 configure_file(cscore-config.cmake.in ${WPILIB_BINARY_DIR}/cscore-config.cmake)
-install(FILES ${WPILIB_BINARY_DIR}/cscore-config.cmake DESTINATION share/cscore)
-install(EXPORT cscore DESTINATION share/cscore)
+if(BUILD_MAVEN)
+    config_maven_build(
+        cscore
+        GROUP edu.wpi.first.cscore
+        ARTIFACT cscore-cpp
+        CONFIG_FILE cscore-config.cmake
+    )
+    set(header_dest cscore-cpp/include)
+else()
+    install(TARGETS cscore EXPORT cscore)
+    export(TARGETS cscore FILE cscore.cmake NAMESPACE cscore::)
+    install(FILES ${WPILIB_BINARY_DIR}/cscore-config.cmake DESTINATION share/cscore)
+    install(EXPORT cscore DESTINATION share/cscore)
+    set(header_dest ${include_dest}/cscore)
+endif()
+
+install(DIRECTORY src/main/native/include/ DESTINATION ${header_dest})
+target_include_directories(
+    cscore
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<INSTALL_INTERFACE:${header_dest}>
+    PRIVATE src/main/native/cpp
+)
 
 subdir_list(cscore_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
 foreach(example ${cscore_examples})
@@ -123,8 +137,16 @@ if(WITH_JAVA)
     target_link_libraries(cscorejni PRIVATE cscore_jni_headers)
     add_dependencies(cscorejni cscore_jar)
 
-    install(TARGETS cscorejni EXPORT cscorejni)
-    export(TARGETS cscorejni FILE cscorejni.cmake NAMESPACE cscorejni::)
+    if(BUILD_MAVEN)
+        config_maven_build(cscorejni GROUP edu.wpi.first.cscore ARTIFACT cscore-cpp)
+        install(
+            DIRECTORY $<TARGET_PROPERTY:cscore_jni_headers,NATIVE_HEADERS_DIRECTORY>/
+            DESTINATION cscore-cpp/sources/jni
+        )
+    else()
+        install(TARGETS cscorejni EXPORT cscorejni)
+        export(TARGETS cscorejni FILE cscorejni.cmake NAMESPACE cscorejni::)
+    endif()
 endif()
 
 if(WITH_JAVA_SOURCE)

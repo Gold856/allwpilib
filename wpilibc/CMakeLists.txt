@@ -2,6 +2,9 @@ project(wpilibc)
 
 include(CompileWarnings)
 include(AddTest)
+if(BUILD_MAVEN)
+    include(BuildMaven)
+endif()
 
 configure_file(src/generate/WPILibVersion.cpp.in WPILibVersion.cpp)
 
@@ -14,14 +17,6 @@ file(
 
 add_library(wpilibc ${wpilibc_native_src} ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)
 set_target_properties(wpilibc PROPERTIES DEBUG_POSTFIX "d")
-
-target_include_directories(
-    wpilibc
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/include>
-        $<INSTALL_INTERFACE:${include_dest}/wpilibc>
-)
 wpilib_target_warnings(wpilibc)
 
 if(WITH_CSCORE)
@@ -39,14 +34,32 @@ target_link_libraries(wpilibc PUBLIC hal ntcore wpimath wpiutil)
 
 set_property(TARGET wpilibc PROPERTY FOLDER "libraries")
 
-install(TARGETS wpilibc EXPORT wpilibc)
-export(TARGETS wpilibc FILE wpilibc.cmake NAMESPACE wpilibc::)
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpilibc")
-install(DIRECTORY src/generated/main/native/include/ DESTINATION "${include_dest}/wpilibc")
-
 configure_file(wpilibc-config.cmake.in ${WPILIB_BINARY_DIR}/wpilibc-config.cmake)
-install(FILES ${WPILIB_BINARY_DIR}/wpilibc-config.cmake DESTINATION share/wpilibc)
-install(EXPORT wpilibc DESTINATION share/wpilibc)
+if(BUILD_MAVEN)
+    config_maven_build(
+        wpilibc
+        GROUP edu.wpi.first.wpilibc
+        ARTIFACT wpilibc-cpp
+        CONFIG_FILE wpilibc-config.cmake
+    )
+    set(header_dest wpilibc-cpp/include)
+else()
+    install(TARGETS wpilibc EXPORT wpilibc)
+    export(TARGETS wpilibc FILE wpilibc.cmake NAMESPACE wpilibc::)
+    install(FILES ${WPILIB_BINARY_DIR}/wpilibc-config.cmake DESTINATION share/wpilibc)
+    install(EXPORT wpilibc DESTINATION share/wpilibc)
+    set(header_dest ${include_dest}/wpilibc)
+endif()
+
+install(DIRECTORY src/main/native/include/ DESTINATION ${header_dest})
+install(DIRECTORY src/generated/main/native/include/ DESTINATION ${header_dest})
+target_include_directories(
+    wpilibc
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/include>
+        $<INSTALL_INTERFACE:${header_dest}>
+)
 
 if(WITH_TESTS)
     wpilib_add_test(wpilibc src/test/native/cpp)

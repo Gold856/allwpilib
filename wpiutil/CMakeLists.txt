@@ -5,6 +5,9 @@ include(GenResources)
 include(CompileWarnings)
 include(AddTest)
 include(DownloadAndCheck)
+if(BUILD_MAVEN)
+    include(BuildMaven)
+endif()
 
 file(
     GLOB wpiutil_jni_src
@@ -81,8 +84,16 @@ if(WITH_JAVA)
     target_link_libraries(wpiutiljni PRIVATE wpiutil_jni_headers)
     add_dependencies(wpiutiljni wpiutil_jar)
 
-    install(TARGETS wpiutiljni EXPORT wpiutiljni)
-    export(TARGETS wpiutiljni FILE wpiutiljni.cmake NAMESPACE wpiutiljni::)
+    if(BUILD_MAVEN)
+        config_maven_build(wpiutiljni GROUP edu.wpi.first.wpiutil ARTIFACT wpiutil-cpp)
+        install(
+            DIRECTORY $<TARGET_PROPERTY:wpiutil_jni_headers,NATIVE_HEADERS_DIRECTORY>/
+            DESTINATION wpiutil-cpp/sources/jni
+        )
+    else()
+        install(TARGETS wpiutiljni EXPORT wpiutiljni)
+        export(TARGETS wpiutiljni FILE wpiutiljni.cmake NAMESPACE wpiutiljni::)
+    endif()
 endif()
 
 if(WITH_JAVA_SOURCE)
@@ -128,6 +139,7 @@ file(GLOB_RECURSE wpiutil_windows_src src/main/native/windows/*.cpp)
 
 file(GLOB fmtlib_native_src src/main/native/thirdparty/fmtlib/src/*.cpp)
 file(GLOB_RECURSE memory_native_src src/main/native/thirdparty/memory/src/*.cpp)
+file(GLOB_RECURSE protobuf_native_src src/main/native/thirdparty/protobuf/src/*.cpp)
 
 add_library(wpiutil ${wpiutil_native_src} ${memory_native_src} ${wpiutil_resources_src})
 set_target_properties(wpiutil PROPERTIES DEBUG_POSTFIX "d")
@@ -143,18 +155,47 @@ if(MSVC)
     target_compile_definitions(wpiutil PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
 wpilib_target_warnings(wpiutil)
-target_link_libraries(wpiutil protobuf::libprotobuf Threads::Threads ${CMAKE_DL_LIBS})
+target_link_libraries(wpiutil Threads::Threads ${CMAKE_DL_LIBS})
 
 if(ATOMIC)
     target_link_libraries(wpiutil ${ATOMIC})
 endif()
 
+configure_file(wpiutil-config.cmake.in ${WPILIB_BINARY_DIR}/wpiutil-config.cmake)
+if(BUILD_MAVEN)
+    if(${arch} STREQUAL athena)
+        find_package(NILibraries REQUIRED)
+        target_link_libraries(wpiutil ${NI_LIBRARIES})
+    endif()
+    target_sources(wpiutil PRIVATE ${protobuf_native_src})
+    if(APPLE)
+        target_compile_options(wpiutil PRIVATE -Wno-format-nonliteral)
+    endif()
+    config_maven_build(
+        wpiutil
+        GROUP edu.wpi.first.wpiutil
+        ARTIFACT wpiutil-cpp
+        CONFIG_FILE wpiutil-config.cmake
+    )
+    set(header_dest wpiutil-cpp/include)
+    install(DIRECTORY src/main/native/thirdparty/protobuf/include/ DESTINATION ${header_dest})
+    target_include_directories(
+        wpiutil
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/protobuf/include>
+    )
+else()
+    target_link_libraries(wpiutil protobuf::libprotobuf)
+    install(TARGETS wpiutil EXPORT wpiutil)
+    export(TARGETS wpiutil FILE wpiutil.cmake NAMESPACE wpiutil::)
+    install(FILES ${WPILIB_BINARY_DIR}/wpiutil-config.cmake DESTINATION share/wpiutil)
+    install(EXPORT wpiutil DESTINATION share/wpiutil)
+    set(header_dest ${include_dest}/wpiutil)
+endif()
+
 if(NOT USE_SYSTEM_FMTLIB)
     target_sources(wpiutil PRIVATE ${fmtlib_native_src})
-    install(
-        DIRECTORY src/main/native/thirdparty/fmtlib/include/
-        DESTINATION "${include_dest}/wpiutil"
-    )
+    install(DIRECTORY src/main/native/thirdparty/fmtlib/include/ DESTINATION ${header_dest})
     target_include_directories(
         wpiutil
         PUBLIC
@@ -192,7 +233,7 @@ install(
         src/main/native/thirdparty/memory/include/
         src/main/native/thirdparty/mpack/include/
         src/main/native/thirdparty/sigslot/include/
-    DESTINATION "${include_dest}/wpiutil"
+    DESTINATION ${header_dest}
 )
 target_include_directories(
     wpiutil
@@ -204,15 +245,8 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/memory/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/mpack/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sigslot/include>
-        $<INSTALL_INTERFACE:${include_dest}/wpiutil>
+        $<INSTALL_INTERFACE:${header_dest}>
 )
-
-install(TARGETS wpiutil EXPORT wpiutil)
-export(TARGETS wpiutil FILE wpiutil.cmake NAMESPACE wpiutil::)
-
-configure_file(wpiutil-config.cmake.in ${WPILIB_BINARY_DIR}/wpiutil-config.cmake)
-install(FILES ${WPILIB_BINARY_DIR}/wpiutil-config.cmake DESTINATION share/wpiutil)
-install(EXPORT wpiutil DESTINATION share/wpiutil)
 
 subdir_list(wpiutil_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
 foreach(example ${wpiutil_examples})

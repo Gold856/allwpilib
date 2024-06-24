@@ -4,6 +4,9 @@ include(SubDirList)
 include(GenResources)
 include(CompileWarnings)
 include(AddTest)
+if(BUILD_MAVEN)
+    include(BuildMaven)
+endif()
 
 file(GLOB wpinet_jni_src src/main/native/cpp/jni/WPINetJNI.cpp)
 
@@ -37,8 +40,16 @@ if(WITH_JAVA)
     target_link_libraries(wpinetjni PRIVATE wpinet_jni_headers)
     add_dependencies(wpinetjni wpinet_jar)
 
-    install(TARGETS wpinetjni EXPORT wpinetjni)
-    export(TARGETS wpinetjni FILE wpinetjni.cmake NAMESPACE wpinetjni::)
+    if(BUILD_MAVEN)
+        config_maven_build(wpinetjni GROUP edu.wpi.first.wpinet ARTIFACT wpinet-cpp)
+        install(
+            DIRECTORY $<TARGET_PROPERTY:wpinet_jni_headers,NATIVE_HEADERS_DIRECTORY>/
+            DESTINATION wpinet-cpp/sources/jni
+        )
+    else()
+        install(TARGETS wpinetjni EXPORT wpinetjni)
+        export(TARGETS wpinetjni FILE wpinetjni.cmake NAMESPACE wpinetjni::)
+    endif()
 endif()
 
 if(WITH_JAVA_SOURCE)
@@ -130,12 +141,26 @@ target_compile_features(wpinet PUBLIC cxx_std_20)
 wpilib_target_warnings(wpinet)
 target_link_libraries(wpinet PUBLIC wpiutil)
 
+configure_file(wpinet-config.cmake.in ${WPILIB_BINARY_DIR}/wpinet-config.cmake)
+if(BUILD_MAVEN)
+    config_maven_build(
+        wpinet
+        GROUP edu.wpi.first.wpimath
+        ARTIFACT wpinet-cpp
+        CONFIG_FILE wpinet-config.cmake
+    )
+    set(header_dest wpinet-cpp/include)
+else()
+    install(TARGETS wpinet EXPORT wpinet)
+    export(TARGETS wpinet FILE wpinet.cmake NAMESPACE wpinet::)
+    install(FILES ${WPILIB_BINARY_DIR}/wpinet-config.cmake DESTINATION share/wpinet)
+    install(EXPORT wpinet DESTINATION share/wpinet)
+    set(header_dest ${include_dest}/wpinet)
+endif()
+
 if(NOT USE_SYSTEM_LIBUV)
     target_sources(wpinet PRIVATE ${uv_native_src})
-    install(
-        DIRECTORY src/main/native/thirdparty/libuv/include/
-        DESTINATION "${include_dest}/wpinet"
-    )
+    install(DIRECTORY src/main/native/thirdparty/libuv/include/ DESTINATION ${header_dest})
     target_include_directories(wpinet PRIVATE src/main/native/thirdparty/libuv/src)
     target_include_directories(
         wpinet
@@ -174,22 +199,15 @@ endif()
 
 install(
     DIRECTORY src/main/native/include/ src/main/native/thirdparty/tcpsockets/include/
-    DESTINATION "${include_dest}/wpinet"
+    DESTINATION ${header_dest}
 )
 target_include_directories(
     wpinet
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/tcpsockets/include>
-        $<INSTALL_INTERFACE:${include_dest}/wpinet>
+        $<INSTALL_INTERFACE:${header_dest}>
 )
-
-install(TARGETS wpinet EXPORT wpinet)
-export(TARGETS wpinet FILE wpinet.cmake NAMESPACE wpinet::)
-
-configure_file(wpinet-config.cmake.in ${WPILIB_BINARY_DIR}/wpinet-config.cmake)
-install(FILES ${WPILIB_BINARY_DIR}/wpinet-config.cmake DESTINATION share/wpinet)
-install(EXPORT wpinet DESTINATION share/wpinet)
 
 subdir_list(wpinet_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
 foreach(example ${wpinet_examples})

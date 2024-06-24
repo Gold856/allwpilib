@@ -5,6 +5,9 @@ include(CompileWarnings)
 include(AddTest)
 include(DownloadAndCheck)
 include(WpiProtobuf)
+if(BUILD_MAVEN)
+    include(BuildMaven)
+endif()
 
 # workaround for makefiles - for some reason parent directories aren't created.
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/protobuf")
@@ -94,8 +97,16 @@ if(WITH_JAVA)
     target_link_libraries(wpimathjni PRIVATE wpimath_jni_headers)
     add_dependencies(wpimathjni wpimath_jar)
 
-    install(TARGETS wpimathjni EXPORT wpimathjni)
-    export(TARGETS wpimathjni FILE wpimathjni.cmake NAMESPACE wpimathjni::)
+    if(BUILD_MAVEN)
+        config_maven_build(wpimathjni GROUP edu.wpi.first.wpimath ARTIFACT wpimath-cpp)
+        install(
+            DIRECTORY $<TARGET_PROPERTY:wpimath_jni_headers,NATIVE_HEADERS_DIRECTORY>/
+            DESTINATION wpimath-cpp/sources/jni
+        )
+    else()
+        install(TARGETS wpimathjni EXPORT wpimathjni)
+        export(TARGETS wpimathjni FILE wpimathjni.cmake NAMESPACE wpimathjni::)
+    endif()
 endif()
 
 if(WITH_JAVA_SOURCE)
@@ -170,11 +181,25 @@ endif()
 wpilib_target_warnings(wpimath)
 target_link_libraries(wpimath wpiutil)
 
-if(NOT USE_SYSTEM_EIGEN)
-    install(
-        DIRECTORY src/main/native/thirdparty/eigen/include/
-        DESTINATION "${include_dest}/wpimath"
+configure_file(wpimath-config.cmake.in ${WPILIB_BINARY_DIR}/wpimath-config.cmake)
+if(BUILD_MAVEN)
+    config_maven_build(
+        wpimath
+        GROUP edu.wpi.first.wpimath
+        ARTIFACT wpimath-cpp
+        CONFIG_FILE wpimath-config.cmake
     )
+    set(header_dest wpimath-cpp/include)
+else()
+    install(TARGETS wpimath EXPORT wpimath)
+    export(TARGETS wpimath FILE wpimath.cmake NAMESPACE wpimath::)
+    install(FILES ${WPILIB_BINARY_DIR}/wpimath-config.cmake DESTINATION share/wpimath)
+    install(EXPORT wpimath DESTINATION share/wpimath)
+    set(header_dest ${include_dest}/wpimath)
+endif()
+
+if(NOT USE_SYSTEM_EIGEN)
+    install(DIRECTORY src/main/native/thirdparty/eigen/include/ DESTINATION ${header_dest})
     target_include_directories(
         wpimath
         SYSTEM
@@ -188,7 +213,7 @@ endif()
 
 install(
     DIRECTORY src/main/native/thirdparty/gcem/include/ src/main/native/thirdparty/sleipnir/include/
-    DESTINATION "${include_dest}/wpimath"
+    DESTINATION ${header_dest}
 )
 target_include_directories(
     wpimath
@@ -199,21 +224,14 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sleipnir/src>
 )
 
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpimath")
+install(DIRECTORY src/main/native/include/ DESTINATION ${header_dest})
 target_include_directories(
     wpimath
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/protobuf>
-        $<INSTALL_INTERFACE:${include_dest}/wpimath>
+        $<INSTALL_INTERFACE:${header_dest}>
 )
-
-install(TARGETS wpimath EXPORT wpimath)
-export(TARGETS wpimath FILE wpimath.cmake NAMESPACE wpimath::)
-
-configure_file(wpimath-config.cmake.in ${WPILIB_BINARY_DIR}/wpimath-config.cmake)
-install(FILES ${WPILIB_BINARY_DIR}/wpimath-config.cmake DESTINATION share/wpimath)
-install(EXPORT wpimath DESTINATION share/wpimath)
 
 if(WITH_TESTS)
     wpilib_add_test(wpimath src/test/native/cpp)

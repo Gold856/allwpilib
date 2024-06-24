@@ -1,5 +1,6 @@
 set(GCC_COMPILER_VERSION "" CACHE STRING "GCC Compiler version")
-set(GNU_MACHINE "arm-raspbian10-linux-gnueabi" CACHE STRING "GNU compiler triple")
+set(GNU_MACHINE "armv6-bullseye-linux-gnueabi" CACHE STRING "GNU compiler triple")
+set(ARM_LINUX_SYSROOT /usr/local/arm-linux-gnueabihf/sysroot)
 
 if(COMMAND toolchain_save_config)
   return() # prevent recursive call
@@ -13,7 +14,7 @@ else()
   #message("CMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR}")
 endif()
 
-include("${CMAKE_CURRENT_LIST_DIR}/opencv/platforms/linux/gnu.toolchain.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/gnu.toolchain.cmake")
 
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL arm AND NOT ARM_IGNORE_FP)
   set(FLOAT_ABI_SUFFIX "")
@@ -48,7 +49,7 @@ else()
 endif()
 
 if(NOT DEFINED ARM_LINUX_SYSROOT AND DEFINED GNU_MACHINE)
-  set(ARM_LINUX_SYSROOT /usr/${GNU_MACHINE}${FLOAT_ABI_SUFFIX})
+  set(ARM_LINUX_SYSROOT /usr/local/sys-root)
 endif()
 
 if(NOT DEFINED CMAKE_CXX_FLAGS)

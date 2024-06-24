@@ -87,3 +87,169 @@ jobs:
         working-directory: build-cmake
         # UnitTest_test segfaults on exit occasionally
         run: ctest --output-on-failure -E 'UnitTest'
+
+  build-maven:
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [Debug, RelWithDebInfo]
+        name: [RIO, Linux Arm32, Linux Arm64, Linux x86-64, macOS, Windows x86-64, Windows ARM64]
+        include:
+          - os: ubuntu-22.04
+            name: RIO
+            container: wpilib/roborio-cross-ubuntu:2024-22.04
+            flags: "-DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache --toolchain ./cmake/toolchains/arm-frc-gnueabi.toolchain.cmake -DWITH_TESTS=OFF -DWITH_SIMULATION_MODULES=OFF -DWITH_GUI=OFF -DJAVA_INCLUDE_PATH=/tmp/jni/ -DJAVA_INCLUDE_PATH2=/tmp/jni/ -DJAVA_JVM_LIBRARY=$JAVA_HOME/lib/libjvm.so -DProtobuf_LIBRARIES=/usr/lib/x86_64-linux-gnu -DProtobuf_INCLUDE_DIR=/usr/include -DProtobuf_PROTOC_EXECUTABLE=bin/protoc -DPROTOC_COMPILER=bin/protoc"
+            protoc-archive: protoc-21.12-linux-x86_64.zip
+            install-location: /tmp/install
+          - os: ubuntu-22.04
+            name: Linux Arm32
+            container: wpilib/raspbian-cross-ubuntu:bullseye-22.04
+            flags: "-DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache --toolchain ./cmake/toolchains/arm-pi-gnueabihf.toolchain.cmake -DWITH_TESTS=OFF -DJAVA_INCLUDE_PATH=/tmp/jni/ -DJAVA_INCLUDE_PATH2=/tmp/jni/ -DJAVA_JVM_LIBRARY=$JAVA_HOME/lib/libjvm.so -DProtobuf_LIBRARIES=/usr/lib/x86_64-linux-gnu -DProtobuf_INCLUDE_DIR=/usr/include -DProtobuf_PROTOC_EXECUTABLE=bin/protoc -DPROTOC_COMPILER=bin/protoc"
+            protoc-archive: protoc-21.12-linux-x86_64.zip
+            install-location: /tmp/install
+          - os: ubuntu-22.04
+            name: Linux Arm64
+            container: wpilib/aarch64-cross-ubuntu:bullseye-22.04
+            flags: "-DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache --toolchain ./cmake/toolchains/aarch64-bullseye-gnu.toolchain.cmake -DWITH_TESTS=OFF -DJAVA_INCLUDE_PATH=/tmp/jni/ -DJAVA_INCLUDE_PATH2=/tmp/jni/ -DJAVA_JVM_LIBRARY=$JAVA_HOME/lib/libjvm.so -DProtobuf_LIBRARIES=/usr/lib/x86_64-linux-gnu -DProtobuf_INCLUDE_DIR=/usr/include -DProtobuf_PROTOC_EXECUTABLE=bin/protoc -DPROTOC_COMPILER=bin/protoc"
+            protoc-archive: protoc-21.12-linux-x86_64.zip
+            install-location: /tmp/install
+          - os: ubuntu-22.04
+            name: Linux x86-64
+            container: wpilib/ubuntu-base:22.04
+            flags: "-DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache -DJAVA_JVM_LIBRARY=$JAVA_HOME/lib/libjvm.so -DProtobuf_LIBRARIES=/usr/lib/x86_64-linux-gnu -DProtobuf_INCLUDE_DIR=/usr/include -DProtobuf_PROTOC_EXECUTABLE=bin/protoc -DPROTOC_COMPILER=bin/protoc"
+            protoc-archive: protoc-21.12-linux-x86_64.zip
+            install-location: /tmp/install
+          - os: macOS-14
+            name: macOS
+            container: ""
+            env: "PATH=\"/opt/homebrew/opt/protobuf@3/bin:$PATH\""
+            flags: "-DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache '-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64' -DWITH_EXAMPLES=ON -DCMAKE_LIBRARY_PATH=/opt/homebrew/opt/protobuf@3/lib -DProtobuf_INCLUDE_DIR=/opt/homebrew/opt/protobuf@3/include -DProtobuf_PROTOC_EXECUTABLE=bin/protoc -DPROTOC_COMPILER=bin/protoc"
+            protoc-archive: protoc-21.12-osx-universal_binary.zip
+            install-location: /tmp/install
+          - os: windows-2022
+            name: Windows x86-64
+            container: ""
+            msvc: amd64
+            flags: "-DWITH_EXAMPLES=ON -DProtobuf_INCLUDE_DIR=wpiutil/src/main/native/thirdparty/protobuf/include '-DProtobuf_PROTOC_EXECUTABLE=bin/protoc.exe' '-DPROTOC_COMPILER=bin/protoc.exe'"
+            protoc-archive: protoc-21.12-win64.zip
+            install-location: D:/install
+          - os: windows-2022
+            name: Windows ARM64
+            container: ""
+            msvc: amd64_arm64
+            flags: "-DWITH_EXAMPLES=ON -DWITH_TESTS=OFF -DProtobuf_INCLUDE_DIR=wpiutil/src/main/native/thirdparty/protobuf/include '-DProtobuf_PROTOC_EXECUTABLE=bin/protoc.exe' '-DPROTOC_COMPILER=bin/protoc.exe'"
+            protoc-archive: protoc-21.12-win64.zip
+            install-location: D:/install
+
+    name: "Build Maven - ${{ matrix.name }} ${{ matrix.config }}"
+    runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
+    steps:
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libprotobuf-dev ninja-build
+
+      - name: Install dependencies (macOS)
+        run: brew install protobuf@3 ninja
+        if: runner.os == 'macOS'
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - uses: ilammy/msvc-dev-cmd@v1.13.0
+        with:
+          arch: ${{ matrix.msvc }}
+        if: runner.os == 'Windows'
+
+      - name: Download JNI headers (Linux)
+        if: runner.os == 'Linux' && matrix.name != 'Linux x86-64'
+        run: |
+          mkdir /tmp/jni/
+          wget https://raw.githubusercontent.com/openjdk/jdk21/master/src/java.base/unix/native/include/jni_md.h -O /tmp/jni/jni_md.h
+          wget https://raw.githubusercontent.com/openjdk/jdk21/master/src/java.base/share/native/include/jni.h -O /tmp/jni/jni.h
+
+      - name: Install CMake
+        if: runner.os == 'Windows'
+        uses: lukka/get-cmake@v3.29.3
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@v0.0.5
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Add workspace as safe directory (Container)
+        if: matrix.container != ''
+        run: git config --global --add safe.directory /__w/allwpilib/allwpilib
+
+      - name: Download protoc
+        run: curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v21.12/${{ matrix.protoc-archive }}
+
+      - name: Unpack protoc
+        if: runner.os != 'Windows'
+        run: unzip ${{ matrix.protoc-archive }}
+
+      - name: Unpack protoc (Windows)
+        if: runner.os == 'Windows'
+        run: tar -xf ${{ matrix.protoc-archive }}
+
+      - name: configure
+        run: cmake -S . -B build -G Ninja -DBUILD_MAVEN=ON -DCMAKE_INSTALL_PREFIX=${{ matrix.install-location }} -DCMAKE_BUILD_TYPE=${{ matrix.config }} ${{ matrix.flags }}
+
+      - name: build
+        working-directory: build
+        run: cmake --build . --parallel $(nproc) --target install
+        env:
+          SCCACHE_WEBDAV_ENDPOINT: https://frcmaven.wpi.edu/artifactory/wpilib-generic-gradle-cache-local
+          SCCACHE_WEBDAV_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+
+      - name: test
+        if: runner.os != 'Windows'
+        working-directory: build
+        run: ctest --output-on-failure
+
+      - name: test (Windows)
+        if: runner.os == 'Windows'
+        working-directory: build
+        # UnitTest_test segfaults on exit occasionally
+        run: ctest --output-on-failure -E 'UnitTest'
+
+      - name: Import Developer ID Certificate
+        uses: wpilibsuite/import-signing-certificate@v2
+        with:
+          certificate-data: ${{ secrets.APPLE_CERTIFICATE_DATA }}
+          certificate-passphrase: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          keychain-password: ${{ secrets.APPLE_KEYCHAIN_PASSWORD }}
+        if: |
+          matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' &&
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
+      - name: Set Keychain Lock Timeout
+        run: security set-keychain-settings -lut 3600
+        if: |
+          matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' &&
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
+
+      - name: Sign macOS apps
+        run: python library_packager.py --install_directory ${{ matrix.install-location }} sign --developer_id ${{ secrets.APPLE_DEVELOPER_ID }}
+        if: |
+          matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' &&
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
+
+      - name: Package artifacts
+        run: python library_packager.py --install_directory ${{ matrix.install-location }} package
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }} ${{ matrix.config }}
+          path: ${{ matrix.install-location }}/*.zip

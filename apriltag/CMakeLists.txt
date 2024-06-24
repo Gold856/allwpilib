@@ -2,6 +2,9 @@ project(apriltag)
 
 include(CompileWarnings)
 include(GenResources)
+if(BUILD_MAVEN)
+    include(BuildMaven)
+endif()
 
 file(
     GLOB_RECURSE apriltaglib_src
@@ -88,8 +91,16 @@ if(WITH_JAVA)
     target_link_libraries(apriltagjni PRIVATE apriltag_jni_headers)
     add_dependencies(apriltagjni apriltag_jar)
 
-    install(TARGETS apriltagjni EXPORT apriltagjni)
-    export(TARGETS apriltagjni FILE apriltagjni.cmake NAMESPACE apriltagjni::)
+    if(BUILD_MAVEN)
+        config_maven_build(apriltagjni GROUP edu.wpi.first.apriltag ARTIFACT apriltag-cpp)
+        install(
+            DIRECTORY $<TARGET_PROPERTY:apriltag_jni_headers,NATIVE_HEADERS_DIRECTORY>/
+            DESTINATION apriltag-cpp/sources/jni
+        )
+    else()
+        install(TARGETS apriltagjni EXPORT apriltagjni)
+        export(TARGETS apriltagjni FILE apriltagjni.cmake NAMESPACE apriltagjni::)
+    endif()
 endif()
 
 if(WITH_JAVA_SOURCE)
@@ -125,17 +136,34 @@ wpilib_target_warnings(apriltag)
 
 target_link_libraries(apriltag wpimath)
 
+configure_file(apriltag-config.cmake.in ${WPILIB_BINARY_DIR}/apriltag-config.cmake)
+if(BUILD_MAVEN)
+    config_maven_build(
+        apriltag
+        GROUP edu.wpi.first.apriltag
+        ARTIFACT apriltag-cpp
+        CONFIG_FILE apriltag-config.cmake
+    )
+    set(header_dest apriltag-cpp/include)
+else()
+    install(TARGETS apriltag EXPORT apriltag)
+    export(TARGETS apriltag FILE apriltag.cmake NAMESPACE apriltag::)
+    install(FILES ${WPILIB_BINARY_DIR}/apriltag-config.cmake DESTINATION share/apriltag)
+    install(EXPORT apriltag DESTINATION share/apriltag)
+    set(header_dest ${include_dest}/apriltag)
+endif()
+
+install(
+    DIRECTORY src/main/native/include/ src/main/native/thirdparty/apriltag/include/
+    DESTINATION ${header_dest}
+)
 target_include_directories(
     apriltag
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
-        $<INSTALL_INTERFACE:${include_dest}/apriltag>
+        $<INSTALL_INTERFACE:${header_dest}>
 )
 
-install(
-    DIRECTORY src/main/native/include/ src/main/native/thirdparty/apriltag/include/
-    DESTINATION "${include_dest}/apriltag"
-)
 target_include_directories(
     apriltag
     SYSTEM
@@ -143,13 +171,6 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/include/common>
 )
-
-install(TARGETS apriltag EXPORT apriltag)
-export(TARGETS apriltag FILE apriltag.cmake NAMESPACE apriltag::)
-
-configure_file(apriltag-config.cmake.in ${WPILIB_BINARY_DIR}/apriltag-config.cmake)
-install(FILES ${WPILIB_BINARY_DIR}/apriltag-config.cmake DESTINATION share/apriltag)
-install(EXPORT apriltag DESTINATION share/apriltag)
 
 if(WITH_TESTS)
     wpilib_add_test(apriltag src/test/native/cpp)
