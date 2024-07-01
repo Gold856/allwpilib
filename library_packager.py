@@ -21,8 +21,7 @@ def main(argv):
     version = out.stdout[1:].strip()
     directories = glob.glob("*", root_dir=args.install_directory)
     for dir in directories:
-        # TODO: Remove
-        if dir == "include" or dir == "java" or dir == "jni" or dir == "share":
+        if dir in ["include", "java", "jni", "share"]:
             continue
         os.chdir(args.install_directory / dir)
         files = glob.glob("**", recursive=True)
