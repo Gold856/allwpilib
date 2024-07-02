@@ -22,7 +22,7 @@ def main(argv):
 
     directories = glob.glob("*", root_dir=install_dir)
     for dir in directories:
-        if dir in ["include", "java", "jni", "share"]:
+        if dir in ["include", "java", "share", "sources"]:
             continue
         os.chdir(install_dir / dir)
         files = glob.glob("**", recursive=True)
@@ -51,17 +51,26 @@ def main(argv):
             archive.write(dirname / "ThirdPartyNotices.txt", "ThirdPartyNotices.txt")
             archive.write(dirname / "LICENSE.md", "LICENSE.md")
 
-    os.chdir(install_dir / "include")
-    header_directories = glob.glob("*", root_dir=install_dir / "include")
-    for header_dir in header_directories:
-        library_header_dir = install_dir / "include" / header_dir
-        os.chdir(library_header_dir)
+    create_archive(dirname, install_dir, version, "include", "headers")
+    create_archive(dirname, install_dir, version, "sources", "sources")
 
-        headers = glob.glob("**", recursive=True, root_dir=library_header_dir)
-        artifact_name = f"{header_dir}-cpp-{version}-headers"
+
+def create_archive(
+    dirname: Path, install_dir: Path, version: str, directory: str, classifier: str
+):
+    os.chdir(install_dir / directory)
+    directories = glob.glob("*", root_dir=install_dir / directory)
+    for dir in directories:
+        library_dir = install_dir / directory / dir
+        os.chdir(library_dir)
+
+        headers = glob.glob("**", recursive=True)
+        artifact_name = f"{dir}-cpp-{version}-{classifier}"
         with zipfile.ZipFile(install_dir / f"{artifact_name}.zip", "w") as archive:
             for header in headers:
                 archive.write(header)
+            archive.write(dirname / "ThirdPartyNotices.txt", "ThirdPartyNotices.txt")
+            archive.write(dirname / "LICENSE.md", "LICENSE.md")
 
 
 if __name__ == "__main__":
