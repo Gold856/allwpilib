@@ -40,22 +40,3 @@ macro(config_maven_build target)
         install(EXPORT ${target} DESTINATION ${PROJECT_NAME})
     endif()
 endmacro()
-macro(create_maven_archive)
-    cmake_parse_arguments(artifact "" "" "FILES" ${ARGN})
-    get_target_property(library_type ${target} TYPE)
-    if(NOT library_type STREQUAL SHARED_LIBRARY)
-        set(static static)
-    endif()
-    file(MAKE_DIRECTORY ${WPILIB_BINARY_DIR}/maven)
-    file(
-        ARCHIVE_CREATE
-        OUTPUT
-            $<INSTALL_PREFIX>/maven/${PROJECT_NAME}-cpp-2024.5.0-${platform}${arch}${static}$<$<STREQUAL:CONFIG,Debug>:debug>.zip
-        PATHS
-            $<INSTALL_PREFIX>/${PROJECT_NAME}/${platform}
-            $<INSTALL_PREFIX>/LICENSE.md
-            $<INSTALL_PREFIX>/ThirdPartyNotices.txt
-            ${artifact_FILES}
-        FORMAT zip
-    )
-endmacro()
