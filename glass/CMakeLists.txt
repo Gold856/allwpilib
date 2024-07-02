@@ -25,9 +25,13 @@ target_include_directories(
         $<INSTALL_INTERFACE:${include_dest}/glass>
 )
 
-install(TARGETS libglass EXPORT libglass)
-export(TARGETS libglass FILE libglass.cmake NAMESPACE libglass::)
-install(DIRECTORY src/lib/native/include/ DESTINATION "${include_dest}/glass")
+if(BUILD_MAVEN)
+    config_maven_build(libglass)
+else()
+    install(TARGETS libglass EXPORT libglass)
+    export(TARGETS libglass FILE libglass.cmake NAMESPACE libglass::)
+    install(DIRECTORY src/lib/native/include/ DESTINATION "${include_dest}/glass")
+endif()
 
 #
 # libglassnt
@@ -50,9 +54,13 @@ target_include_directories(
         $<INSTALL_INTERFACE:${include_dest}/glass>
 )
 
-install(TARGETS libglassnt EXPORT libglassnt)
-export(TARGETS libglassnt FILE libglassnt.cmake NAMESPACE libglassnt::)
-install(DIRECTORY src/libnt/native/include/ DESTINATION "${include_dest}/glass")
+if(BUILD_MAVEN)
+    config_maven_build(libglassnt)
+else()
+    install(TARGETS libglassnt EXPORT libglassnt)
+    export(TARGETS libglassnt FILE libglassnt.cmake NAMESPACE libglassnt::)
+    install(DIRECTORY src/libnt/native/include/ DESTINATION "${include_dest}/glass")
+endif()
 
 #
 # glass application
