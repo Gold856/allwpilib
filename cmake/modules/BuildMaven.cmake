@@ -31,12 +31,24 @@ macro(config_maven_build target)
         set(lib_type static)
     endif()
     set(library_dest ${PROJECT_NAME}/${platform}/${arch}/${lib_type})
+
     install(TARGETS ${target} EXPORT ${target} DESTINATION ${library_dest})
     if(artifact_CONFIG_FILE)
-        install(
-            FILES ${WPILIB_BINARY_DIR}/${artifact_CONFIG_FILE}
-            DESTINATION ${PROJECT_NAME}
-        )
+        install(FILES ${WPILIB_BINARY_DIR}/${artifact_CONFIG_FILE} DESTINATION ${PROJECT_NAME})
         install(EXPORT ${target} DESTINATION ${PROJECT_NAME})
+    endif()
+
+    get_target_property(sources ${target} SOURCES)
+    install(DIRECTORY src/main/native/cpp/ DESTINATION sources/${PROJECT_NAME})
+
+    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/cpp/)
+        install(DIRECTORY src/generated/main/native/cpp/ DESTINATION sources/${PROJECT_NAME})
+    endif()
+
+    if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/generated/main/cpp/)
+        install(
+            DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated/main/cpp/
+            DESTINATION sources/${PROJECT_NAME}
+        )
     endif()
 endmacro()
