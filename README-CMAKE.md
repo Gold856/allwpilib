@@ -45,6 +45,8 @@ The following build options are available:
 
 * `BUILD_SHARED_LIBS` (ON Default)
   * This option will cause CMake to build static libraries instead of shared libraries. If this is off, `WITH_JAVA` must be off. Otherwise CMake will error.
+* `BUILD_MAVEN` (OFF Default)
+  * This option will build wpilib with maven artifacts.
 * `WITH_CSCORE` (ON Default)
   * This option will cause cscore to be built. Turning this off will implicitly disable cameraserver. If this is off, the OpenCV build requirement is removed.
 * `WITH_EXAMPLES` (OFF Default)
