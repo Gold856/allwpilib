@@ -86,6 +86,10 @@ if(WITH_JAVA)
 
     if(BUILD_MAVEN)
         config_maven_build(wpiutiljni)
+        install(
+            DIRECTORY $<TARGET_PROPERTY:wpiutil_jni_headers,NATIVE_HEADERS_DIRECTORY>
+            DESTINATION sources/wpiutil/jni
+        )
     else()
         install(TARGETS wpiutiljni EXPORT wpiutiljni)
         export(TARGETS wpiutiljni FILE wpiutiljni.cmake NAMESPACE wpiutiljni::)
@@ -167,7 +171,6 @@ if(BUILD_MAVEN)
         wpiutil
         PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/protobuf/include>
-            $<INSTALL_INTERFACE:${include_dest}/wpiutil>
     )
 else()
     target_link_libraries(wpiutil protobuf::libprotobuf)
