@@ -111,7 +111,11 @@ jobs:
     steps:
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libopencv-dev libopencv4.5-java libprotobuf-dev protobuf-compiler ninja-build
+        run: sudo apt-get update && sudo apt-get install -y libprotobuf-dev ninja-build
+
+      - name: Setup protoc (Linux)
+        if: runner.os == 'Linux'
+        run: wget https://github.com/protocolbuffers/protobuf/releases/download/v21.12/protoc-21.12-linux-x86_64.zip && unzip protoc-21.12-linux-x86_64.zip && export PATH=$PATH:$(pwd)/bin
 
       - name: Install dependencies (macOS)
         run: brew install opencv protobuf@3 ninja
