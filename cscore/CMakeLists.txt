@@ -131,6 +131,10 @@ if(WITH_JAVA)
 
     if(BUILD_MAVEN)
         config_maven_build(cscorejni)
+        install(
+            DIRECTORY $<TARGET_PROPERTY:cscore_jni_headers,NATIVE_HEADERS_DIRECTORY>
+            DESTINATION sources/cscore/jni
+        )
     else()
         install(TARGETS cscorejni EXPORT cscorejni)
         export(TARGETS cscorejni FILE cscorejni.cmake NAMESPACE cscorejni::)

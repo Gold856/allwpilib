@@ -42,6 +42,10 @@ if(WITH_JAVA)
 
     if(BUILD_MAVEN)
         config_maven_build(wpinetjni)
+        install(
+            DIRECTORY $<TARGET_PROPERTY:wpinet_jni_headers,NATIVE_HEADERS_DIRECTORY>
+            DESTINATION sources/wpinet/jni
+        )
     else()
         install(TARGETS wpinetjni EXPORT wpinetjni)
         export(TARGETS wpinetjni FILE wpinetjni.cmake NAMESPACE wpinetjni::)

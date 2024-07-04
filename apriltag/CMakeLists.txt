@@ -93,6 +93,10 @@ if(WITH_JAVA)
 
     if(BUILD_MAVEN)
         config_maven_build(apriltagjni)
+        install(
+            DIRECTORY $<TARGET_PROPERTY:apriltag_jni_headers,NATIVE_HEADERS_DIRECTORY>
+            DESTINATION sources/apriltag/jni
+        )
     else()
         install(TARGETS apriltagjni EXPORT apriltagjni)
         export(TARGETS apriltagjni FILE apriltagjni.cmake NAMESPACE apriltagjni::)

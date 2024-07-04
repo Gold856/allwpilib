@@ -82,6 +82,10 @@ if(WITH_JAVA)
 
     if(BUILD_MAVEN)
         config_maven_build(haljni)
+        install(
+            DIRECTORY $<TARGET_PROPERTY:hal_jni_headers,NATIVE_HEADERS_DIRECTORY>
+            DESTINATION sources/hal/jni
+        )
     else()
         install(TARGETS haljni EXPORT haljni)
         export(TARGETS haljni FILE haljni.cmake NAMESPACE haljni::)
