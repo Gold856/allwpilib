@@ -98,7 +98,7 @@ jobs:
           - os: ubuntu-22.04
             name: Linux
             container: wpilib/roborio-cross-ubuntu:2024-22.04
-            flags: "-DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON -DBUILD_MAVEN=ON -DCMAKE_INSTALL_PREFIX=~/wpilib -DWITH_GUI=OFF"
+            flags: "-DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON -DBUILD_MAVEN=ON -DCMAKE_INSTALL_PREFIX=~/wpilib -DWITH_GUI=OFF -DJAVA_INCLUDE_PATH=$JAVA_HOME/include -DJAVA_INCLUDE_PATH2=$JAVA_HOME/include -DJAVA_JVM_LIBRARY=$JAVA_HOME/lib/libjvm.so"
           - os: macOS-14
             name: macOS
             container: ""
