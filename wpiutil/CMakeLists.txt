@@ -135,6 +135,7 @@ file(GLOB_RECURSE wpiutil_windows_src src/main/native/windows/*.cpp)
 
 file(GLOB fmtlib_native_src src/main/native/thirdparty/fmtlib/src/*.cpp)
 file(GLOB_RECURSE memory_native_src src/main/native/thirdparty/memory/src/*.cpp)
+file(GLOB_RECURSE protobuf_native_src src/main/native/thirdparty/protobuf/src/*.cpp)
 
 add_library(wpiutil ${wpiutil_native_src} ${memory_native_src} ${wpiutil_resources_src})
 set_target_properties(wpiutil PROPERTIES DEBUG_POSTFIX "d")
@@ -150,10 +151,26 @@ if(MSVC)
     target_compile_definitions(wpiutil PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
 wpilib_target_warnings(wpiutil)
-target_link_libraries(wpiutil protobuf::libprotobuf Threads::Threads ${CMAKE_DL_LIBS})
+target_link_libraries(wpiutil Threads::Threads ${CMAKE_DL_LIBS})
 
 if(ATOMIC)
     target_link_libraries(wpiutil ${ATOMIC})
+endif()
+
+if(BUILD_MAVEN)
+    target_sources(wpiutil PRIVATE ${protobuf_native_src})
+    install(
+        DIRECTORY src/main/native/thirdparty/protobuf/include/
+        DESTINATION "${include_dest}/wpiutil"
+    )
+    target_include_directories(
+        wpiutil
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/protobuf/include>
+            $<INSTALL_INTERFACE:${include_dest}/wpiutil>
+    )
+else()
+    target_link_libraries(wpiutil protobuf::libprotobuf)
 endif()
 
 if(NOT USE_SYSTEM_FMTLIB)
