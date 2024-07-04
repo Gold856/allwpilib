@@ -98,7 +98,7 @@ jobs:
           - os: ubuntu-22.04
             name: Linux
             container: wpilib/roborio-cross-ubuntu:2024-22.04
-            flags: "-DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON -DBUILD_MAVEN=ON -DCMAKE_INSTALL_PREFIX=~/wpilib"
+            flags: "-DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=ON -DBUILD_MAVEN=ON -DCMAKE_INSTALL_PREFIX=~/wpilib -DWITH_GUI=OFF"
           - os: macOS-14
             name: macOS
             container: ""
@@ -122,8 +122,14 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - name: configure
+      - name: configure (macOS)
         run: cmake -S . -B build -G "Ninja" -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache ${{ matrix.flags }}
+        env:
+          SCCACHE_GHA_ENABLED: "true"
+        if: runner.os == 'macOS'
+
+      - name: configure (RIO)
+        run: cmake --toolchain ./cmake/toolchains/arm-frc-gnueabi.toolchain.cmake -S . -B build -G "Ninja" -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache ${{ matrix.flags }}
         env:
           SCCACHE_GHA_ENABLED: "true"
 
