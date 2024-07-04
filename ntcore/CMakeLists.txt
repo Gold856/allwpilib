@@ -78,6 +78,10 @@ if(WITH_JAVA)
 
     if(BUILD_MAVEN)
         config_maven_build(ntcorejni)
+        install(
+            DIRECTORY $<TARGET_PROPERTY:ntcore_jni_headers,NATIVE_HEADERS_DIRECTORY>
+            DESTINATION sources/ntcore/jni
+        )
     else()
         install(TARGETS ntcorejni EXPORT ntcorejni)
         export(TARGETS ntcorejni FILE ntcorejni.cmake NAMESPACE ntcorejni::)
