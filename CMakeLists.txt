@@ -134,25 +134,31 @@ set(CMAKE_FIND_PACKAGE_PREFER_CONFIG OFF)
 get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 
 if(isMultiConfig)
-    if(NOT "Asan" IN_LIST CMAKE_CONFIGURATION_TYPES)
-        list(APPEND CMAKE_CONFIGURATION_TYPES Asan)
-    endif()
-    if(NOT "Tsan" IN_LIST CMAKE_CONFIGURATION_TYPES)
-        list(APPEND CMAKE_CONFIGURATION_TYPES Tsan)
-    endif()
-    if(NOT "Ubsan" IN_LIST CMAKE_CONFIGURATION_TYPES)
-        list(APPEND CMAKE_CONFIGURATION_TYPES Ubsan)
+    if(BUILD_MAVEN)
+        list(REMOVE_ITEM CMAKE_CONFIGURATION_TYPES MinSizeRel)
+    else()
+        if(NOT "Asan" IN_LIST CMAKE_CONFIGURATION_TYPES)
+            list(APPEND CMAKE_CONFIGURATION_TYPES Asan)
+        endif()
+        if(NOT "Tsan" IN_LIST CMAKE_CONFIGURATION_TYPES)
+            list(APPEND CMAKE_CONFIGURATION_TYPES Tsan)
+        endif()
+        if(NOT "Ubsan" IN_LIST CMAKE_CONFIGURATION_TYPES)
+            list(APPEND CMAKE_CONFIGURATION_TYPES Ubsan)
+        endif()
     endif()
 else()
-    set(allowedBuildTypes
+    set(allowedBuildTypes Debug RelWithDebInfo)
+    set(cmake_only_build_types
         Asan
         Tsan
         Ubsan
-        Debug
         Release
-        RelWithDebInfo
         MinSizeRel
     )
+    if(NOT BUILD_MAVEN)
+        set(allowedBuildTypes ${allowedBuildTypes} ${cmake_only_build_types})
+    endif()
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "${allowedBuildTypes}")
 
     if(CMAKE_BUILD_TYPE AND NOT CMAKE_BUILD_TYPE IN_LIST allowedBuildTypes)
