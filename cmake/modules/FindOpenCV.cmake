@@ -6,10 +6,10 @@ elseif(BUILD_MAVEN)
         https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/thirdparty/frc2024/opencv/opencv-cpp/4.8.0-4
     )
     set(base_artifact_name opencv-cpp-4.8.0-4)
-    set(library_artifact opencv-cpp-4.8.0-4--${platform}${arch})
-    set(headers_artifact ${library_artifact}-headers)
+    set(library_artifact ${base_artifact_name}-${platform}${arch})
+    set(headers_artifact ${base_artifact_name}-headers)
     set(dest ${WPILIB_BINARY_DIR}/opencv)
-
+    message(STATUS "Downloading and unpacking OpenCV artifacts.")
     if(NOT EXISTS ${dest}/${library_artifact}.zip)
         download_and_check(${base_url}/${library_artifact}.zip ${dest}/${library_artifact}.zip)
     endif()
@@ -17,13 +17,16 @@ elseif(BUILD_MAVEN)
         download_and_check(${base_url}/${headers_artifact}.zip ${dest}/${headers_artifact}.zip)
     endif()
     if(NOT EXISTS ${dest}/${library_artifact}debug.zip)
-        download_and_check( ${base_url}/${library_artifact}debug.zip ${dest}/${library_artifact}debug.zip
+        download_and_check(
+            ${base_url}/${library_artifact}debug.zip
+            ${dest}/${library_artifact}debug.zip
         )
     endif()
 
     file(ARCHIVE_EXTRACT INPUT ${dest}/${library_artifact}.zip DESTINATION ${dest}/release)
     file(ARCHIVE_EXTRACT INPUT ${dest}/${library_artifact}debug.zip DESTINATION ${dest}/debug)
     file(ARCHIVE_EXTRACT INPUT ${dest}/${headers_artifact}.zip DESTINATION ${dest}/include)
+    message(STATUS "Done.")
     set(libs
         aruco
         calib3d
