@@ -2,7 +2,7 @@ include(PlatformVars)
 include(DownloadAndCheck)
 set(base_url https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/ni-libraries)
 set(version 2024.2.1)
-set(libs chipobject netcomm visa)
+set(libs chipobject netcomm runtime visa)
 set(dest ${WPILIB_BINARY_DIR}/ni-libraries)
 message(STATUS "Downloading and unpacking NI libraries.")
 foreach(lib ${libs})
@@ -16,27 +16,34 @@ foreach(lib ${libs})
                 ${dest}/${library_artifact}.zip
             )
         endif()
-        if(NOT EXISTS ${dest}/${headers_artifact}.zip)
+        if(NOT EXISTS ${dest}/${headers_artifact}.zip AND (NOT ${lib} STREQUAL runtime))
             download_and_check(
                 ${base_url}/${lib}/${version}/${headers_artifact}.zip
                 ${dest}/${headers_artifact}.zip
             )
         endif()
         file(ARCHIVE_EXTRACT INPUT ${dest}/${library_artifact}.zip DESTINATION ${dest}/${lib})
-        file(
-            ARCHIVE_EXTRACT
-            INPUT ${dest}/${headers_artifact}.zip
-            DESTINATION ${dest}/${lib}/include
-        )
+        if(NOT ${lib} STREQUAL runtime)
+            file(
+                ARCHIVE_EXTRACT
+                INPUT ${dest}/${headers_artifact}.zip
+                DESTINATION ${dest}/${lib}/include
+            )
+        endif()
     endif()
-    file(GLOB ni_lib ${dest}/${lib}/linux/athena/shared/*)
-    add_library(${lib} SHARED IMPORTED)
-    target_include_directories(${lib} INTERFACE ${dest}/${lib}/include)
-    set_target_properties(
-        ${lib}
-        PROPERTIES IMPORTED_LOCATION_DEBUG ${ni_lib} IMPORTED_LOCATION_RELWITHDEBINFO ${ni_lib}
-    )
-    list(APPEND NI_LIBRARIES ${lib})
+    file(GLOB ni_libs ${dest}/${lib}/linux/athena/shared/*)
+    foreach(ni_lib ${ni_libs})
+        cmake_path(GET ni_lib STEM lib_name)
+        add_library(${lib_name} SHARED IMPORTED)
+        if(NOT ${lib} STREQUAL runtime)
+            target_include_directories(${lib_name} INTERFACE ${dest}/${lib}/include)
+        endif()
+        set_target_properties(
+            ${lib_name}
+            PROPERTIES IMPORTED_LOCATION_DEBUG ${ni_lib} IMPORTED_LOCATION_RELWITHDEBINFO ${ni_lib}
+        )
+        list(APPEND NI_LIBRARIES ${lib_name})
+    endforeach()
 endforeach()
 message(STATUS "Done.")
 set(NILibraries_FOUND true PARENT_SCOPE)
