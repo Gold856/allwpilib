@@ -125,9 +125,13 @@ endif()
 
 find_package(LIBSSH 0.7.1)
 
-set(CMAKE_FIND_PACKAGE_PREFER_CONFIG NOT ${BUILD_MAVEN})
+set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
 set(protobuf_MODULE_COMPATIBLE ON CACHE BOOL "" FORCE)
-find_package(Protobuf REQUIRED)
+if(BUILD_MAVEN)
+    find_package(Protobuf MODULE REQUIRED)
+else()
+    find_package(Protobuf REQUIRED)
+endif()
 find_program(PROTOC_COMPILER protoc REQUIRED)
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG OFF)
 
