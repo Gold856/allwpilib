@@ -98,7 +98,7 @@ jobs:
           - os: ubuntu-22.04
             name: Linux
             container: wpilib/roborio-cross-ubuntu:2024-22.04
-            flags: "-DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_EXAMPLES=ON -DBUILD_MAVEN=ON -DCMAKE_INSTALL_PREFIX=~/wpilib -DWITH_GUI=OFF -DJAVA_INCLUDE_PATH=$JAVA_HOME/include -DJAVA_INCLUDE_PATH2=$JAVA_HOME/include -DJAVA_JVM_LIBRARY=$JAVA_HOME/lib/libjvm.so -DProtobuf_LIBRARIES=/usr/lib/x86_64-linux-gnu -DProtobuf_INCLUDE_DIR=/usr/include"
+            flags: "-DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_EXAMPLES=ON -DBUILD_MAVEN=ON -DCMAKE_INSTALL_PREFIX=~/wpilib -DWITH_GUI=OFF -DJAVA_INCLUDE_PATH=/tmp/jni/ -DJAVA_INCLUDE_PATH2=/tmp/jni/ -DJAVA_JVM_LIBRARY=$JAVA_HOME/lib/libjvm.so -DProtobuf_LIBRARIES=/usr/lib/x86_64-linux-gnu -DProtobuf_INCLUDE_DIR=/usr/include"
           - os: macOS-14
             name: macOS
             container: ""
@@ -115,7 +115,17 @@ jobs:
 
       - name: Setup protoc (Linux)
         if: runner.os == 'Linux'
-        run: wget https://github.com/protocolbuffers/protobuf/releases/download/v21.12/protoc-21.12-linux-x86_64.zip && unzip protoc-21.12-linux-x86_64.zip && sudo mv ./bin/protoc /usr/bin
+        run: |
+          wget https://github.com/protocolbuffers/protobuf/releases/download/v21.12/protoc-21.12-linux-x86_64.zip
+          unzip protoc-21.12-linux-x86_64.zip
+          sudo mv ./bin/protoc /usr/bin
+
+      - name: Download JNI headers (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          mkdir /tmp/jni/
+          wget https://raw.githubusercontent.com/openjdk/jdk21/master/src/java.base/unix/native/include/jni_md.h -O /tmp/jni/jni_md.h
+          wget https://raw.githubusercontent.com/openjdk/jdk21/master/src/java.base/share/native/include/jni.h -O /tmp/jni/jni.h
 
       - name: Install dependencies (macOS)
         run: brew install opencv protobuf@3 ninja
