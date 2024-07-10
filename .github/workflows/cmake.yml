@@ -103,7 +103,7 @@ jobs:
             name: macOS
             container: ""
             env: "PATH=\"/opt/homebrew/opt/protobuf@3/bin:$PATH\""
-            flags: "-DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_JAVA=OFF -DWITH_EXAMPLES=ON -DBUILD_MAVEN=ON -DCMAKE_INSTALL_PREFIX=~/wpilib -DCMAKE_LIBRARY_PATH=/opt/homebrew/opt/protobuf@3/lib -DProtobuf_INCLUDE_DIR=/opt/homebrew/opt/protobuf@3/include -DPROTOC_COMPILER=$(pwd)/bin/protoc"
+            flags: "-DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_JAVA=OFF -DWITH_EXAMPLES=ON -DBUILD_MAVEN=ON -DCMAKE_INSTALL_PREFIX=~/wpilib -DCMAKE_LIBRARY_PATH=/opt/homebrew/opt/protobuf@3/lib -DProtobuf_INCLUDE_DIR=/opt/homebrew/opt/protobuf@3/include -DProtobuf_PROTOC_EXECUTABLE=$(pwd)/bin/protoc -DPROTOC_COMPILER=$(pwd)/bin/protoc"
 
     name: "Build - ${{ matrix.name }} with Maven"
     runs-on: ${{ matrix.os }}
@@ -121,10 +121,10 @@ jobs:
           sudo mv ./bin/protoc /usr/bin
 
       - name: Setup protoc (macOS)
-        if: runner.os == 'Linux'
+        if: runner.os == 'macOS'
         run: |
-          curl https://github.com/protocolbuffers/protobuf/releases/download/v21.12/protoc-21.12-osx-universal_binary.zip
-          unzip protoc-21.12-linux-x86_64.zip
+          curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v21.12/protoc-21.12-osx-universal_binary.zip
+          unzip protoc-21.12-osx-universal_binary.zip
           export PATH=$(pwd)/bin/:$PATH
 
       - name: Download JNI headers (Linux)
@@ -135,7 +135,7 @@ jobs:
           wget https://raw.githubusercontent.com/openjdk/jdk21/master/src/java.base/share/native/include/jni.h -O /tmp/jni/jni.h
 
       - name: Install dependencies (macOS)
-        run: brew install ninja
+        run: brew install protobuf@3 ninja
         if: runner.os == 'macOS'
 
       - name: Run sccache-cache

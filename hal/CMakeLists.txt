@@ -4,7 +4,7 @@ include(CompileWarnings)
 include(AddTest)
 if(BUILD_MAVEN)
     include(BuildMaven)
-    find_package(NILibraries)
+    find_package(NILibraries REQUIRED)
 endif()
 
 file(
