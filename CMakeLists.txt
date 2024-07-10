@@ -135,7 +135,7 @@ get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 
 if(isMultiConfig)
     if(BUILD_MAVEN)
-        list(REMOVE_ITEM CMAKE_CONFIGURATION_TYPES MinSizeRel)
+        list(REMOVE_ITEM CMAKE_CONFIGURATION_TYPES MinSizeRel Release)
     else()
         if(NOT "Asan" IN_LIST CMAKE_CONFIGURATION_TYPES)
             list(APPEND CMAKE_CONFIGURATION_TYPES Asan)
