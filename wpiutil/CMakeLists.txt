@@ -162,6 +162,10 @@ if(ATOMIC)
 endif()
 
 if(BUILD_MAVEN)
+    if(${arch} STREQUAL athena)
+        find_package(NILibraries REQUIRED)
+        target_link_libraries(wpiutil ${NI_LIBRARIES})
+    endif()
     target_sources(wpiutil PRIVATE ${protobuf_native_src})
     install(
         DIRECTORY src/main/native/thirdparty/protobuf/include/
