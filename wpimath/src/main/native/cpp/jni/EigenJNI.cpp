@@ -4,7 +4,7 @@
 
 #include <jni.h>
 
-#ifdef __GNUC__
+#if __GNUC__ >= 12
 #pragma GCC diagnostic ignored "-Wuse-after-free"
 #endif
 
