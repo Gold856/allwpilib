@@ -107,7 +107,7 @@ jobs:
           - os: windows-2022
             name: Windows
             container: ""
-            flags: "-DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_EXAMPLES=ON -DBUILD_MAVEN=ON -DCMAKE_INSTALL_PREFIX=C:/wpilib -DProtobuf_INCLUDE_DIR=wpiutil/src/main/native/thirdparty/protobuf/include -DProtobuf_PROTOC_EXECUTABLE=bin/protoc.exe"
+            flags: "-DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_EXAMPLES=ON -DBUILD_MAVEN=ON -DCMAKE_INSTALL_PREFIX=C:/wpilib -DProtobuf_INCLUDE_DIR=wpiutil/src/main/native/thirdparty/protobuf/include -DProtobuf_PROTOC_EXECUTABLE=bin/protoc -DPROTOC_COMPILER=bin/protoc"
 
     name: "Build - ${{ matrix.name }} with Maven"
     runs-on: ${{ matrix.os }}
@@ -120,6 +120,9 @@ jobs:
       - name: Install dependencies (macOS)
         run: brew install protobuf@3 ninja
         if: runner.os == 'macOS'
+
+      - uses: ilammy/msvc-dev-cmd@v1.13.0
+        if: runner.os == 'Windows'
 
       - name: Setup protoc (Linux)
         if: runner.os == 'Linux'
@@ -135,6 +138,13 @@ jobs:
           unzip protoc-21.12-osx-universal_binary.zip
           export PATH=$(pwd)/bin/:$PATH
 
+      - name: Setup protoc (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v21.12/protoc-21.12-win64.zip
+          tar -xf protoc-21.12-win64.zip
+          echo "Path=$(pwd)\;$env:Path" >> "$env:GITHUB_ENV"
+
       - name: Download JNI headers (Linux)
         if: runner.os == 'Linux'
         run: |
@@ -142,9 +152,6 @@ jobs:
           wget https://raw.githubusercontent.com/openjdk/jdk21/master/src/java.base/unix/native/include/jni_md.h -O /tmp/jni/jni_md.h
           wget https://raw.githubusercontent.com/openjdk/jdk21/master/src/java.base/share/native/include/jni.h -O /tmp/jni/jni.h
 
-      - uses: ilammy/msvc-dev-cmd@v1.13.0
-        if: runner.os == 'Windows'
-        
       - name: Install CMake
         if: runner.os == 'Windows'
         uses: lukka/get-cmake@v3.29.3
