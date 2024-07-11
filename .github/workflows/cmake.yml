@@ -103,7 +103,7 @@ jobs:
             name: macOS
             container: ""
             env: "PATH=\"/opt/homebrew/opt/protobuf@3/bin:$PATH\""
-            flags: "-DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_EXAMPLES=ON -DBUILD_MAVEN=ON -DCMAKE_INSTALL_PREFIX=~/wpilib -DCMAKE_LIBRARY_PATH=/opt/homebrew/opt/protobuf@3/lib -DProtobuf_INCLUDE_DIR=/opt/homebrew/opt/protobuf@3/include -DProtobuf_PROTOC_EXECUTABLE=$(pwd)/bin/protoc -DPROTOC_COMPILER=$(pwd)/bin/protoc"
+            flags: "-DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_EXAMPLES=ON -DBUILD_MAVEN=ON -DCMAKE_INSTALL_PREFIX=~/wpilib -DCMAKE_LIBRARY_PATH=/opt/homebrew/opt/protobuf@3/lib -DProtobuf_INCLUDE_DIR=/opt/homebrew/opt/protobuf@3/include -DProtobuf_PROTOC_EXECUTABLE=/opt/homebrew/opt/protobuf@3/bin/protoc -DPROTOC_COMPILER=/opt/homebrew/opt/protobuf@3/bin/protoc"
           - os: windows-2022
             name: Windows
             container: ""
@@ -136,7 +136,7 @@ jobs:
         run: |
           curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v21.12/protoc-21.12-osx-universal_binary.zip
           unzip protoc-21.12-osx-universal_binary.zip
-          export PATH=$(pwd)/bin/:$PATH
+          mv ./bin/protoc /opt/homebrew/opt/protobuf@3/bin/
 
       - name: Setup protoc (Windows)
         if: runner.os == 'Windows'
