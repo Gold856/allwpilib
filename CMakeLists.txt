@@ -129,6 +129,14 @@ set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
 set(protobuf_MODULE_COMPATIBLE ON CACHE BOOL "" FORCE)
 if(BUILD_MAVEN)
     find_package(Protobuf MODULE REQUIRED)
+    if(MSVC)
+        set_target_properties(
+            protobuf::protoc
+            PROPERTIES
+                IMPORTED_LOCATION_DEBUG ${Protobuf_PROTOC_EXECUTABLE}
+                IMPORTED_LOCATION_RELWITHDEBINFO ${Protobuf_PROTOC_EXECUTABLE}
+        )
+    endif()
 else()
     find_package(Protobuf REQUIRED)
 endif()
