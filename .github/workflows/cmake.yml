@@ -98,12 +98,12 @@ jobs:
           - os: ubuntu-22.04
             name: Linux
             container: wpilib/roborio-cross-ubuntu:2024-22.04
-            flags: "--toolchain ./cmake/toolchains/arm-frc-gnueabi.toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_EXAMPLES=ON -DBUILD_MAVEN=ON -DCMAKE_INSTALL_PREFIX=~/wpilib -DWITH_GUI=OFF -DJAVA_INCLUDE_PATH=/tmp/jni/ -DJAVA_INCLUDE_PATH2=/tmp/jni/ -DJAVA_JVM_LIBRARY=$JAVA_HOME/lib/libjvm.so -DProtobuf_LIBRARIES=/usr/lib/x86_64-linux-gnu -DProtobuf_INCLUDE_DIR=/usr/include"
+            flags: "--toolchain ./cmake/toolchains/arm-frc-gnueabi.toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_TESTS=OFF -DWITH_EXAMPLES=ON -DBUILD_MAVEN=ON -DCMAKE_INSTALL_PREFIX=~/wpilib -DWITH_GUI=OFF -DJAVA_INCLUDE_PATH=/tmp/jni/ -DJAVA_INCLUDE_PATH2=/tmp/jni/ -DJAVA_JVM_LIBRARY=$JAVA_HOME/lib/libjvm.so -DProtobuf_LIBRARIES=/usr/lib/x86_64-linux-gnu -DProtobuf_INCLUDE_DIR=/usr/include"
           - os: macOS-14
             name: macOS
             container: ""
             env: "PATH=\"/opt/homebrew/opt/protobuf@3/bin:$PATH\""
-            flags: "-DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_JAVA=OFF -DWITH_EXAMPLES=ON -DBUILD_MAVEN=ON -DCMAKE_INSTALL_PREFIX=~/wpilib -DCMAKE_LIBRARY_PATH=/opt/homebrew/opt/protobuf@3/lib -DProtobuf_INCLUDE_DIR=/opt/homebrew/opt/protobuf@3/include -DProtobuf_PROTOC_EXECUTABLE=$(pwd)/bin/protoc -DPROTOC_COMPILER=$(pwd)/bin/protoc"
+            flags: "-DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_EXAMPLES=ON -DBUILD_MAVEN=ON -DCMAKE_INSTALL_PREFIX=~/wpilib -DCMAKE_LIBRARY_PATH=/opt/homebrew/opt/protobuf@3/lib -DProtobuf_INCLUDE_DIR=/opt/homebrew/opt/protobuf@3/include -DProtobuf_PROTOC_EXECUTABLE=$(pwd)/bin/protoc -DPROTOC_COMPILER=$(pwd)/bin/protoc"
 
     name: "Build - ${{ matrix.name }} with Maven"
     runs-on: ${{ matrix.os }}
