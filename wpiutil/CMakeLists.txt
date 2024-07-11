@@ -167,6 +167,9 @@ if(BUILD_MAVEN)
         target_link_libraries(wpiutil ${NI_LIBRARIES})
     endif()
     target_sources(wpiutil PRIVATE ${protobuf_native_src})
+    if(APPLE)
+        target_compile_options(wpiutil PRIVATE -Wno-format-nonliteral)
+    endif()
     install(
         DIRECTORY src/main/native/thirdparty/protobuf/include/
         DESTINATION "${include_dest}/wpiutil"
