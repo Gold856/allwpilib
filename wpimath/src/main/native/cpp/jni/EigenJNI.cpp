@@ -4,6 +4,10 @@
 
 #include <jni.h>
 
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wuse-after-free"
+#endif
+
 #include <Eigen/Cholesky>
 #include <Eigen/Core>
 #include <Eigen/QR>
