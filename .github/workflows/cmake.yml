@@ -127,12 +127,16 @@ jobs:
         run: brew install protobuf@3 ninja
         if: runner.os == 'macOS'
 
-      - name: Setup Java (Windows)
+      - name: Setup Java
         uses: actions/setup-java@v4
-        if: runner.os == 'Windows'
         with:
           distribution: 'temurin'
           java-version: 17
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
 
       - uses: ilammy/msvc-dev-cmd@v1.13.0
         if: runner.os == 'Windows'
@@ -153,23 +157,16 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - name: Setup protoc (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          wget https://github.com/protocolbuffers/protobuf/releases/download/v21.12/protoc-21.12-linux-x86_64.zip
-          unzip protoc-21.12-linux-x86_64.zip
+      - name: Download protoc
+        run: curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v21.12/${{ matrix.protoc-archive }}
 
-      - name: Setup protoc (macOS)
-        if: runner.os == 'macOS'
-        run: |
-          curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v21.12/protoc-21.12-osx-universal_binary.zip
-          unzip protoc-21.12-osx-universal_binary.zip
+      - name: Unpack protoc
+        if: runner.os != 'Windows'
+        run: unzip ${{ matrix.protoc-archive }}
 
-      - name: Setup protoc (Windows)
+      - name: Unpack protoc (Windows)
         if: runner.os == 'Windows'
-        run: |
-          curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v21.12/protoc-21.12-win64.zip
-          tar -xf protoc-21.12-win64.zip
+        run: tar -xf ${{ matrix.protoc-archive }}
 
       - name: configure
         run: cmake -S . -B build -G Ninja -DBUILD_MAVEN=ON -DCMAKE_INSTALL_PREFIX=${{ matrix.install-location }} ${{ matrix.flags }}
