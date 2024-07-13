@@ -156,6 +156,9 @@ jobs:
         uses: mozilla-actions/sccache-action@v0.0.5
 
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Download protoc
         run: curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v21.12/${{ matrix.protoc-archive }}
