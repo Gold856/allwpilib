@@ -38,7 +38,7 @@ def main(argv):
             if "static" in file:
                 static_or_not = "static"
             # We need a complete platform path to calculate OS and arch
-            if len(platform_parts := file.split("\\")) >= 3:
+            if len(platform_parts := file.replace("\\", "/").split("/")) >= 3:
                 platform = platform_parts[0]
                 arch = platform_parts[1]
         artifact_name = (
@@ -64,11 +64,11 @@ def create_archive(
         library_dir = install_dir / directory / dir
         os.chdir(library_dir)
 
-        headers = glob.glob("**", recursive=True)
+        files = glob.glob("**", recursive=True)
         artifact_name = f"{dir}-cpp-{version}-{classifier}"
         with zipfile.ZipFile(install_dir / f"{artifact_name}.zip", "w") as archive:
-            for header in headers:
-                archive.write(header)
+            for file in files:
+                archive.write(file)
             archive.write(dirname / "ThirdPartyNotices.txt", "ThirdPartyNotices.txt")
             archive.write(dirname / "LICENSE.md", "LICENSE.md")
 
