@@ -98,12 +98,16 @@ jobs:
           - os: ubuntu-22.04
             name: Linux
             container: wpilib/roborio-cross-ubuntu:2024-22.04
-            flags: "-DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache --toolchain ./cmake/toolchains/arm-frc-gnueabi.toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_TESTS=OFF -DWITH_SIMULATION_MODULES=OFF -DBUILD_MAVEN=ON -DCMAKE_INSTALL_PREFIX=~/wpilib -DWITH_GUI=OFF -DJAVA_INCLUDE_PATH=/tmp/jni/ -DJAVA_INCLUDE_PATH2=/tmp/jni/ -DJAVA_JVM_LIBRARY=$JAVA_HOME/lib/libjvm.so -DProtobuf_LIBRARIES=/usr/lib/x86_64-linux-gnu -DProtobuf_INCLUDE_DIR=/usr/include -DProtobuf_PROTOC_EXECUTABLE=bin/protoc -DPROTOC_COMPILER=bin/protoc"
+            flags: "-DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache --toolchain ./cmake/toolchains/arm-frc-gnueabi.toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_TESTS=OFF -DWITH_SIMULATION_MODULES=OFF -DWITH_GUI=OFF -DJAVA_INCLUDE_PATH=/tmp/jni/ -DJAVA_INCLUDE_PATH2=/tmp/jni/ -DJAVA_JVM_LIBRARY=$JAVA_HOME/lib/libjvm.so -DProtobuf_LIBRARIES=/usr/lib/x86_64-linux-gnu -DProtobuf_INCLUDE_DIR=/usr/include -DProtobuf_PROTOC_EXECUTABLE=bin/protoc -DPROTOC_COMPILER=bin/protoc"
+            protoc-archive: protoc-21.12-linux-x86_64.zip
+            install-location: /tmp/install
           - os: macOS-14
             name: macOS
             container: ""
             env: "PATH=\"/opt/homebrew/opt/protobuf@3/bin:$PATH\""
-            flags: "-DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache -DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_EXAMPLES=ON -DBUILD_MAVEN=ON -DCMAKE_INSTALL_PREFIX=~/wpilib -DCMAKE_LIBRARY_PATH=/opt/homebrew/opt/protobuf@3/lib -DProtobuf_INCLUDE_DIR=/opt/homebrew/opt/protobuf@3/include -DProtobuf_PROTOC_EXECUTABLE=bin/protoc -DPROTOC_COMPILER=bin/protoc"
+            flags: "-DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache -DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_EXAMPLES=ON -DCMAKE_LIBRARY_PATH=/opt/homebrew/opt/protobuf@3/lib -DProtobuf_INCLUDE_DIR=/opt/homebrew/opt/protobuf@3/include -DProtobuf_PROTOC_EXECUTABLE=bin/protoc -DPROTOC_COMPILER=bin/protoc"
+            protoc-archive: protoc-21.12-osx-universal_binary.zip
+            install-location: /tmp/install
           - os: windows-2022
             name: Windows
             container: ""
@@ -168,7 +172,7 @@ jobs:
           tar -xf protoc-21.12-win64.zip
 
       - name: configure
-        run: cmake -S . -B build -G Ninja ${{ matrix.flags }}
+        run: cmake -S . -B build -G Ninja -DBUILD_MAVEN=ON -DCMAKE_INSTALL_PREFIX=${{ matrix.install-location }} ${{ matrix.flags }}
         env:
           SCCACHE_GHA_ENABLED: "true"
 
@@ -188,3 +192,11 @@ jobs:
         working-directory: build
         # UnitTest_test segfaults on exit occasionally
         run: ctest --output-on-failure -E 'UnitTest'
+
+      - name: Package artifacts
+        run: python library_packager.py --install_directory ${{ matrix.install-location }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}
+          path: ${{ matrix.install-location }}/*.zip
