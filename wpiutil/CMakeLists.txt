@@ -169,6 +169,11 @@ if(BUILD_MAVEN)
     target_sources(wpiutil PRIVATE ${protobuf_native_src})
     if(APPLE)
         target_compile_options(wpiutil PRIVATE -Wno-format-nonliteral)
+    elseif(MSVC)
+        target_link_options(
+            wpiutil
+            PRIVATE /EXPORT:?kTypeToCppTypeMap@FieldDescriptor@protobuf@google@@0QBW4CppType@123@B
+        )
     endif()
     install(
         DIRECTORY src/main/native/thirdparty/protobuf/include/
