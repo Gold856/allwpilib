@@ -25,6 +25,21 @@ elseif(BUILD_MAVEN)
 
     file(ARCHIVE_EXTRACT INPUT ${dest}/${library_artifact}.zip DESTINATION ${dest}/release)
     file(ARCHIVE_EXTRACT INPUT ${dest}/${library_artifact}debug.zip DESTINATION ${dest}/debug)
+    if(MSVC)
+        file(GLOB opencv_release_libs ${dest}/release/windows/x86-64/shared/*.dll)
+        file(GLOB opencv_debug_libs ${dest}/debug/windows/x86-64/shared/*.dll)
+        get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+        if(isMultiConfig)
+            file(
+                COPY ${opencv_release_libs}
+                DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/RelWithDebInfo
+            )
+            file(COPY ${opencv_debug_libs} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
+        else()
+            file(COPY ${opencv_release_libs} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+            file(COPY ${opencv_debug_libs} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+        endif()
+    endif()
     file(ARCHIVE_EXTRACT INPUT ${dest}/${headers_artifact}.zip DESTINATION ${dest}/include)
     message(STATUS "Done.")
     set(libs
