@@ -94,7 +94,7 @@ if(WITH_JAVA)
     if(BUILD_MAVEN)
         config_maven_build(apriltagjni ARTIFACT apriltag)
         install(
-            DIRECTORY $<TARGET_PROPERTY:apriltag_jni_headers,NATIVE_HEADERS_DIRECTORY>
+            DIRECTORY $<TARGET_PROPERTY:apriltag_jni_headers,NATIVE_HEADERS_DIRECTORY>/
             DESTINATION sources/apriltag/jni
         )
     else()

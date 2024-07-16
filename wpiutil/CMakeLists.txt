@@ -87,7 +87,7 @@ if(WITH_JAVA)
     if(BUILD_MAVEN)
         config_maven_build(wpiutiljni ARTIFACT wpiutil)
         install(
-            DIRECTORY $<TARGET_PROPERTY:wpiutil_jni_headers,NATIVE_HEADERS_DIRECTORY>
+            DIRECTORY $<TARGET_PROPERTY:wpiutil_jni_headers,NATIVE_HEADERS_DIRECTORY>/
             DESTINATION sources/wpiutil/jni
         )
     else()

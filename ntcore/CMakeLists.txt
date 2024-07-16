@@ -79,7 +79,7 @@ if(WITH_JAVA)
     if(BUILD_MAVEN)
         config_maven_build(ntcorejni ARTIFACT ntcore)
         install(
-            DIRECTORY $<TARGET_PROPERTY:ntcore_jni_headers,NATIVE_HEADERS_DIRECTORY>
+            DIRECTORY $<TARGET_PROPERTY:ntcore_jni_headers,NATIVE_HEADERS_DIRECTORY>/
             DESTINATION sources/ntcore/jni
         )
     else()
