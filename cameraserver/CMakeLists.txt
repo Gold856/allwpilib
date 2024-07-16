@@ -73,7 +73,7 @@ set_property(TARGET cameraserver PROPERTY FOLDER "libraries")
 
 configure_file(cameraserver-config.cmake.in ${WPILIB_BINARY_DIR}/cameraserver-config.cmake)
 if(BUILD_MAVEN)
-    config_maven_build(cameraserver CONFIG_FILE cameraserver-config.cmake)
+    config_maven_build(cameraserver ARTIFACT cameraserver CONFIG_FILE cameraserver-config.cmake)
 else()
     install(TARGETS cameraserver EXPORT cameraserver)
     export(TARGETS cameraserver FILE cameraserver.cmake NAMESPACE cameraserver::)

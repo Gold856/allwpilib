@@ -39,7 +39,7 @@ set_property(TARGET hal PROPERTY FOLDER "libraries")
 configure_file(hal-config.cmake.in ${WPILIB_BINARY_DIR}/hal-config.cmake)
 
 if(BUILD_MAVEN)
-    config_maven_build(hal CONFIG_FILE hal-config.cmake)
+    config_maven_build(hal ARTIFACT hal CONFIG_FILE hal-config.cmake)
     if(${arch} STREQUAL athena)
         find_package(NILibraries REQUIRED)
         target_sources(hal PRIVATE ${hal_athena_native_src})
@@ -91,7 +91,7 @@ if(WITH_JAVA)
     add_dependencies(haljni hal_jar)
 
     if(BUILD_MAVEN)
-        config_maven_build(haljni)
+        config_maven_build(haljni ARTIFACT hal)
         install(
             DIRECTORY $<TARGET_PROPERTY:hal_jni_headers,NATIVE_HEADERS_DIRECTORY>
             DESTINATION sources/hal/jni

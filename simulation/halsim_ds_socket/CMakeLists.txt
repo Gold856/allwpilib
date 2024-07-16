@@ -14,7 +14,7 @@ target_include_directories(halsim_ds_socket PRIVATE src/main/native/include)
 set_property(TARGET halsim_ds_socket PROPERTY FOLDER "libraries")
 
 if(BUILD_MAVEN)
-    config_maven_build(halsim_ds_socket)
+    config_maven_build(halsim_ds_socket ARTIFACT halsim_ds_socket)
 else()
     install(TARGETS halsim_ds_socket EXPORT halsim_ds_socket)
     export(TARGETS halsim_ds_socket FILE halsim_ds_socket.cmake NAMESPACE halsim_ds_socket::)

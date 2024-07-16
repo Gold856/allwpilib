@@ -105,7 +105,7 @@ if(WITH_JAVA)
     add_dependencies(wpimathjni wpimath_jar)
 
     if(BUILD_MAVEN)
-        config_maven_build(wpimathjni)
+        config_maven_build(wpimathjni ARTIFACT wpimath)
         install(
             DIRECTORY $<TARGET_PROPERTY:wpimath_jni_headers,NATIVE_HEADERS_DIRECTORY>
             DESTINATION sources/wpimath/jni
@@ -201,7 +201,7 @@ target_include_directories(
 
 configure_file(wpimath-config.cmake.in ${WPILIB_BINARY_DIR}/wpimath-config.cmake)
 if(BUILD_MAVEN)
-    config_maven_build(wpimath CONFIG_FILE wpimath-config.cmake)
+    config_maven_build(wpimath ARTIFACT wpimath CONFIG_FILE wpimath-config.cmake)
 else()
     install(TARGETS wpimath EXPORT wpimath)
     export(TARGETS wpimath FILE wpimath.cmake NAMESPACE wpimath::)
