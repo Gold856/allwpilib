@@ -43,7 +43,7 @@ if(WITH_JAVA)
     if(BUILD_MAVEN)
         config_maven_build(wpinetjni ARTIFACT wpinet)
         install(
-            DIRECTORY $<TARGET_PROPERTY:wpinet_jni_headers,NATIVE_HEADERS_DIRECTORY>
+            DIRECTORY $<TARGET_PROPERTY:wpinet_jni_headers,NATIVE_HEADERS_DIRECTORY>/
             DESTINATION sources/wpinet/jni
         )
     else()

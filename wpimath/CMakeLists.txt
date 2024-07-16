@@ -107,7 +107,7 @@ if(WITH_JAVA)
     if(BUILD_MAVEN)
         config_maven_build(wpimathjni ARTIFACT wpimath)
         install(
-            DIRECTORY $<TARGET_PROPERTY:wpimath_jni_headers,NATIVE_HEADERS_DIRECTORY>
+            DIRECTORY $<TARGET_PROPERTY:wpimath_jni_headers,NATIVE_HEADERS_DIRECTORY>/
             DESTINATION sources/wpimath/jni
         )
     else()
