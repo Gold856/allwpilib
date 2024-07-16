@@ -85,7 +85,7 @@ if(WITH_JAVA)
     add_dependencies(wpiutiljni wpiutil_jar)
 
     if(BUILD_MAVEN)
-        config_maven_build(wpiutiljni)
+        config_maven_build(wpiutiljni ARTIFACT wpiutil)
         install(
             DIRECTORY $<TARGET_PROPERTY:wpiutil_jni_headers,NATIVE_HEADERS_DIRECTORY>
             DESTINATION sources/wpiutil/jni
@@ -271,7 +271,7 @@ target_include_directories(
 
 configure_file(wpiutil-config.cmake.in ${WPILIB_BINARY_DIR}/wpiutil-config.cmake)
 if(BUILD_MAVEN)
-    config_maven_build(wpiutil CONFIG_FILE wpiutil-config.cmake)
+    config_maven_build(wpiutil ARTIFACT wpiutil CONFIG_FILE wpiutil-config.cmake)
 else()
     install(TARGETS wpiutil EXPORT wpiutil)
     export(TARGETS wpiutil FILE wpiutil.cmake NAMESPACE wpiutil::)

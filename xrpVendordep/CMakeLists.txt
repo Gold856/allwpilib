@@ -68,7 +68,7 @@ target_include_directories(
 
 configure_file(xrpvendordep-config.cmake.in ${WPILIB_BINARY_DIR}/xrpvendordep-config.cmake)
 if(BUILD_MAVEN)
-    config_maven_build(xrpVendordep CONFIG_FILE xrpvendordep-config.cmake)
+    config_maven_build(xrpVendordep ARTIFACT xrpVendordep CONFIG_FILE xrpvendordep-config.cmake)
 else()
     install(TARGETS xrpVendordep EXPORT xrpvendordep)
     export(TARGETS xrpVendordep FILE xrpvendordep.cmake NAMESPACE xrpvendordep::)

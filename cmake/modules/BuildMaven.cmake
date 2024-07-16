@@ -1,36 +1,36 @@
 include(PlatformVars)
 macro(config_maven_build target)
-    cmake_parse_arguments(artifact "" "CONFIG_FILE;SOURCE_DIR" "" ${ARGN})
+    cmake_parse_arguments(artifact "" "CONFIG_FILE;SOURCE_DIR;ARTIFACT" "" ${ARGN})
     get_target_property(library_type ${target} TYPE)
     if(library_type STREQUAL SHARED_LIBRARY)
         set(lib_type shared)
     else()
         set(lib_type static)
     endif()
-    set(library_dest ${PROJECT_NAME}/${platform}/${arch}/${lib_type})
+    set(library_dest ${artifact_ARTIFACT}/${platform}/${arch}/${lib_type})
 
     install(TARGETS ${target} EXPORT ${target} DESTINATION ${library_dest})
     # Exported targets always have a config file
     if(artifact_CONFIG_FILE)
-        install(FILES ${WPILIB_BINARY_DIR}/${artifact_CONFIG_FILE} DESTINATION ${PROJECT_NAME})
-        install(EXPORT ${target} DESTINATION ${PROJECT_NAME})
+        install(FILES ${WPILIB_BINARY_DIR}/${artifact_CONFIG_FILE} DESTINATION ${artifact_ARTIFACT})
+        install(EXPORT ${target} DESTINATION ${artifact_ARTIFACT})
     endif()
 
     if(artifact_SOURCE_DIR)
-        install(DIRECTORY ${artifact_SOURCE_DIR} DESTINATION sources/${PROJECT_NAME})
+        install(DIRECTORY ${artifact_SOURCE_DIR} DESTINATION sources/${artifact_ARTIFACT})
     else()
-        install(DIRECTORY src/main/native/cpp/ DESTINATION sources/${PROJECT_NAME})
+        install(DIRECTORY src/main/native/cpp/ DESTINATION sources/${artifact_ARTIFACT})
     endif()
 
     # If there are generated source files, install them
     if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/cpp/)
-        install(DIRECTORY src/generated/main/native/cpp/ DESTINATION sources/${PROJECT_NAME})
+        install(DIRECTORY src/generated/main/native/cpp/ DESTINATION sources/${artifact_ARTIFACT})
     endif()
 
     if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/generated/main/cpp/)
         install(
             DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated/main/cpp/
-            DESTINATION sources/${PROJECT_NAME}
+            DESTINATION sources/${artifact_ARTIFACT}
         )
     endif()
 endmacro()

@@ -92,7 +92,7 @@ if(WITH_JAVA)
     add_dependencies(apriltagjni apriltag_jar)
 
     if(BUILD_MAVEN)
-        config_maven_build(apriltagjni)
+        config_maven_build(apriltagjni ARTIFACT apriltag)
         install(
             DIRECTORY $<TARGET_PROPERTY:apriltag_jni_headers,NATIVE_HEADERS_DIRECTORY>
             DESTINATION sources/apriltag/jni
@@ -172,7 +172,7 @@ target_include_directories(
 
 configure_file(apriltag-config.cmake.in ${WPILIB_BINARY_DIR}/apriltag-config.cmake)
 if(BUILD_MAVEN)
-    config_maven_build(apriltag CONFIG_FILE apriltag-config.cmake)
+    config_maven_build(apriltag ARTIFACT apriltag CONFIG_FILE apriltag-config.cmake)
 else()
     install(TARGETS apriltag EXPORT apriltag)
     export(TARGETS apriltag FILE apriltag.cmake NAMESPACE apriltag::)
