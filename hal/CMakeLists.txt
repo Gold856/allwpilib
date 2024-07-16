@@ -93,7 +93,7 @@ if(WITH_JAVA)
     if(BUILD_MAVEN)
         config_maven_build(haljni ARTIFACT hal)
         install(
-            DIRECTORY $<TARGET_PROPERTY:hal_jni_headers,NATIVE_HEADERS_DIRECTORY>
+            DIRECTORY $<TARGET_PROPERTY:hal_jni_headers,NATIVE_HEADERS_DIRECTORY>/
             DESTINATION sources/hal/jni
         )
     else()

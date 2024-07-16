@@ -132,7 +132,7 @@ if(WITH_JAVA)
     if(BUILD_MAVEN)
         config_maven_build(cscorejni ARTIFACT cscore)
         install(
-            DIRECTORY $<TARGET_PROPERTY:cscore_jni_headers,NATIVE_HEADERS_DIRECTORY>
+            DIRECTORY $<TARGET_PROPERTY:cscore_jni_headers,NATIVE_HEADERS_DIRECTORY>/
             DESTINATION sources/cscore/jni
         )
     else()
