@@ -95,12 +95,30 @@ jobs:
       fail-fast: false
       matrix:
         config: [Debug, RelWithDebInfo]
-        name: [RIO, macOS, Windows x86-64, Windows ARM64]
+        name: [RIO, Linux Arm32, Linux Arm64, Linux x86-64, macOS, Windows x86-64, Windows ARM64]
         include:
           - os: ubuntu-22.04
             name: RIO
             container: wpilib/roborio-cross-ubuntu:2024-22.04
             flags: "-DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache --toolchain ./cmake/toolchains/arm-frc-gnueabi.toolchain.cmake -DWITH_TESTS=OFF -DWITH_SIMULATION_MODULES=OFF -DWITH_GUI=OFF -DJAVA_INCLUDE_PATH=/tmp/jni/ -DJAVA_INCLUDE_PATH2=/tmp/jni/ -DJAVA_JVM_LIBRARY=$JAVA_HOME/lib/libjvm.so -DProtobuf_LIBRARIES=/usr/lib/x86_64-linux-gnu -DProtobuf_INCLUDE_DIR=/usr/include -DProtobuf_PROTOC_EXECUTABLE=bin/protoc -DPROTOC_COMPILER=bin/protoc"
+            protoc-archive: protoc-21.12-linux-x86_64.zip
+            install-location: /tmp/install
+          - os: ubuntu-22.04
+            name: Linux Arm32
+            container: wpilib/raspbian-cross-ubuntu:bullseye-22.04
+            flags: "-DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache --toolchain ./cmake/toolchains/arm-pi-gnueabihf.toolchain.cmake -DWITH_TESTS=OFF -DJAVA_INCLUDE_PATH=/tmp/jni/ -DJAVA_INCLUDE_PATH2=/tmp/jni/ -DJAVA_JVM_LIBRARY=$JAVA_HOME/lib/libjvm.so -DProtobuf_LIBRARIES=/usr/lib/x86_64-linux-gnu -DProtobuf_INCLUDE_DIR=/usr/include -DProtobuf_PROTOC_EXECUTABLE=bin/protoc -DPROTOC_COMPILER=bin/protoc"
+            protoc-archive: protoc-21.12-linux-x86_64.zip
+            install-location: /tmp/install
+          - os: ubuntu-22.04
+            name: Linux Arm64
+            container: wpilib/aarch64-cross-ubuntu:bullseye-22.04
+            flags: "-DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache --toolchain ./cmake/toolchains/aarch64-bullseye-gnu.toolchain.cmake -DWITH_TESTS=OFF -DJAVA_INCLUDE_PATH=/tmp/jni/ -DJAVA_INCLUDE_PATH2=/tmp/jni/ -DJAVA_JVM_LIBRARY=$JAVA_HOME/lib/libjvm.so -DProtobuf_LIBRARIES=/usr/lib/x86_64-linux-gnu -DProtobuf_INCLUDE_DIR=/usr/include -DProtobuf_PROTOC_EXECUTABLE=bin/protoc -DPROTOC_COMPILER=bin/protoc"
+            protoc-archive: protoc-21.12-linux-x86_64.zip
+            install-location: /tmp/install
+          - os: ubuntu-22.04
+            name: Linux x86-64
+            container: wpilib/ubuntu-base:22.04
+            flags: "-DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache -DJAVA_JVM_LIBRARY=$JAVA_HOME/lib/libjvm.so -DProtobuf_LIBRARIES=/usr/lib/x86_64-linux-gnu -DProtobuf_INCLUDE_DIR=/usr/include -DProtobuf_PROTOC_EXECUTABLE=bin/protoc -DPROTOC_COMPILER=bin/protoc"
             protoc-archive: protoc-21.12-linux-x86_64.zip
             install-location: /tmp/install
           - os: macOS-14
@@ -154,7 +172,7 @@ jobs:
         if: runner.os == 'Windows'
 
       - name: Download JNI headers (Linux)
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && matrix.name != 'Linux x86-64'
         run: |
           mkdir /tmp/jni/
           wget https://raw.githubusercontent.com/openjdk/jdk21/master/src/java.base/unix/native/include/jni_md.h -O /tmp/jni/jni_md.h
