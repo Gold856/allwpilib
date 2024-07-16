@@ -75,13 +75,16 @@ target_include_directories(
         $<INSTALL_INTERFACE:${include_dest}/wpilibNewCommands>
 )
 
-
 configure_file(
     wpilibnewcommands-config.cmake.in
     ${WPILIB_BINARY_DIR}/wpilibnewcommands-config.cmake
 )
 if(BUILD_MAVEN)
-    config_maven_build(wpilibNewCommands CONFIG_FILE wpilibnewcommands-config.cmake)
+    config_maven_build(
+        wpilibNewCommands
+        ARTIFACT wpilibNewCommands
+        CONFIG_FILE wpilibnewcommands-config.cmake
+    )
 else()
     install(TARGETS wpilibNewCommands EXPORT wpilibnewcommands)
     export(TARGETS wpilibNewCommands FILE wpilibnewcommands.cmake NAMESPACE wpilibnewcommands::)

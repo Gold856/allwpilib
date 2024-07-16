@@ -43,7 +43,14 @@ wpilib_target_warnings(wpiguidev)
 target_link_libraries(wpiguidev wpigui)
 
 if(BUILD_MAVEN)
-    config_maven_build(wpigui)
+    config_maven_build(
+        wpigui
+        ARTIFACT wpigui
+        SOURCE_DIR src/main/native/cpp/
+        src/main/native/directx11
+        src/main/native/metal/
+        src/main/native/opengl3/
+    )
 else()
     install(TARGETS wpigui EXPORT wpigui)
     export(TARGETS wpigui FILE wpigui.cmake NAMESPACE wpigui::)

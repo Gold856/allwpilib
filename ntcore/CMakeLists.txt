@@ -33,7 +33,7 @@ set_property(TARGET ntcore PROPERTY FOLDER "libraries")
 
 configure_file(ntcore-config.cmake.in ${WPILIB_BINARY_DIR}/ntcore-config.cmake)
 if(BUILD_MAVEN)
-    config_maven_build(ntcore CONFIG_FILE ntcore-config.cmake)
+    config_maven_build(ntcore ARTIFACT ntcore CONFIG_FILE ntcore-config.cmake)
 else()
     install(TARGETS ntcore EXPORT ntcore)
     export(TARGETS ntcore FILE ntcore.cmake NAMESPACE ntcore::)
@@ -77,7 +77,7 @@ if(WITH_JAVA)
     add_dependencies(ntcorejni ntcore_jar)
 
     if(BUILD_MAVEN)
-        config_maven_build(ntcorejni)
+        config_maven_build(ntcorejni ARTIFACT ntcore)
         install(
             DIRECTORY $<TARGET_PROPERTY:ntcore_jni_headers,NATIVE_HEADERS_DIRECTORY>
             DESTINATION sources/ntcore/jni

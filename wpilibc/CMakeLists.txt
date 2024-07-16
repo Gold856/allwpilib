@@ -44,7 +44,7 @@ set_property(TARGET wpilibc PROPERTY FOLDER "libraries")
 
 configure_file(wpilibc-config.cmake.in ${WPILIB_BINARY_DIR}/wpilibc-config.cmake)
 if(BUILD_MAVEN)
-    config_maven_build(wpilibc CONFIG_FILE wpilibc-config.cmake)
+    config_maven_build(wpilibc ARTIFACT wpilibc CONFIG_FILE wpilibc-config.cmake)
 else()
     install(TARGETS wpilibc EXPORT wpilibc)
     export(TARGETS wpilibc FILE wpilibc.cmake NAMESPACE wpilibc::)

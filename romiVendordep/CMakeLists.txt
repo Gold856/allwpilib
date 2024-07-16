@@ -68,7 +68,7 @@ target_include_directories(
 
 configure_file(romivendordep-config.cmake.in ${WPILIB_BINARY_DIR}/romivendordep-config.cmake)
 if(BUILD_MAVEN)
-    config_maven_build(romiVendordep CONFIG_FILE romivendordep-config.cmake)
+    config_maven_build(romiVendordep ARTIFACT romiVendordep CONFIG_FILE romivendordep-config.cmake)
 else()
     install(TARGETS romiVendordep EXPORT romivendordep)
     export(TARGETS romiVendordep FILE romivendordep.cmake NAMESPACE romivendordep::)

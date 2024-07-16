@@ -30,7 +30,7 @@ target_include_directories(
 )
 
 if(BUILD_MAVEN)
-    config_maven_build(libglass SOURCE_DIR src/lib/native/cpp)
+    config_maven_build(libglass ARTIFACT libglass SOURCE_DIR src/lib/native/cpp)
 else()
     install(TARGETS libglass EXPORT libglass)
     export(TARGETS libglass FILE libglass.cmake NAMESPACE libglass::)
@@ -62,7 +62,7 @@ target_include_directories(
 )
 
 if(BUILD_MAVEN)
-    config_maven_build(libglassnt SOURCE_DIR src/libnt/native/cpp)
+    config_maven_build(libglassnt ARTIFACT libglassnt SOURCE_DIR src/libnt/native/cpp)
 else()
     install(TARGETS libglassnt EXPORT libglassnt)
     export(TARGETS libglassnt FILE libglassnt.cmake NAMESPACE libglassnt::)

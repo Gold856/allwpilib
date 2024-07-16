@@ -48,7 +48,7 @@ set_property(TARGET cscore PROPERTY FOLDER "libraries")
 
 configure_file(cscore-config.cmake.in ${WPILIB_BINARY_DIR}/cscore-config.cmake)
 if(BUILD_MAVEN)
-    config_maven_build(cscore CONFIG_FILE cscore-config.cmake)
+    config_maven_build(cscore ARTIFACT cscore CONFIG_FILE cscore-config.cmake)
 else()
     install(TARGETS cscore EXPORT cscore)
     export(TARGETS cscore FILE cscore.cmake NAMESPACE cscore::)
@@ -130,7 +130,7 @@ if(WITH_JAVA)
     add_dependencies(cscorejni cscore_jar)
 
     if(BUILD_MAVEN)
-        config_maven_build(cscorejni)
+        config_maven_build(cscorejni ARTIFACT cscore)
         install(
             DIRECTORY $<TARGET_PROPERTY:cscore_jni_headers,NATIVE_HEADERS_DIRECTORY>
             DESTINATION sources/cscore/jni

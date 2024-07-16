@@ -41,7 +41,7 @@ if(WITH_JAVA)
     add_dependencies(wpinetjni wpinet_jar)
 
     if(BUILD_MAVEN)
-        config_maven_build(wpinetjni)
+        config_maven_build(wpinetjni ARTIFACT wpinet)
         install(
             DIRECTORY $<TARGET_PROPERTY:wpinet_jni_headers,NATIVE_HEADERS_DIRECTORY>
             DESTINATION sources/wpinet/jni
@@ -203,7 +203,7 @@ target_include_directories(
 
 configure_file(wpinet-config.cmake.in ${WPILIB_BINARY_DIR}/wpinet-config.cmake)
 if(BUILD_MAVEN)
-    config_maven_build(wpinet CONFIG_FILE wpinet-config.cmake)
+    config_maven_build(wpinet ARTIFACT wpinet CONFIG_FILE wpinet-config.cmake)
 else()
     install(TARGETS wpinet EXPORT wpinet)
     export(TARGETS wpinet FILE wpinet.cmake NAMESPACE wpinet::)

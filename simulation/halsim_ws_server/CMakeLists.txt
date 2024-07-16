@@ -14,7 +14,7 @@ target_include_directories(halsim_ws_server PRIVATE src/main/native/include)
 set_property(TARGET halsim_ws_server PROPERTY FOLDER "libraries")
 
 if(BUILD_MAVEN)
-    config_maven_build(halsim_ws_server)
+    config_maven_build(halsim_ws_server ARTIFACT halsim_ws_server)
 else()
     install(TARGETS halsim_ws_server EXPORT halsim_ws_server)
     export(TARGETS halsim_ws_server FILE halsim_ws_server.cmake NAMESPACE halsim_ws_server::)
