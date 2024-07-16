@@ -107,7 +107,7 @@ jobs:
             name: macOS
             container: ""
             env: "PATH=\"/opt/homebrew/opt/protobuf@3/bin:$PATH\""
-            flags: "-DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache -DWITH_EXAMPLES=ON -DCMAKE_LIBRARY_PATH=/opt/homebrew/opt/protobuf@3/lib -DProtobuf_INCLUDE_DIR=/opt/homebrew/opt/protobuf@3/include -DProtobuf_PROTOC_EXECUTABLE=bin/protoc -DPROTOC_COMPILER=bin/protoc"
+            flags: "-DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache '-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64' -DWITH_EXAMPLES=ON -DCMAKE_LIBRARY_PATH=/opt/homebrew/opt/protobuf@3/lib -DProtobuf_INCLUDE_DIR=/opt/homebrew/opt/protobuf@3/include -DProtobuf_PROTOC_EXECUTABLE=bin/protoc -DPROTOC_COMPILER=bin/protoc"
             protoc-archive: protoc-21.12-osx-universal_binary.zip
             install-location: /tmp/install
           - os: windows-2022
