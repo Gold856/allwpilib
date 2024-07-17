@@ -15,6 +15,10 @@
 #include "frc/DigitalInput.h"
 #include "frc/Errors.h"
 
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace frc;
 
 Encoder::Encoder(int aChannel, int bChannel, bool reverseDirection,
