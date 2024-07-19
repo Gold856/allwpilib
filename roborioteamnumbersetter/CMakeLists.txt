@@ -3,6 +3,9 @@ project(roborioteamnumbersetter)
 include(CompileWarnings)
 include(GenResources)
 include(LinkMacOSGUI)
+if(BUILD_MAVEN)
+    include(BuildMaven)
+endif()
 
 configure_file(src/main/generate/WPILibVersion.cpp.in WPILibVersion.cpp)
 generate_resources(src/main/native/resources generated/main/cpp RTNS rtns rtns_resources_src)
@@ -35,4 +38,8 @@ elseif(APPLE)
         roborioteamnumbersetter
         PROPERTIES MACOSX_BUNDLE YES OUTPUT_NAME "roborioTeamNumberSetter"
     )
+endif()
+
+if(BUILD_MAVEN)
+    config_maven_build(roborioteamnumbersetter ARTIFACT roboRIOTeamNumberSetter)
 endif()

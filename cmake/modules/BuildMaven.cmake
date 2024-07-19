@@ -1,15 +1,22 @@
 include(PlatformVars)
-macro(config_maven_build target)
+function(config_maven_build target)
     cmake_parse_arguments(artifact "" "CONFIG_FILE;SOURCE_DIR;ARTIFACT" "" ${ARGN})
     get_target_property(library_type ${target} TYPE)
     if(library_type STREQUAL SHARED_LIBRARY)
         set(lib_type shared)
+    elseif(library_type STREQUAL EXECUTABLE)
+        set(lib_type "")
     else()
         set(lib_type static)
     endif()
     set(library_dest ${artifact_ARTIFACT}/${platform}/${arch}/${lib_type})
 
     install(TARGETS ${target} EXPORT ${target} DESTINATION ${library_dest})
+    if(library_type STREQUAL EXECUTABLE)
+        return()
+        # Nothing below applies to executables
+    endif()
+
     # Exported targets always have a config file
     if(artifact_CONFIG_FILE)
         install(FILES ${WPILIB_BINARY_DIR}/${artifact_CONFIG_FILE} DESTINATION ${artifact_ARTIFACT})
@@ -33,4 +40,4 @@ macro(config_maven_build target)
             DESTINATION sources/${artifact_ARTIFACT}
         )
     endif()
-endmacro()
+endfunction()
