@@ -18,6 +18,8 @@ def main(argv):
     args = parser.parse_args(argv)
     install_dir: Path = args.install_directory
     out = subprocess.run(["git", "describe"], capture_output=True, text=True)
+    print("git:")
+    print(out.stdout)
     version = out.stdout[1:].strip()
 
     directories = glob.glob("*", root_dir=install_dir)
