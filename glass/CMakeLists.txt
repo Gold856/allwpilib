@@ -3,6 +3,9 @@ project(glass)
 include(CompileWarnings)
 include(GenResources)
 include(LinkMacOSGUI)
+if(BUILD_MAVEN)
+    include(BuildMaven)
+endif()
 
 #
 # libglass
@@ -95,4 +98,8 @@ if(WIN32)
     set_target_properties(glass PROPERTIES WIN32_EXECUTABLE YES)
 elseif(APPLE)
     set_target_properties(glass PROPERTIES MACOSX_BUNDLE YES OUTPUT_NAME "Glass")
+endif()
+
+if(BUILD_MAVEN)
+    config_maven_build(glass ARTIFACT Glass)
 endif()
