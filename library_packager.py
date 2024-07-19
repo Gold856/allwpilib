@@ -8,15 +8,53 @@ from pathlib import Path
 
 
 def main(argv):
-    dirname = Path(__file__).resolve().parent
+    repo_root = Path(__file__).resolve().parent
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--install_directory",
         help="Required.",
+        required=True,
         type=Path,
     )
+    subparsers = parser.add_subparsers(dest="subcommand", required=True)
+    subparsers.add_parser(
+        "package", help="Packages all the files in the install directory."
+    )
+    sign_parser = subparsers.add_parser("sign", help="Signs macOS apps.")
+    sign_parser.add_argument(
+        "--developer_id",
+        help="The Apple Developer ID used to sign macOS apps.",
+        required=True,
+        type=str,
+    )
+
     args = parser.parse_args(argv)
     install_dir: Path = args.install_directory
+    if args.subcommand == "package":
+        package_artifacts(install_dir, repo_root)
+    elif args.subcommand == "sign":
+        sign_apps(args.developer_id)
+
+
+def sign_apps(developer_id: str):
+    apps = glob.glob("**/*.app", recursive=True)
+    for app in apps:
+        subprocess.run(
+            [
+                "codesign",
+                "--force",
+                "--strict",
+                "--timestamp",
+                "--options=runtime",
+                "--verbose",
+                "-s",
+                developer_id,
+                app,
+            ]
+        )
+
+
+def package_artifacts(install_dir: Path, repo_root: Path):
     out = subprocess.run(["git", "describe"], capture_output=True, text=True)
     print("git:")
     print(out.stdout)
@@ -50,15 +88,15 @@ def main(argv):
         with zipfile.ZipFile(install_dir / f"{artifact_name}.zip", "w") as archive:
             for file in files:
                 archive.write(file)
-            archive.write(dirname / "ThirdPartyNotices.txt", "ThirdPartyNotices.txt")
-            archive.write(dirname / "LICENSE.md", "LICENSE.md")
+            archive.write(repo_root / "ThirdPartyNotices.txt", "ThirdPartyNotices.txt")
+            archive.write(repo_root / "LICENSE.md", "LICENSE.md")
 
-    create_archive(dirname, install_dir, version, "include", "headers")
-    create_archive(dirname, install_dir, version, "sources", "sources")
+    create_archive(repo_root, install_dir, version, "include", "headers")
+    create_archive(repo_root, install_dir, version, "sources", "sources")
 
 
 def create_archive(
-    dirname: Path, install_dir: Path, version: str, directory: str, classifier: str
+    repo_root: Path, install_dir: Path, version: str, directory: str, classifier: str
 ):
     os.chdir(install_dir / directory)
     directories = glob.glob("*", root_dir=install_dir / directory)
@@ -71,8 +109,8 @@ def create_archive(
         with zipfile.ZipFile(install_dir / f"{artifact_name}.zip", "w") as archive:
             for file in files:
                 archive.write(file)
-            archive.write(dirname / "ThirdPartyNotices.txt", "ThirdPartyNotices.txt")
-            archive.write(dirname / "LICENSE.md", "LICENSE.md")
+            archive.write(repo_root / "ThirdPartyNotices.txt", "ThirdPartyNotices.txt")
+            archive.write(repo_root / "LICENSE.md", "LICENSE.md")
 
 
 if __name__ == "__main__":
