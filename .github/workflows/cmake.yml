@@ -207,14 +207,14 @@ jobs:
 
       - name: configure
         run: cmake -S . -B build -G Ninja -DBUILD_MAVEN=ON -DCMAKE_INSTALL_PREFIX=${{ matrix.install-location }} -DCMAKE_BUILD_TYPE=${{ matrix.config }} ${{ matrix.flags }}
-        env:
-          SCCACHE_GHA_ENABLED: "true"
 
       - name: build
         working-directory: build
         run: cmake --build . --parallel $(nproc) --target install
         env:
-          SCCACHE_GHA_ENABLED: "true"
+          SCCACHE_WEBDAV_ENDPOINT: "https://frcmaven.wpi.edu/artifactory/wpilib-generic-gradlecache/"
+          SCCACHE_WEBDAV_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
 
       - name: test
         if: runner.os != 'Windows'
