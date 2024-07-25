@@ -38,5 +38,6 @@ elseif(APPLE)
 endif()
 
 if(BUILD_MAVEN)
+    target_compile_definitions(datalogtool PRIVATE LIBSSH_STATIC)
     config_maven_build(datalogtool ARTIFACT DataLogTool)
 endif()
