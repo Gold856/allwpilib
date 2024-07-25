@@ -37,7 +37,9 @@ def main(argv):
 
 
 def sign_apps(developer_id: str):
-    apps = glob.glob("**/*.app", recursive=True)
+    apps = glob.glob("**/*.app", recursive=True) + glob.glob(
+        "**/*.dylib", recursive=True
+    )
     for app in apps:
         subprocess.run(
             [
