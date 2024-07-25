@@ -41,5 +41,6 @@ elseif(APPLE)
 endif()
 
 if(BUILD_MAVEN)
+    target_compile_definitions(roborioteamnumbersetter PRIVATE LIBSSH_STATIC)
     config_maven_build(roborioteamnumbersetter ARTIFACT roboRIOTeamNumberSetter)
 endif()
