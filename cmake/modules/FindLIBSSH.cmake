@@ -37,6 +37,52 @@ include(FindPackageHandleStandardArgs)
 if(LIBSSH_LIBRARIES AND LIBSSH_INCLUDE_DIRS)
     # in cache already
     set(LIBSSH_FOUND TRUE)
+elseif(BUILD_MAVEN)
+    include(FetchContent)
+    include(PlatformVars)
+    set(base_url
+        https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/thirdparty/frc2024/libssh/0.105-1
+    )
+    set(base_artifact_name libssh-0.105-1)
+    set(library_artifact ${base_artifact_name}-${platform}${arch}static)
+    message(STATUS "Downloading and unpacking libssh artifacts.")
+    fetchcontent_declare(libssh_debug URL ${base_url}/${library_artifact}debug.zip)
+    fetchcontent_declare(libssh_release URL ${base_url}/${library_artifact}.zip)
+    fetchcontent_declare(libssh_headers URL ${base_url}/${base_artifact_name}-headers.zip)
+    fetchcontent_makeavailable(libssh_debug libssh_release libssh_headers)
+    message(STATUS "Done.")
+    file(
+        GLOB debug_lib_location
+        ${libssh_debug_SOURCE_DIR}/${platform}/${arch}/static/*${CMAKE_STATIC_LIBRARY_SUFFIX}
+    )
+    file(
+        GLOB release_lib_location
+        ${libssh_release_SOURCE_DIR}/${platform}/${arch}/static/*${CMAKE_STATIC_LIBRARY_SUFFIX}
+    )
+    add_library(libssh STATIC IMPORTED)
+    set_target_properties(
+        libssh
+        PROPERTIES
+            IMPORTED_LOCATION_DEBUG ${debug_lib_location}
+            IMPORTED_LOCATION_RELWITHDEBINFO ${release_lib_location}
+    )
+    target_include_directories(libssh INTERFACE ${libssh_headers_SOURCE_DIR})
+    if(MSVC)
+        target_link_libraries(libssh INTERFACE ws2_32.lib crypt32.lib)
+    elseif(APPLE)
+        target_link_options(libssh INTERFACE "-framework Kerberos")
+    endif()
+    set(LIBSSH_LIBRARIES libssh)
+    set(LIBSSH_INCLUDE_DIRS ${libssh_headers_SOURCE_DIR})
+    set(LIBSSH_VERSION 0.105.1)
+    mark_as_advanced(LIBSSH_INCLUDE_DIRS LIBSSH_LIBRARIES)
+
+    find_package_handle_standard_args(
+        LIBSSH
+        FOUND_VAR LIBSSH_FOUND
+        REQUIRED_VARS LIBSSH_INCLUDE_DIRS LIBSSH_LIBRARIES
+        VERSION_VAR LIBSSH_VERSION
+    )
 else()
     find_path(
         LIBSSH_INCLUDE_DIR
