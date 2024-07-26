@@ -19,19 +19,6 @@ wpilib_target_warnings(hal)
 set_target_properties(hal PROPERTIES DEBUG_POSTFIX "d")
 set_target_properties(hal PROPERTIES OUTPUT_NAME "wpiHal")
 
-target_include_directories(
-    hal
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
-        $<INSTALL_INTERFACE:${include_dest}/hal>
-)
-
-target_include_directories(
-    hal
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/include>
-        $<INSTALL_INTERFACE:${include_dest}/hal>
-)
 target_link_libraries(hal PUBLIC wpiutil)
 
 set_property(TARGET hal PROPERTY FOLDER "libraries")
@@ -39,7 +26,6 @@ set_property(TARGET hal PROPERTY FOLDER "libraries")
 configure_file(hal-config.cmake.in ${WPILIB_BINARY_DIR}/hal-config.cmake)
 
 if(BUILD_MAVEN)
-    config_maven_build(hal ARTIFACT hal CONFIG_FILE hal-config.cmake)
     if(${arch} STREQUAL athena)
         find_package(NILibraries REQUIRED)
         target_sources(hal PRIVATE ${hal_athena_native_src})
@@ -47,15 +33,32 @@ if(BUILD_MAVEN)
     else()
         target_sources(hal PRIVATE ${hal_sim_native_src})
     endif()
+    config_maven_build(hal GROUP edu.wpi.first.hal ARTIFACT hal-cpp CONFIG_FILE hal-config.cmake)
+    set(header_dest hal-cpp/include)
 else()
     target_sources(hal PRIVATE ${hal_sim_native_src})
     install(TARGETS hal EXPORT hal)
     export(TARGETS hal FILE hal.cmake NAMESPACE hal::)
     install(FILES ${WPILIB_BINARY_DIR}/hal-config.cmake DESTINATION share/hal)
     install(EXPORT hal DESTINATION share/hal)
+    set(header_dest ${include_dest}/hal)
 endif()
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/hal")
-install(DIRECTORY src/generated/main/native/include/ DESTINATION "${include_dest}/hal")
+
+install(DIRECTORY src/main/native/include/ DESTINATION ${header_dest})
+target_include_directories(
+    hal
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<INSTALL_INTERFACE:${header_dest}>
+)
+
+install(DIRECTORY src/generated/main/native/include/ DESTINATION ${header_dest})
+target_include_directories(
+    hal
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/include>
+        $<INSTALL_INTERFACE:${header_dest}>
+)
 
 # Java bindings
 if(WITH_JAVA)
@@ -91,10 +94,10 @@ if(WITH_JAVA)
     add_dependencies(haljni hal_jar)
 
     if(BUILD_MAVEN)
-        config_maven_build(haljni ARTIFACT hal)
+        config_maven_build(haljni GROUP edu.wpi.first.hal ARTIFACT hal-cpp)
         install(
             DIRECTORY $<TARGET_PROPERTY:hal_jni_headers,NATIVE_HEADERS_DIRECTORY>/
-            DESTINATION sources/hal/jni
+            DESTINATION hal-cpp/sources/jni
         )
     else()
         install(TARGETS haljni EXPORT haljni)

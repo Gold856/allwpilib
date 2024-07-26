@@ -34,12 +34,6 @@ else()
     target_sources(cscore PRIVATE ${cscore_linux_src})
 endif()
 
-target_include_directories(
-    cscore
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
-        $<INSTALL_INTERFACE:${include_dest}/cscore>
-)
 target_include_directories(cscore PRIVATE src/main/native/cpp)
 wpilib_target_warnings(cscore)
 target_link_libraries(cscore PUBLIC wpinet wpiutil ${OpenCV_LIBS})
@@ -48,14 +42,28 @@ set_property(TARGET cscore PROPERTY FOLDER "libraries")
 
 configure_file(cscore-config.cmake.in ${WPILIB_BINARY_DIR}/cscore-config.cmake)
 if(BUILD_MAVEN)
-    config_maven_build(cscore ARTIFACT cscore CONFIG_FILE cscore-config.cmake)
+    config_maven_build(
+        cscore
+        GROUP edu.wpi.first.cscore
+        ARTIFACT cscore-cpp
+        CONFIG_FILE cscore-config.cmake
+    )
+    set(header_dest cscore-cpp/include)
 else()
     install(TARGETS cscore EXPORT cscore)
     export(TARGETS cscore FILE cscore.cmake NAMESPACE cscore::)
     install(FILES ${WPILIB_BINARY_DIR}/cscore-config.cmake DESTINATION share/cscore)
     install(EXPORT cscore DESTINATION share/cscore)
+    set(header_dest ${include_dest}/cscore)
 endif()
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/cscore")
+
+install(DIRECTORY src/main/native/include/ DESTINATION ${header_dest})
+target_include_directories(
+    cscore
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<INSTALL_INTERFACE:${header_dest}>
+)
 
 subdir_list(cscore_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
 foreach(example ${cscore_examples})
@@ -130,10 +138,10 @@ if(WITH_JAVA)
     add_dependencies(cscorejni cscore_jar)
 
     if(BUILD_MAVEN)
-        config_maven_build(cscorejni ARTIFACT cscore)
+        config_maven_build(cscorejni GROUP edu.wpi.first.cscore ARTIFACT cscore-cpp)
         install(
             DIRECTORY $<TARGET_PROPERTY:cscore_jni_headers,NATIVE_HEADERS_DIRECTORY>/
-            DESTINATION sources/cscore/jni
+            DESTINATION cscore-cpp/sources/jni
         )
     else()
         install(TARGETS cscorejni EXPORT cscorejni)

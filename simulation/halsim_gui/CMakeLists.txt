@@ -17,7 +17,7 @@ target_include_directories(halsim_gui PRIVATE src/main/native/include)
 set_property(TARGET halsim_gui PROPERTY FOLDER "libraries")
 
 if(BUILD_MAVEN)
-    config_maven_build(halsim_gui ARTIFACT halsim_gui)
+    config_maven_build(halsim_gui GROUP edu.wpi.first.halsim ARTIFACT halsim_gui)
 else()
     install(TARGETS halsim_gui EXPORT halsim_gui)
     export(TARGETS halsim_gui FILE halsim_gui.cmake NAMESPACE halsim_gui::)
