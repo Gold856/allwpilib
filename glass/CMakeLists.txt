@@ -25,20 +25,27 @@ set_property(TARGET libglass PROPERTY FOLDER "libraries")
 wpilib_target_warnings(libglass)
 target_link_libraries(libglass PUBLIC wpigui wpimath wpiutil fieldImages)
 
+if(BUILD_MAVEN)
+    config_maven_build(
+        libglass
+        GROUP edu.wpi.first.glass
+        ARTIFACT libglass
+        SOURCE_DIR src/lib/native/cpp
+    )
+    set(header_dest libglass/include)
+else()
+    install(TARGETS libglass EXPORT libglass)
+    export(TARGETS libglass FILE libglass.cmake NAMESPACE libglass::)
+    set(header_dest ${include_dest}/glass)
+endif()
+
+install(DIRECTORY src/lib/native/include/ DESTINATION ${header_dest})
 target_include_directories(
     libglass
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/lib/native/include>
-        $<INSTALL_INTERFACE:${include_dest}/glass>
+        $<INSTALL_INTERFACE:${header_dest}>
 )
-
-if(BUILD_MAVEN)
-    config_maven_build(libglass ARTIFACT libglass SOURCE_DIR src/lib/native/cpp)
-else()
-    install(TARGETS libglass EXPORT libglass)
-    export(TARGETS libglass FILE libglass.cmake NAMESPACE libglass::)
-    install(DIRECTORY src/lib/native/include/ DESTINATION "${include_dest}/glass")
-endif()
 
 #
 # libglassnt
@@ -57,20 +64,27 @@ set_property(TARGET libglassnt PROPERTY FOLDER "libraries")
 wpilib_target_warnings(libglassnt)
 target_link_libraries(libglassnt PUBLIC ntcore libglass)
 
+if(BUILD_MAVEN)
+    config_maven_build(
+        libglassnt
+        GROUP edu.wpi.first.glass
+        ARTIFACT libglassnt
+        SOURCE_DIR src/libnt/native/cpp
+    )
+    set(header_dest libglassnt/include)
+else()
+    install(TARGETS libglassnt EXPORT libglassnt)
+    export(TARGETS libglassnt FILE libglassnt.cmake NAMESPACE libglassnt::)
+    set(header_dest ${include_dest}/glass)
+endif()
+
+install(DIRECTORY src/libnt/native/include/ DESTINATION ${header_dest})
 target_include_directories(
     libglassnt
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/libnt/native/include>
-        $<INSTALL_INTERFACE:${include_dest}/glass>
+        $<INSTALL_INTERFACE:${header_dest}>
 )
-
-if(BUILD_MAVEN)
-    config_maven_build(libglassnt ARTIFACT libglassnt SOURCE_DIR src/libnt/native/cpp)
-else()
-    install(TARGETS libglassnt EXPORT libglassnt)
-    export(TARGETS libglassnt FILE libglassnt.cmake NAMESPACE libglassnt::)
-    install(DIRECTORY src/libnt/native/include/ DESTINATION "${include_dest}/glass")
-endif()
 
 #
 # glass application
@@ -101,5 +115,5 @@ elseif(APPLE)
 endif()
 
 if(BUILD_MAVEN)
-    config_maven_build(glass ARTIFACT Glass)
+    config_maven_build(glass GROUP edu.wpi.first.tools ARTIFACT Glass)
 endif()

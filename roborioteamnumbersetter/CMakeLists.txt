@@ -42,5 +42,9 @@ endif()
 
 if(BUILD_MAVEN)
     target_compile_definitions(roborioteamnumbersetter PRIVATE LIBSSH_STATIC)
-    config_maven_build(roborioteamnumbersetter ARTIFACT roboRIOTeamNumberSetter)
+    config_maven_build(
+        roborioteamnumbersetter
+        GROUP edu.wpi.first.tools
+        ARTIFACT roboRIOTeamNumberSetter
+    )
 endif()

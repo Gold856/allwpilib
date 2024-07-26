@@ -49,5 +49,5 @@ if(WITH_TESTS)
 endif()
 
 if(BUILD_MAVEN)
-    config_maven_build(sysid ARTIFACT SysId)
+    config_maven_build(sysid GROUP edu.wpi.first.tools ARTIFACT SysId)
 endif()

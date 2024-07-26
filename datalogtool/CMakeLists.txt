@@ -39,5 +39,5 @@ endif()
 
 if(BUILD_MAVEN)
     target_compile_definitions(datalogtool PRIVATE LIBSSH_STATIC)
-    config_maven_build(datalogtool ARTIFACT DataLogTool)
+    config_maven_build(datalogtool GROUP edu.wpi.first.tools ARTIFACT DataLogTool)
 endif()

@@ -14,7 +14,7 @@ target_include_directories(halsim_ws_core PUBLIC src/main/native/include)
 set_property(TARGET halsim_ws_core PROPERTY FOLDER "libraries")
 
 if(BUILD_MAVEN)
-    config_maven_build(halsim_ws_core ARTIFACT halsim_ws_core)
+    config_maven_build(halsim_ws_core GROUP edu.wpi.first.halsim ARTIFACT halsim_ws_core)
 else()
     install(TARGETS halsim_ws_core EXPORT halsim_ws_core)
     export(TARGETS halsim_ws_core FILE halsim_ws_core.cmake NAMESPACE halsim_ws_core::)

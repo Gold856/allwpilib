@@ -20,6 +20,24 @@ set_property(TARGET wpigui PROPERTY FOLDER "libraries")
 wpilib_target_warnings(wpigui)
 target_link_libraries(wpigui PUBLIC imgui)
 
+if(BUILD_MAVEN)
+    config_maven_build(
+        wpigui
+        GROUP edu.wpi.first.wpigui
+        ARTIFACT wpigui-cpp
+        SOURCE_DIR src/main/native/cpp/
+        src/main/native/directx11
+        src/main/native/metal/
+        src/main/native/opengl3/
+    )
+    set(header_dest wpigui-cpp/include)
+else()
+    install(TARGETS wpigui EXPORT wpigui)
+    export(TARGETS wpigui FILE wpigui.cmake NAMESPACE wpigui::)
+    set(header_dest ${include_dest}/wpigui)
+endif()
+
+install(DIRECTORY src/main/native/include/ DESTINATION ${header_dest})
 target_include_directories(
     wpigui
     PUBLIC
@@ -41,18 +59,3 @@ add_executable(wpiguidev src/dev/native/cpp/main.cpp)
 wpilib_link_macos_gui(wpiguidev)
 wpilib_target_warnings(wpiguidev)
 target_link_libraries(wpiguidev wpigui)
-
-if(BUILD_MAVEN)
-    config_maven_build(
-        wpigui
-        ARTIFACT wpigui
-        SOURCE_DIR src/main/native/cpp/
-        src/main/native/directx11
-        src/main/native/metal/
-        src/main/native/opengl3/
-    )
-else()
-    install(TARGETS wpigui EXPORT wpigui)
-    export(TARGETS wpigui FILE wpigui.cmake NAMESPACE wpigui::)
-endif()
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpigui")

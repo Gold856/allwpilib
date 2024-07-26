@@ -17,14 +17,6 @@ file(
 )
 add_library(ntcore ${ntcore_native_src})
 set_target_properties(ntcore PROPERTIES DEBUG_POSTFIX "d")
-target_include_directories(
-    ntcore
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/cpp
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/include>
-        $<INSTALL_INTERFACE:${include_dest}/ntcore>
-)
 wpilib_target_warnings(ntcore)
 target_compile_features(ntcore PUBLIC cxx_std_20)
 target_link_libraries(ntcore PUBLIC wpinet wpiutil)
@@ -33,15 +25,31 @@ set_property(TARGET ntcore PROPERTY FOLDER "libraries")
 
 configure_file(ntcore-config.cmake.in ${WPILIB_BINARY_DIR}/ntcore-config.cmake)
 if(BUILD_MAVEN)
-    config_maven_build(ntcore ARTIFACT ntcore CONFIG_FILE ntcore-config.cmake)
+    config_maven_build(
+        ntcore
+        GROUP edu.wpi.first.ntcore
+        ARTIFACT ntcore-cpp
+        CONFIG_FILE ntcore-config.cmake
+    )
+    set(header_dest ntcore-cpp/include)
 else()
     install(TARGETS ntcore EXPORT ntcore)
     export(TARGETS ntcore FILE ntcore.cmake NAMESPACE ntcore::)
     install(FILES ${WPILIB_BINARY_DIR}/ntcore-config.cmake DESTINATION share/ntcore)
     install(EXPORT ntcore DESTINATION share/ntcore)
+    set(header_dest ${include_dest}/ntcore)
 endif()
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/ntcore")
-install(DIRECTORY src/generated/main/native/include/ DESTINATION "${include_dest}/ntcore")
+
+install(DIRECTORY src/main/native/include/ DESTINATION ${header_dest})
+install(DIRECTORY src/generated/main/native/include/ DESTINATION ${header_dest})
+target_include_directories(
+    ntcore
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/cpp
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/include>
+        $<INSTALL_INTERFACE:${header_dest}>
+)
 
 # Java bindings
 if(WITH_JAVA)
@@ -77,10 +85,10 @@ if(WITH_JAVA)
     add_dependencies(ntcorejni ntcore_jar)
 
     if(BUILD_MAVEN)
-        config_maven_build(ntcorejni ARTIFACT ntcore)
+        config_maven_build(ntcorejni GROUP edu.wpi.first.ntcore ARTIFACT ntcore-cpp)
         install(
             DIRECTORY $<TARGET_PROPERTY:ntcore_jni_headers,NATIVE_HEADERS_DIRECTORY>/
-            DESTINATION sources/ntcore/jni
+            DESTINATION ntcore-cpp/sources/jni
         )
     else()
         install(TARGETS ntcorejni EXPORT ntcorejni)

@@ -59,23 +59,29 @@ target_compile_features(xrpVendordep PUBLIC cxx_std_20)
 wpilib_target_warnings(xrpVendordep)
 target_link_libraries(xrpVendordep wpilibc)
 
+configure_file(xrpvendordep-config.cmake.in ${WPILIB_BINARY_DIR}/xrpvendordep-config.cmake)
+if(BUILD_MAVEN)
+    config_maven_build(
+        xrpVendordep
+        GROUP edu.wpi.first.xrpVendordep
+        ARTIFACT xrpVendordep-cpp
+        CONFIG_FILE xrpvendordep-config.cmake
+    )
+    set(header_dest xrpVendordep-cpp/include)
+else()
+    install(TARGETS xrpVendordep EXPORT xrpvendordep)
+    export(TARGETS xrpVendordep FILE xrpvendordep.cmake NAMESPACE xrpvendordep::)
+    install(FILES ${WPILIB_BINARY_DIR}/xrpvendordep-config.cmake DESTINATION share/xrpVendordep)
+    install(EXPORT xrpvendordep DESTINATION share/xrpVendordep)
+    set(header_dest ${include_dest}/xrpVendordep)
+endif()
+install(DIRECTORY src/main/native/include/ DESTINATION ${header_dest})
 target_include_directories(
     xrpVendordep
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
         $<INSTALL_INTERFACE:${include_dest}/xrpVendordep>
 )
-
-configure_file(xrpvendordep-config.cmake.in ${WPILIB_BINARY_DIR}/xrpvendordep-config.cmake)
-if(BUILD_MAVEN)
-    config_maven_build(xrpVendordep ARTIFACT xrpVendordep CONFIG_FILE xrpvendordep-config.cmake)
-else()
-    install(TARGETS xrpVendordep EXPORT xrpvendordep)
-    export(TARGETS xrpVendordep FILE xrpvendordep.cmake NAMESPACE xrpvendordep::)
-    install(FILES ${WPILIB_BINARY_DIR}/xrpvendordep-config.cmake DESTINATION share/xrpVendordep)
-    install(EXPORT xrpvendordep DESTINATION share/xrpVendordep)
-endif()
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/xrpVendordep")
 
 if(WITH_TESTS)
     wpilib_add_test(xrpVendordep src/test/native/cpp)

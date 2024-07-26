@@ -92,10 +92,10 @@ if(WITH_JAVA)
     add_dependencies(apriltagjni apriltag_jar)
 
     if(BUILD_MAVEN)
-        config_maven_build(apriltagjni ARTIFACT apriltag)
+        config_maven_build(apriltagjni GROUP edu.wpi.first.apriltag ARTIFACT apriltag-cpp)
         install(
             DIRECTORY $<TARGET_PROPERTY:apriltag_jni_headers,NATIVE_HEADERS_DIRECTORY>/
-            DESTINATION sources/apriltag/jni
+            DESTINATION apriltag-cpp/sources/jni
         )
     else()
         install(TARGETS apriltagjni EXPORT apriltagjni)
@@ -136,50 +136,51 @@ wpilib_target_warnings(apriltag)
 
 target_link_libraries(apriltag wpimath)
 
-target_include_directories(
-    apriltag
-    PUBLIC
-        $<BUILD_INTERFACE:${apriltaglib_SOURCE_DIR}>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
-        $<INSTALL_INTERFACE:${include_dest}/apriltag>
-)
-
-install(
-    DIRECTORY src/main/native/thirdparty/apriltag/include/
-    DESTINATION "${include_dest}/apriltag"
-)
-target_include_directories(
-    apriltag
-    SYSTEM
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/include/common>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/src>
-)
-
-install(
-    DIRECTORY src/main/native/thirdparty/apriltag/include/
-    DESTINATION "${include_dest}/apriltag"
-)
-target_include_directories(
-    apriltag
-    SYSTEM
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/include/common>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/src>
-)
-
 configure_file(apriltag-config.cmake.in ${WPILIB_BINARY_DIR}/apriltag-config.cmake)
 if(BUILD_MAVEN)
-    config_maven_build(apriltag ARTIFACT apriltag CONFIG_FILE apriltag-config.cmake)
+    config_maven_build(
+        apriltag
+        GROUP edu.wpi.first.apriltag
+        ARTIFACT apriltag-cpp
+        CONFIG_FILE apriltag-config.cmake
+    )
+    set(header_dest apriltag-cpp/include)
 else()
     install(TARGETS apriltag EXPORT apriltag)
     export(TARGETS apriltag FILE apriltag.cmake NAMESPACE apriltag::)
     install(FILES ${WPILIB_BINARY_DIR}/apriltag-config.cmake DESTINATION share/apriltag)
     install(EXPORT apriltag DESTINATION share/apriltag)
+    set(header_dest ${include_dest}/apriltag)
 endif()
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/apriltag")
+
+install(DIRECTORY src/main/native/include/ DESTINATION ${header_dest})
+target_include_directories(
+    apriltag
+    PUBLIC
+        $<BUILD_INTERFACE:${apriltaglib_SOURCE_DIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<INSTALL_INTERFACE:${header_dest}>
+)
+
+install(DIRECTORY src/main/native/thirdparty/apriltag/include/ DESTINATION ${header_dest})
+target_include_directories(
+    apriltag
+    SYSTEM
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/include/common>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/src>
+)
+
+install(DIRECTORY src/main/native/thirdparty/apriltag/include/ DESTINATION ${header_dest})
+target_include_directories(
+    apriltag
+    SYSTEM
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/include/common>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/apriltag/src>
+)
 
 if(WITH_TESTS)
     wpilib_add_test(apriltag src/test/native/cpp)
