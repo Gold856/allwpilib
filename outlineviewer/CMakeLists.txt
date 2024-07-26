@@ -38,5 +38,5 @@ elseif(APPLE)
 endif()
 
 if(BUILD_MAVEN)
-    config_maven_build(outlineviewer ARTIFACT OutlineViewer)
+    config_maven_build(outlineviewer GROUP edu.wpi.first.tools ARTIFACT OutlineViewer)
 endif()

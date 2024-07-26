@@ -105,10 +105,10 @@ if(WITH_JAVA)
     add_dependencies(wpimathjni wpimath_jar)
 
     if(BUILD_MAVEN)
-        config_maven_build(wpimathjni ARTIFACT wpimath)
+        config_maven_build(wpimathjni GROUP edu.wpi.first.wpimath ARTIFACT wpimath-cpp)
         install(
             DIRECTORY $<TARGET_PROPERTY:wpimath_jni_headers,NATIVE_HEADERS_DIRECTORY>/
-            DESTINATION sources/wpimath/jni
+            DESTINATION wpimath-cpp/sources/jni
         )
     else()
         install(TARGETS wpimathjni EXPORT wpimathjni)
@@ -154,27 +154,38 @@ endif()
 wpilib_target_warnings(wpimath)
 target_link_libraries(wpimath wpiutil)
 
-if(NOT USE_SYSTEM_EIGEN)
-    install(
-        DIRECTORY src/main/native/thirdparty/eigen/include/
-        DESTINATION "${include_dest}/wpimath"
+configure_file(wpimath-config.cmake.in ${WPILIB_BINARY_DIR}/wpimath-config.cmake)
+if(BUILD_MAVEN)
+    config_maven_build(
+        wpimath
+        GROUP edu.wpi.first.wpimath
+        ARTIFACT wpimath-cpp
+        CONFIG_FILE wpimath-config.cmake
     )
+    set(header_dest wpimath-cpp/include)
+else()
+    install(TARGETS wpimath EXPORT wpimath)
+    export(TARGETS wpimath FILE wpimath.cmake NAMESPACE wpimath::)
+    install(FILES ${WPILIB_BINARY_DIR}/wpimath-config.cmake DESTINATION share/wpimath)
+    install(EXPORT wpimath DESTINATION share/wpimath)
+    set(header_dest ${include_dest}/wpimath)
+endif()
+
+if(NOT USE_SYSTEM_EIGEN)
+    install(DIRECTORY src/main/native/thirdparty/eigen/include/ DESTINATION ${header_dest})
     target_include_directories(
         wpimath
         SYSTEM
         PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/eigen/include>
-            $<INSTALL_INTERFACE:${include_dest}/wpimath>
+            $<INSTALL_INTERFACE:${header_dest}>
     )
 else()
     find_package(Eigen3 CONFIG REQUIRED)
     target_link_libraries(wpimath Eigen3::Eigen)
 endif()
 
-install(
-    DIRECTORY src/main/native/thirdparty/sleipnir/include/
-    DESTINATION "${include_dest}/wpimath"
-)
+install(DIRECTORY src/main/native/thirdparty/sleipnir/include/ DESTINATION ${header_dest})
 target_include_directories(
     wpimath
     SYSTEM
@@ -183,31 +194,21 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sleipnir/src>
 )
 
-install(DIRECTORY src/main/native/thirdparty/gcem/include/ DESTINATION "${include_dest}/wpimath")
+install(DIRECTORY src/main/native/thirdparty/gcem/include/ DESTINATION ${header_dest})
 target_include_directories(
     wpimath
     SYSTEM
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/gcem/include>
 )
 
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpimath")
+install(DIRECTORY src/main/native/include/ DESTINATION ${header_dest})
 target_include_directories(
     wpimath
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/protobuf>
-        $<INSTALL_INTERFACE:${include_dest}/wpimath>
+        $<INSTALL_INTERFACE:${header_dest}>
 )
-
-configure_file(wpimath-config.cmake.in ${WPILIB_BINARY_DIR}/wpimath-config.cmake)
-if(BUILD_MAVEN)
-    config_maven_build(wpimath ARTIFACT wpimath CONFIG_FILE wpimath-config.cmake)
-else()
-    install(TARGETS wpimath EXPORT wpimath)
-    export(TARGETS wpimath FILE wpimath.cmake NAMESPACE wpimath::)
-    install(FILES ${WPILIB_BINARY_DIR}/wpimath-config.cmake DESTINATION share/wpimath)
-    install(EXPORT wpimath DESTINATION share/wpimath)
-endif()
 
 if(WITH_TESTS)
     wpilib_add_test(wpimath src/test/native/cpp)

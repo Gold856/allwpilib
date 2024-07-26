@@ -14,7 +14,7 @@ target_include_directories(halsim_xrp PRIVATE src/main/native/include)
 set_property(TARGET halsim_xrp PROPERTY FOLDER "libraries")
 
 if(BUILD_MAVEN)
-    config_maven_build(halsim_xrp ARTIFACT halsim_xrp)
+    config_maven_build(halsim_xrp GROUP edu.wpi.first.halsim ARTIFACT halsim_xrp)
 else()
     install(TARGETS halsim_xrp EXPORT halsim_xrp)
     export(TARGETS halsim_xrp FILE halsim_xrp.cmake NAMESPACE halsim_xrp::)
