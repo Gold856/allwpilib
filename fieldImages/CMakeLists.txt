@@ -2,6 +2,9 @@ project(fieldImages)
 
 include(CompileWarnings)
 include(GenResources)
+if(BUILD_MAVEN)
+    include(BuildMaven)
+endif()
 
 if(WITH_JAVA)
     include(UseJava)
@@ -52,17 +55,26 @@ if(MSVC)
 endif()
 wpilib_target_warnings(fieldImages)
 
-install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/fieldImages")
+configure_file(fieldimages-config.cmake.in ${WPILIB_BINARY_DIR}/fieldimages-config.cmake)
+if(BUILD_MAVEN)
+    config_maven_build(
+        fieldImages
+        GROUP edu.wpi.first.fieldImages
+        ARTIFACT fieldImages-cpp
+        CONFIG_FILE fieldimages-config.cmake
+    )
+    set(header_dest fieldImages-cpp/include)
+else()
+    install(TARGETS fieldImages EXPORT fieldimages)
+    export(TARGETS fieldImages FILE fieldimages.cmake NAMESPACE fieldimages::)
+    install(FILES ${WPILIB_BINARY_DIR}/fieldimages-config.cmake DESTINATION share/fieldImages)
+    install(EXPORT fieldimages DESTINATION share/fieldImages)
+    set(header_dest ${include_dest}/fieldImages)
+endif()
+install(DIRECTORY src/main/native/include/ DESTINATION ${header_dest})
 target_include_directories(
     fieldImages
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
-        $<INSTALL_INTERFACE:${include_dest}/fieldImages>
+        $<INSTALL_INTERFACE:${header_dest}>
 )
-
-install(TARGETS fieldImages EXPORT fieldimages)
-export(TARGETS fieldImages FILE fieldimages.cmake NAMESPACE fieldimages::)
-
-configure_file(fieldimages-config.cmake.in ${WPILIB_BINARY_DIR}/fieldimages-config.cmake)
-install(FILES ${WPILIB_BINARY_DIR}/fieldimages-config.cmake DESTINATION share/fieldImages)
-install(EXPORT fieldimages DESTINATION share/fieldImages)
