@@ -15,6 +15,7 @@ set_property(TARGET halsim_ds_socket PROPERTY FOLDER "libraries")
 
 if(BUILD_MAVEN)
     config_maven_build(halsim_ds_socket GROUP edu.wpi.first.halsim ARTIFACT halsim_ds_socket)
+    install(DIRECTORY src/main/native/include/ DESTINATION halsim_ds_socket/include)
 else()
     install(TARGETS halsim_ds_socket EXPORT halsim_ds_socket)
     export(TARGETS halsim_ds_socket FILE halsim_ds_socket.cmake NAMESPACE halsim_ds_socket::)
