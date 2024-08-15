@@ -43,10 +43,10 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${WPILIB_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${WPILIB_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${WPILIB_BINARY_DIR}/bin)
 
-# use, i.e. don't skip the full RPATH for the build tree
+# use, i.e. don"t skip the full RPATH for the build tree
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
 
-# when building, don't use the install RPATH already
+# when building, don"t use the install RPATH already
 # (but later on when installing)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
@@ -136,6 +136,69 @@ find_package(Protobuf REQUIRED)
 find_program(PROTOC_COMPILER protoc REQUIRED)
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG OFF)
 
+find_package(Doxygen REQUIRED)
+set(DOXYGEN_NUM_PROC_THREADS 16)
+set(dirs
+    apriltag
+    cameraserver
+    cscore
+    fieldImages
+    hal
+    ntcore
+    wpilibc
+    wpilibNewCommands
+    wpimath
+    wpinet
+    wpiutil
+)
+foreach(dir ${dirs})
+    list(APPEND docs_dirs ${dir}/src/main/native/include)
+    file(GLOB dirs ${dir}/src/main/native/thirdparty/*/include)
+    list(FILTER dirs EXCLUDE REGEX eigen|protobuf|memory)
+    list(APPEND docs_dirs ${dirs})
+    list(APPEND docs_dirs ${dir}/src/generated/main/native/include)
+endforeach()
+set(DOXYGEN_CASE_SENSE_NAMES false)
+set(DOXYGEN_EXTENSION_MAPPING inc=C++ no_extension=C++)
+set(DOXYGEN_EXTRACT_ALL true)
+set(DOXYGEN_EXTRACT_STATIC true)
+set(DOXYGEN_FILE_PATTERNS "*")
+set(DOXYGEN_FULL_PATH_NAMES true)
+set(DOXYGEN_FULL_SIDEBAR false)
+set(DOXYGEN_GENERATE_HTML true)
+set(DOXYGEN_GENERATE_LATEX false)
+set(DOXYGEN_GENERATE_TREEVIEW true)
+# set(DOXYGEN_HTML_COLORSTYLE "LIGHT")
+set(DOXYGEN_HTML_EXTRA_STYLESHEET docs/theme.css)
+set(DOXYGEN_JAVADOC_AUTOBRIEF true)
+set(DOXYGEN_ALIASES
+    "effects=\\par <i>Effects:</i>^^"
+    "notes=\\par <i>Notes:</i>^^"
+    "requires=\\par <i>Requires:</i>^^"
+    "requiredbe=\\par <i>Required Behavior:</i>^^"
+    "concept{2}=<a href=\"md_doc_concepts.html#1\">2</a>"
+    "defaultbe=\\par <i>Default Behavior:</i>^^"
+)
+set(DOXYGEN_PROJECT_NAME WPILibC++)
+# set(DOXYGEN_PROJECT_NUMBER version)
+set(DOXYGEN_PROJECT_LOGO wpiutil/src/main/native/resources/wpilib-128.png)
+set(DOXYGEN_QUIET true)
+set(DOXYGEN_RECURSIVE true)
+set(DOXYGEN_STRIP_CODE_COMMENTS false)
+set(DOXYGEN_STRIP_FROM_PATH ${docs_dirs})
+set(DOXYGEN_STRIP_FROM_INC_PATH ${docs_dirs})
+set(DOXYGEN_TIMESTAMP "DATETIME")
+set(DOXYGEN_USE_MATHJAX true)
+set(DOXYGEN_WARNINGS false)
+set(DOXYGEN_WARN_IF_INCOMPLETE_DOC true)
+set(DOXYGEN_WARN_IF_UNDOCUMENTED false)
+set(DOXYGEN_WARN_NO_PARAMDOC true)
+
+set(DOXYGEN_ENABLE_PREPROCESSING true)
+set(DOXYGEN_MACRO_EXPANSION true)
+set(DOXYGEN_EXPAND_ONLY_PREDEF true)
+set(DOXYGEN_PREDEFINED "__cplusplus" "HAL_ENUM(name)=enum name : int32_t")
+doxygen_add_docs(docs ${docs_dirs})
 get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 
 if(isMultiConfig)
