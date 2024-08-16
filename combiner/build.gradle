@@ -1,0 +1,68 @@
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+apply plugin: 'maven-publish'
+
+def fileFinder = new FileNameFinder()
+
+def allFiles = files(fileFinder.getFileNames(new File(projectDir, 'build-cmake').absolutePath, '**/install/*.zip'))
+
+def pubVersion = file(fileFinder.getFileNames(new File(projectDir, 'build-cmake').absolutePath, '**/install/version.txt').first()).text.trim()
+
+println pubVersion
+
+String regex = "([_M_]*)_GROUP_([^\\.]+)_ID_([^\\.]+)_CLS([^\\.]*)."
+Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
+
+def groups = [:]
+
+for (File it : allFiles) {
+  Matcher matcher = pattern.matcher(it.name);
+
+  if (!matcher.find()) {
+    continue
+  }
+
+  def groupId = matcher.group(2)
+  def artifactId = matcher.group(3)
+  def classifier = matcher.group(4)
+
+  if (!classifier.empty) {
+    classifier = classifier.substring(1)
+  }
+
+  def group = groups[groupId]
+  if (group == null) {
+    group = [:]
+    groups[groupId] = group
+  }
+
+  def id = group[artifactId]
+  if (id == null) {
+    id = []
+    group[artifactId] = id
+  }
+
+  id << new Tuple(classifier, it)
+}
+
+publishing {
+  publications {
+    groups.each { key, value->
+      value.each { key2, value2->
+        "${key}${key2}"(MavenPublication) {
+          value2.each { t->
+            artifact (t.get(1)) {
+              if (!t.get(0).empty) {
+                classifier = t.get(0)
+              }
+            }
+          }
+          groupId = key.replace('_', '.')
+          artifactId = key2
+          version = pubVersion
+        }
+      }
+    }
+  }
+}
