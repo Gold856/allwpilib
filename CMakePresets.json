@@ -45,6 +45,38 @@
       "cacheVariables": {
         "WITH_JAVA": "ON"
       }
+    },
+    {
+      "name": "ci-maven",
+      "description": "Maven config",
+      "inherits": "with-java",
+      "cacheVariables": {
+        "BUILD_MAVEN": true,
+        "Protobuf_INCLUDE_DIR": "wpiutil/src/main/native/thirdparty/protobuf/include",
+        "WITH_EXAMPLES": true
+      }
+    },
+    {
+      "name": "ci-maven-unix",
+      "description": "Maven config for compiling on *nix platforms",
+      "inherits": ["ci-maven", "sccache"],
+      "cacheVariables": {
+        "Protobuf_INCLUDE_DIR": "wpiutil/src/main/native/thirdparty/protobuf/include",
+        "Protobuf_PROTOC_EXECUTABLE": "bin/protoc",
+        "PROTOC_COMPILER": "bin/protoc"
+      }
+    },
+    {
+      "name": "ci-maven-linux-cross",
+      "description": "Maven config for cross-compiling Linux",
+      "inherits": "ci-maven-unix",
+      "cacheVariables": {
+        "Protobuf_LIBRARIES": "/usr/lib/x86_64-linux-gnu",
+        "JAVA_INCLUDE_PATH": "/tmp/jni/",
+        "JAVA_INCLUDE_PATH2": "/tmp/jni/",
+        "JAVA_JVM_LIBRARY": "$JAVA_HOME/lib/libjvm.so",
+        "WITH_TESTS": false
+      }
     }
   ]
 }

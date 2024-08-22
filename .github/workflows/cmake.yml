@@ -98,46 +98,46 @@ jobs:
           - os: ubuntu-22.04
             name: RIO
             container: wpilib/roborio-cross-ubuntu:2024-22.04
-            flags: "-DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache --toolchain ./cmake/toolchains/arm-frc-gnueabi.toolchain.cmake -DWITH_TESTS=OFF -DWITH_SIMULATION_MODULES=OFF -DWITH_GUI=OFF -DJAVA_INCLUDE_PATH=/tmp/jni/ -DJAVA_INCLUDE_PATH2=/tmp/jni/ -DJAVA_JVM_LIBRARY=$JAVA_HOME/lib/libjvm.so -DProtobuf_LIBRARIES=/usr/lib/x86_64-linux-gnu -DProtobuf_INCLUDE_DIR=/usr/include -DProtobuf_PROTOC_EXECUTABLE=bin/protoc -DPROTOC_COMPILER=bin/protoc"
+            flags: "--preset ci-maven-linux-cross --toolchain ./cmake/toolchains/arm-frc-gnueabi.toolchain.cmake -DWITH_SIMULATION_MODULES=OFF -DWITH_GUI=OFF"
             protoc-archive: protoc-21.12-linux-x86_64.zip
             install-location: /tmp/install
           - os: ubuntu-22.04
             name: Linux Arm32
             container: wpilib/raspbian-cross-ubuntu:bullseye-22.04
-            flags: "-DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache --toolchain ./cmake/toolchains/arm-pi-gnueabihf.toolchain.cmake -DWITH_TESTS=OFF -DJAVA_INCLUDE_PATH=/tmp/jni/ -DJAVA_INCLUDE_PATH2=/tmp/jni/ -DJAVA_JVM_LIBRARY=$JAVA_HOME/lib/libjvm.so -DProtobuf_LIBRARIES=/usr/lib/x86_64-linux-gnu -DProtobuf_INCLUDE_DIR=/usr/include -DProtobuf_PROTOC_EXECUTABLE=bin/protoc -DPROTOC_COMPILER=bin/protoc"
+            flags: "--preset ci-maven-linux-cross --toolchain ./cmake/toolchains/arm-pi-gnueabihf.toolchain.cmake"
             protoc-archive: protoc-21.12-linux-x86_64.zip
             install-location: /tmp/install
           - os: ubuntu-22.04
             name: Linux Arm64
             container: wpilib/aarch64-cross-ubuntu:bullseye-22.04
-            flags: "-DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache --toolchain ./cmake/toolchains/aarch64-bullseye-gnu.toolchain.cmake -DWITH_TESTS=OFF -DJAVA_INCLUDE_PATH=/tmp/jni/ -DJAVA_INCLUDE_PATH2=/tmp/jni/ -DJAVA_JVM_LIBRARY=$JAVA_HOME/lib/libjvm.so -DProtobuf_LIBRARIES=/usr/lib/x86_64-linux-gnu -DProtobuf_INCLUDE_DIR=/usr/include -DProtobuf_PROTOC_EXECUTABLE=bin/protoc -DPROTOC_COMPILER=bin/protoc"
+            flags: "--preset ci-maven-linux-cross --toolchain ./cmake/toolchains/aarch64-bullseye-gnu.toolchain.cmake"
             protoc-archive: protoc-21.12-linux-x86_64.zip
             install-location: /tmp/install
           - os: ubuntu-22.04
             name: Linux x86-64
             container: wpilib/ubuntu-base:22.04
-            flags: "-DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache -DJAVA_JVM_LIBRARY=$JAVA_HOME/lib/libjvm.so -DProtobuf_LIBRARIES=/usr/lib/x86_64-linux-gnu -DProtobuf_INCLUDE_DIR=/usr/include -DProtobuf_PROTOC_EXECUTABLE=bin/protoc -DPROTOC_COMPILER=bin/protoc"
+            flags: "--preset ci-maven-unix"
             protoc-archive: protoc-21.12-linux-x86_64.zip
             install-location: /tmp/install
           - os: macOS-14
             name: macOS
             container: ""
             env: "PATH=\"/opt/homebrew/opt/protobuf@3/bin:$PATH\""
-            flags: "-DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache '-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64' -DWITH_EXAMPLES=ON -DCMAKE_LIBRARY_PATH=/opt/homebrew/opt/protobuf@3/lib -DProtobuf_INCLUDE_DIR=/opt/homebrew/opt/protobuf@3/include -DProtobuf_PROTOC_EXECUTABLE=bin/protoc -DPROTOC_COMPILER=bin/protoc"
+            flags: "--preset ci-maven-unix '-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64' -DCMAKE_LIBRARY_PATH=/opt/homebrew/opt/protobuf@3/lib"
             protoc-archive: protoc-21.12-osx-universal_binary.zip
             install-location: /tmp/install
           - os: windows-2022
             name: Windows x86-64
             container: ""
             msvc: amd64
-            flags: "-DWITH_EXAMPLES=ON -DProtobuf_INCLUDE_DIR=wpiutil/src/main/native/thirdparty/protobuf/include '-DProtobuf_PROTOC_EXECUTABLE=bin/protoc.exe' '-DPROTOC_COMPILER=bin/protoc.exe'"
+            flags: "--preset ci-maven '-DProtobuf_PROTOC_EXECUTABLE=bin/protoc.exe' '-DPROTOC_COMPILER=bin/protoc.exe'"
             protoc-archive: protoc-21.12-win64.zip
             install-location: D:/install
           - os: windows-2022
             name: Windows ARM64
             container: ""
             msvc: amd64_arm64
-            flags: "-DWITH_EXAMPLES=ON -DWITH_TESTS=OFF -DProtobuf_INCLUDE_DIR=wpiutil/src/main/native/thirdparty/protobuf/include '-DProtobuf_PROTOC_EXECUTABLE=bin/protoc.exe' '-DPROTOC_COMPILER=bin/protoc.exe'"
+            flags: "--preset ci-maven -DWITH_TESTS=OFF '-DProtobuf_PROTOC_EXECUTABLE=bin/protoc.exe' '-DPROTOC_COMPILER=bin/protoc.exe'"
             protoc-archive: protoc-21.12-win64.zip
             install-location: D:/install
 
@@ -204,10 +204,10 @@ jobs:
         run: tar -xf ${{ matrix.protoc-archive }}
 
       - name: configure
-        run: cmake -S . -B build -G Ninja -DBUILD_MAVEN=ON -DCMAKE_INSTALL_PREFIX=${{ matrix.install-location }} -DCMAKE_BUILD_TYPE=${{ matrix.config }} ${{ matrix.flags }}
+        run: cmake -DCMAKE_INSTALL_PREFIX=${{ matrix.install-location }} -DCMAKE_BUILD_TYPE=${{ matrix.config }} ${{ matrix.flags }}
 
       - name: build
-        working-directory: build
+        working-directory: build-cmake
         run: cmake --build . --parallel $(nproc) --target install
         env:
           SCCACHE_WEBDAV_ENDPOINT: https://frcmaven.wpi.edu/artifactory/wpilib-generic-gradle-cache-local
@@ -216,12 +216,12 @@ jobs:
 
       - name: test
         if: runner.os != 'Windows'
-        working-directory: build
+        working-directory: build-cmake
         run: ctest --output-on-failure
 
       - name: test (Windows)
         if: runner.os == 'Windows'
-        working-directory: build
+        working-directory: build-cmake
         # UnitTest_test segfaults on exit occasionally
         run: ctest --output-on-failure -E 'UnitTest'
 
