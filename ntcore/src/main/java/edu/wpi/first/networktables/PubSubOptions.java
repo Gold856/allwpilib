@@ -5,7 +5,6 @@
 package edu.wpi.first.networktables;
 
 /** NetworkTables publish/subscribe options. */
-@SuppressWarnings("MemberName")
 public class PubSubOptions {
   /**
    * Construct from a list of options.

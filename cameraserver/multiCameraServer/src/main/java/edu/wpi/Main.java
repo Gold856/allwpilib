@@ -49,7 +49,6 @@ import java.util.List;
 public final class Main {
   private static String configFile = "/boot/frc.json";
 
-  @SuppressWarnings("MemberName")
   public static class CameraConfig {
     public String name;
     public String path;

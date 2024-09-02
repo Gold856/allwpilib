@@ -12,7 +12,6 @@ import java.util.Objects;
  *
  * <p>Limited to 12 bits of precision.
  */
-@SuppressWarnings("MemberName")
 public class Color {
   /** Red component (0-1). */
   public final double red;

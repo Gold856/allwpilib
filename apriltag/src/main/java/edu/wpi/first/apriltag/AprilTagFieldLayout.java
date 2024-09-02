@@ -280,11 +280,9 @@ public class AprilTagFieldLayout {
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
   private static class FieldDimensions {
-    @SuppressWarnings("MemberName")
     @JsonProperty(value = "length")
     public final double fieldLength;
 
-    @SuppressWarnings("MemberName")
     @JsonProperty(value = "width")
     public final double fieldWidth;
 

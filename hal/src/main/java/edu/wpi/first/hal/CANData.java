@@ -5,7 +5,6 @@
 package edu.wpi.first.hal;
 
 /** Represents a received CAN message. */
-@SuppressWarnings("MemberName")
 public class CANData {
   /** Contents of the CAN frame. */
   public final byte[] data = new byte[8];

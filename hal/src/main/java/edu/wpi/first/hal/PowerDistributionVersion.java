@@ -5,7 +5,6 @@
 package edu.wpi.first.hal;
 
 /** Power distribution version. */
-@SuppressWarnings("MemberName")
 public class PowerDistributionVersion {
   /** Firmware major version number. */
   public final int firmwareMajor;

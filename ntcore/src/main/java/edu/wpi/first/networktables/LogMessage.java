@@ -5,7 +5,6 @@
 package edu.wpi.first.networktables;
 
 /** NetworkTables log message. */
-@SuppressWarnings("MemberName")
 public final class LogMessage {
   /** Critical logging level. */
   public static final int kCritical = 50;

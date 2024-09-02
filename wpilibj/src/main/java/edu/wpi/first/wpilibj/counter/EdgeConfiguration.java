@@ -16,11 +16,9 @@ public enum EdgeConfiguration {
   kBoth(true, true);
 
   /** True if triggering on rising edge. */
-  @SuppressWarnings("MemberName")
   public final boolean rising;
 
   /** True if triggering on falling edge. */
-  @SuppressWarnings("MemberName")
   public final boolean falling;
 
   EdgeConfiguration(boolean rising, boolean falling) {

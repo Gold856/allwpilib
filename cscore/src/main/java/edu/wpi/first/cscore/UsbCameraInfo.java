@@ -5,7 +5,6 @@
 package edu.wpi.first.cscore;
 
 /** USB camera information. */
-@SuppressWarnings("MemberName")
 public class UsbCameraInfo {
   /**
    * Create a new set of UsbCameraInfo.

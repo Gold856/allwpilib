@@ -5,7 +5,6 @@
 package edu.wpi.first.hal;
 
 /** Structure for holding the match info data request. */
-@SuppressWarnings("MemberName")
 public class MatchInfoData {
   /** Stores the event name. */
   public String eventName = "";

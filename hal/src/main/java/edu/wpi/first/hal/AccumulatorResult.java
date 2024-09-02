@@ -5,7 +5,6 @@
 package edu.wpi.first.hal;
 
 /** Structure for holding the values stored in an accumulator. */
-@SuppressWarnings("MemberName")
 public class AccumulatorResult {
   /** The total value accumulated. */
   public long value;

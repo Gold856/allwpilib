@@ -22,7 +22,6 @@ import java.util.PriorityQueue;
  * <p>periodic() functions from the base class are called on an interval by a Notifier instance.
  */
 public class TimedRobot extends IterativeRobotBase {
-  @SuppressWarnings("MemberName")
   static class Callback implements Comparable<Callback> {
     public Runnable func;
     public long period;

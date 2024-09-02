@@ -8,7 +8,6 @@ import edu.wpi.first.util.PixelFormat;
 import java.util.Objects;
 
 /** Video mode. */
-@SuppressWarnings("MemberName")
 public class VideoMode {
   /**
    * Create a new video mode.

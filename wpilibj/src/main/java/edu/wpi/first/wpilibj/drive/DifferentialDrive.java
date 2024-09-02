@@ -69,7 +69,6 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    *
    * <p>Uses normalized voltage [-1.0..1.0].
    */
-  @SuppressWarnings("MemberName")
   public static class WheelSpeeds {
     /** Left wheel speed. */
     public double left;

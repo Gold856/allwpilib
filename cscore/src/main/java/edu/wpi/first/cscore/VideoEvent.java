@@ -5,7 +5,6 @@
 package edu.wpi.first.cscore;
 
 /** Video event. */
-@SuppressWarnings("MemberName")
 public class VideoEvent {
   /** VideoEvent kind. */
   public enum Kind {

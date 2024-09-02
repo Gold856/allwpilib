@@ -5,7 +5,6 @@
 package edu.wpi.first.networktables;
 
 /** NetworkTables topic information. */
-@SuppressWarnings("MemberName")
 public final class TopicInfo {
   /** Topic handle. */
   public final int topic;

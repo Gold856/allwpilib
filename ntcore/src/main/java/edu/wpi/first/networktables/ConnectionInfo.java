@@ -5,7 +5,6 @@
 package edu.wpi.first.networktables;
 
 /** NetworkTables Connection information. */
-@SuppressWarnings("MemberName")
 public final class ConnectionInfo {
   /**
    * The remote identifier (as set on the remote node by {@link

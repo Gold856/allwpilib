@@ -12,10 +12,10 @@ import edu.wpi.first.util.RawFrame;
 import java.util.Objects;
 
 /** Represents an AprilTag's metadata. */
-@SuppressWarnings("MemberName")
 public class AprilTag {
   /** The tag's ID. */
   @JsonProperty(value = "ID")
+  @SuppressWarnings("MemberName")
   public int ID;
 
   /** The tag's pose. */
