@@ -24,9 +24,9 @@ public enum Fields {
   /** Alias to the current game. */
   public static final Fields kDefaultField = k2025Reefscape;
 
-  public final String m_resourceFile;
+  public final String resourceFile;
 
   Fields(String resourceFile) {
-    m_resourceFile = kBaseResourceDir + resourceFile;
+    this.resourceFile = kBaseResourceDir + resourceFile;
   }
 }

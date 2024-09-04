@@ -228,10 +228,10 @@ public class AprilTagFieldLayout {
   public static AprilTagFieldLayout loadField(AprilTagFields field) {
     if (field.m_fieldLayout == null) {
       try {
-        field.m_fieldLayout = loadFromResource(field.m_resourceFile);
+        field.m_fieldLayout = loadFromResource(field.resourceFile);
       } catch (IOException e) {
         throw new UncheckedIOException(
-            "Could not load AprilTagFieldLayout from " + field.m_resourceFile, e);
+            "Could not load AprilTagFieldLayout from " + field.resourceFile, e);
       }
     }
     // Copy layout because the layout's origin is mutable

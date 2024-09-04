@@ -92,10 +92,10 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
       units::meters_per_second_t currentRightVelocity,
       units::meters_per_second_t nextRightVelocity, units::second_t dt);
 
-  decltype(1_V / 1_mps) m_kVLinear;
-  decltype(1_V / 1_mps_sq) m_kALinear;
-  decltype(1_V / 1_mps) m_kVAngular;
-  decltype(1_V / 1_mps_sq) m_kAAngular;
+  decltype(1_V / 1_mps) kVLinear;
+  decltype(1_V / 1_mps_sq) kALinear;
+  decltype(1_V / 1_mps) kVAngular;
+  decltype(1_V / 1_mps_sq) kAAngular;
 };
 }  // namespace frc
 

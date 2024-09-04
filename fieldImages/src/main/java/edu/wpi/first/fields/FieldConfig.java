@@ -18,35 +18,35 @@ import java.nio.file.Path;
 public class FieldConfig {
   public static class Corners {
     @JsonProperty("top-left")
-    public double[] m_topLeft;
+    public double[] topLeft;
 
     @JsonProperty("bottom-right")
-    public double[] m_bottomRight;
+    public double[] bottomRight;
   }
 
   @JsonProperty("game")
-  public String m_game;
+  public String game;
 
   @JsonProperty("field-image")
-  public String m_fieldImage;
+  public String fieldImage;
 
   @JsonProperty("field-corners")
-  public Corners m_fieldCorners;
+  public Corners fieldCorners;
 
   @JsonProperty("field-size")
-  public double[] m_fieldSize;
+  public double[] fieldSize;
 
   @JsonProperty("field-unit")
-  public String m_fieldUnit;
+  public String fieldUnit;
 
   public FieldConfig() {}
 
   public URL getImageUrl() {
-    return getClass().getResource(Fields.kBaseResourceDir + m_fieldImage);
+    return getClass().getResource(Fields.kBaseResourceDir + fieldImage);
   }
 
   public InputStream getImageAsStream() {
-    return getClass().getResourceAsStream(Fields.kBaseResourceDir + m_fieldImage);
+    return getClass().getResourceAsStream(Fields.kBaseResourceDir + fieldImage);
   }
 
   /**
@@ -57,7 +57,7 @@ public class FieldConfig {
    * @throws IOException Throws if the file could not be loaded
    */
   public static FieldConfig loadField(Fields field) throws IOException {
-    return loadFromResource(field.m_resourceFile);
+    return loadFromResource(field.resourceFile);
   }
 
   /**
