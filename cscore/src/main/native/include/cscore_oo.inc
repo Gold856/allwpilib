@@ -586,6 +586,45 @@ inline void MjpegServer::SetDefaultCompression(int quality) {
               quality, &m_status);
 }
 
+inline WebRTCServer::WebRTCServer(std::string_view name,
+                                  std::string_view listenAddress, int port) {
+  m_handle = CreateWebRTCServer(name, listenAddress, port, &m_status);
+}
+
+inline std::string WebRTCServer::GetListenAddress() const {
+  m_status = 0;
+  return cs::GetWebRTCServerListenAddress(m_handle, &m_status);
+}
+
+inline int WebRTCServer::GetPort() const {
+  m_status = 0;
+  return cs::GetWebRTCServerPort(m_handle, &m_status);
+}
+
+inline void WebRTCServer::SetResolution(int width, int height) {
+  m_status = 0;
+  SetProperty(GetSinkProperty(m_handle, "width", &m_status), width, &m_status);
+  SetProperty(GetSinkProperty(m_handle, "height", &m_status), height,
+              &m_status);
+}
+
+inline void WebRTCServer::SetFPS(int fps) {
+  m_status = 0;
+  SetProperty(GetSinkProperty(m_handle, "fps", &m_status), fps, &m_status);
+}
+
+inline void WebRTCServer::SetCompression(int quality) {
+  m_status = 0;
+  SetProperty(GetSinkProperty(m_handle, "compression", &m_status), quality,
+              &m_status);
+}
+
+inline void WebRTCServer::SetDefaultCompression(int quality) {
+  m_status = 0;
+  SetProperty(GetSinkProperty(m_handle, "default_compression", &m_status),
+              quality, &m_status);
+}
+
 inline void ImageSink::SetDescription(std::string_view description) {
   m_status = 0;
   SetSinkDescription(m_handle, description, &m_status);

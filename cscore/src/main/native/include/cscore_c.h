@@ -390,6 +390,9 @@ void CS_SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
 CS_Sink CS_CreateMjpegServer(const struct WPI_String* name,
                              const struct WPI_String* listenAddress, int port,
                              CS_Status* status);
+CS_Sink CS_CreateWebRTCServer(const struct WPI_String* name,
+                              const struct WPI_String* listenAddress, int port,
+                              CS_Status* status);
 CS_Sink CS_CreateCvSink(const struct WPI_String* name,
                         enum WPI_PixelFormat pixelFormat, CS_Status* status);
 CS_Sink CS_CreateCvSinkCallback(const struct WPI_String* name,
@@ -431,6 +434,15 @@ void CS_GetMjpegServerListenAddress(CS_Sink sink,
                                     struct WPI_String* listenAddress,
                                     CS_Status* status);
 int CS_GetMjpegServerPort(CS_Sink sink, CS_Status* status);
+/** @} */
+
+/**
+ * @defgroup cscore_webrtcserver_cfunc WebRTCServer Sink Functions
+ * @{
+ */
+void CS_GetWebRTCServerListenAddress(CS_Sink sink, WPI_String* listenAddress,
+                                     CS_Status* status);
+int CS_GetWebRTCServerPort(CS_Sink sink, CS_Status* status);
 /** @} */
 
 /**

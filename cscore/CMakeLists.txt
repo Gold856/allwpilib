@@ -10,7 +10,7 @@ file(GLOB cscore_linux_src src/main/native/linux/*.cpp)
 file(GLOB cscore_osx_src src/main/native/osx/*.cpp)
 file(GLOB cscore_osx_objc_src src/main/native/objcpp/*.mm)
 file(GLOB cscore_windows_src src/main/native/windows/*.cpp)
-
+find_package(libdatachannel CONFIG REQUIRED)
 add_library(cscore ${cscore_native_src})
 set_target_properties(cscore PROPERTIES DEBUG_POSTFIX "d")
 
@@ -39,7 +39,7 @@ target_include_directories(
     PRIVATE src/main/native/cpp
 )
 wpilib_target_warnings(cscore)
-target_link_libraries(cscore PUBLIC wpinet wpiutil ${OpenCV_LIBS})
+target_link_libraries(cscore PUBLIC wpinet wpiutil ${OpenCV_LIBS} LibDataChannel::LibDataChannel)
 
 set_property(TARGET cscore PROPERTY FOLDER "libraries")
 

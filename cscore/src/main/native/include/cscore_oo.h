@@ -1090,6 +1090,87 @@ class MjpegServer : public VideoSink {
 };
 
 /**
+ * A sink that acts as a WebRTC network server.
+ */
+class WebRTCServer : public VideoSink {
+ public:
+  WebRTCServer() = default;
+
+  /**
+   * Create a WebRTC server sink.
+   *
+   * @param name Sink name (arbitrary unique identifier)
+   * @param listenAddress TCP listen address (empty string for all addresses)
+   * @param port TCP port number
+   */
+  WebRTCServer(std::string_view name, std::string_view listenAddress, int port);
+
+  /**
+   * Create a WebRTC server sink.
+   *
+   * @param name Sink name (arbitrary unique identifier)
+   * @param port TCP port number
+   */
+  WebRTCServer(std::string_view name, int port)
+      : WebRTCServer(name, "", port) {}
+
+  /**
+   * Get the listen address of the server.
+   */
+  std::string GetListenAddress() const;
+
+  /**
+   * Get the port number of the server.
+   */
+  int GetPort() const;
+
+  /**
+   * Set the stream resolution for clients that don't specify it.
+   *
+   * <p>It is not necessary to set this if it is the same as the source
+   * resolution.
+   *
+   * <p>Setting this different than the source resolution will result in
+   * increased CPU usage, particularly for MJPEG source cameras, as it will
+   * decompress, resize, and recompress the image, instead of using the
+   * camera's MJPEG image directly.
+   *
+   * @param width width, 0 for unspecified
+   * @param height height, 0 for unspecified
+   */
+  void SetResolution(int width, int height);
+
+  /**
+   * Set the stream frames per second (FPS) for clients that don't specify it.
+   *
+   * <p>It is not necessary to set this if it is the same as the source FPS.
+   *
+   * @param fps FPS, 0 for unspecified
+   */
+  void SetFPS(int fps);
+
+  /**
+   * Set the compression for clients that don't specify it.
+   *
+   * <p>Setting this will result in increased CPU usage for MJPEG source cameras
+   * as it will decompress and recompress the image instead of using the
+   * camera's MJPEG image directly.
+   *
+   * @param quality JPEG compression quality (0-100), -1 for unspecified
+   */
+  void SetCompression(int quality);
+
+  /**
+   * Set the default compression used for non-MJPEG sources.  If not set,
+   * 80 is used.  This function has no effect on MJPEG source cameras; use
+   * SetCompression() instead to force recompression of MJPEG source images.
+   *
+   * @param quality JPEG compression quality (0-100)
+   */
+  void SetDefaultCompression(int quality);
+};
+
+/**
  * A base class for single image reading sinks.
  */
 class ImageSink : public VideoSink {
