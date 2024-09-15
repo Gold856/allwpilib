@@ -318,6 +318,9 @@ void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
  */
 CS_Sink CreateMjpegServer(std::string_view name, std::string_view listenAddress,
                           int port, CS_Status* status);
+CS_Sink CreateWebRTCServer(std::string_view name,
+                           std::string_view listenAddress, int port,
+                           CS_Status* status);
 CS_Sink CreateCvSink(std::string_view name, VideoMode::PixelFormat pixelFormat,
                      CS_Status* status);
 CS_Sink CreateCvSinkCallback(std::string_view name,
@@ -363,6 +366,14 @@ void ReleaseSink(CS_Sink sink, CS_Status* status);
  */
 std::string GetMjpegServerListenAddress(CS_Sink sink, CS_Status* status);
 int GetMjpegServerPort(CS_Sink sink, CS_Status* status);
+/** @} */
+
+/**
+ * @defgroup cscore_webrtcserver_func WebRTCServer Sink Functions
+ * @{
+ */
+std::string GetWebRTCServerListenAddress(CS_Sink sink, CS_Status* status);
+int GetWebRTCServerPort(CS_Sink sink, CS_Status* status);
 /** @} */
 
 /**
