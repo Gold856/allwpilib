@@ -18,8 +18,8 @@ int main() {
     wpi::print("  {}\n", addr);
   }
   cs::UsbCamera camera{"usbcam", cs::UsbCamera::EnumerateUsbCameras()[0].dev};
-  // camera.SetVideoMode(cs::VideoMode::kMJPEG, 320, 240, 30);
-  cs::WebRTCServer webrtcServer{"httpserver", 8081};
+  camera.SetVideoMode(cs::VideoMode::kMJPEG, 1280, 720, 30);
+  cs::WebRTCServer webrtcServer{"httpserver", 1180};
   webrtcServer.SetSource(camera);
   cs::SetDefaultLogger(0);
   CS_Status status = 0;

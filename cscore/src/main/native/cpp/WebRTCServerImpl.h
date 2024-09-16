@@ -8,6 +8,8 @@
 #include <atomic>
 #include <memory>
 #include <rtc/datachannel.hpp>
+#include <rtc/peerconnection.hpp>
+#include <rtc/websocketserver.hpp>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -42,7 +44,7 @@ class WebRTCServerImpl : public SinkImpl {
  private:
   void SetSourceImpl(std::shared_ptr<SourceImpl> source) override;
 
-  void ServerThreadMain();
+  void ServerThreadMain(std::shared_ptr<rtc::DataChannel> channel);
 
   class ConnThread;
 
@@ -62,8 +64,7 @@ class WebRTCServerImpl : public SinkImpl {
   int m_compressionProp;
   int m_defaultCompressionProp;
   int m_fpsProp;
-  std::shared_ptr<rtc::PeerConnection> m_connection;
-  std::shared_ptr<rtc::DataChannel> m_dataChannel;
+  std::shared_ptr<rtc::WebSocketServer> m_signalingServer;
 };
 
 }  // namespace cs
