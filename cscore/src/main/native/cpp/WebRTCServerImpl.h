@@ -7,8 +7,6 @@
 
 #include <atomic>
 #include <memory>
-#include <rtc/datachannel.hpp>
-#include <rtc/peerconnection.hpp>
 #include <rtc/websocketserver.hpp>
 #include <string>
 #include <string_view>
@@ -33,8 +31,7 @@ class WebRTCServerImpl : public SinkImpl {
  public:
   WebRTCServerImpl(std::string_view name, wpi::Logger& logger,
                    Notifier& notifier, Telemetry& telemetry,
-                   std::string_view listenAddress, int port,
-                   std::unique_ptr<wpi::NetworkAcceptor> acceptor);
+                   std::string_view listenAddress, int port);
   ~WebRTCServerImpl() override;
 
   void Stop();
@@ -44,17 +41,13 @@ class WebRTCServerImpl : public SinkImpl {
  private:
   void SetSourceImpl(std::shared_ptr<SourceImpl> source) override;
 
-  void ServerThreadMain(std::shared_ptr<rtc::DataChannel> channel);
-
   class ConnThread;
 
   // Never changed, so not protected by mutex
   std::string m_listenAddress;
   int m_port;
 
-  std::unique_ptr<wpi::NetworkAcceptor> m_acceptor;
   std::atomic_bool m_active;  // set to false to terminate threads
-  std::thread m_serverThread;
 
   std::vector<wpi::SafeThreadOwner<ConnThread>> m_connThreads;
 

@@ -82,29 +82,22 @@ class WebRTCServerImpl::ConnThread : public wpi::SafeThread {
   }
 };
 
-WebRTCServerImpl::WebRTCServerImpl(
-    std::string_view name, wpi::Logger& logger, Notifier& notifier,
-    Telemetry& telemetry, std::string_view listenAddress, int port,
-    std::unique_ptr<wpi::NetworkAcceptor> acceptor)
+WebRTCServerImpl::WebRTCServerImpl(std::string_view name, wpi::Logger& logger,
+                                   Notifier& notifier, Telemetry& telemetry,
+                                   std::string_view listenAddress, int port)
     : SinkImpl{name, logger, notifier, telemetry},
       m_listenAddress(listenAddress),
-      m_port(port),
-      m_acceptor{std::move(acceptor)} {
+      m_port(port) {
   m_active = true;
 
   rtc::WebSocketServerConfiguration wsConfig;
-  wsConfig.port = port;
+  wsConfig.port = 1180;  // FIXME: Casting issue
   m_signalingServer = std::make_shared<rtc::WebSocketServer>(wsConfig);
   m_signalingServer->onClient([this](std::shared_ptr<rtc::WebSocket> socket) {
     socket->onOpen([socket, this] {
-      std::shared_ptr<rtc::PeerConnection> connection =
-          std::make_shared<rtc::PeerConnection>();
-      rtc::DataChannelInit config;
-      config.negotiated = true;
-      config.id = 100;
-      config.reliability = {.unordered = true};
+      auto connection = std::make_shared<rtc::PeerConnection>();
       std::shared_ptr<rtc::DataChannel> channel =
-          connection->createDataChannel("test", config);
+          connection->createDataChannel("test");
 
       connection->setLocalDescription(rtc::Description::Type::Offer);
       wpi::json offer{{"type", connection->localDescription()->typeString()},
@@ -113,8 +106,7 @@ WebRTCServerImpl::WebRTCServerImpl(
       socket->onMessage([socket, connection](rtc::message_variant data) {
         auto sdpAnswer = std::get<std::string>(data);
         if (wpi::contains(sdpAnswer, "sdp")) {
-          wpi::json answer = wpi::json::parse(sdpAnswer);
-          std::cout << answer;
+          auto answer = wpi::json::parse(sdpAnswer);
           rtc::Description desc(answer["sdp"].template get<std::string>(),
                                 answer["type"].template get<std::string>());
           connection->setRemoteDescription(desc);
@@ -126,11 +118,15 @@ WebRTCServerImpl::WebRTCServerImpl(
 
       std::scoped_lock lock(m_mutex);
       // Find unoccupied worker thread, or create one if necessary
-      auto it = std::find_if(m_connThreads.begin(), m_connThreads.end(),
-                             [](const wpi::SafeThreadOwner<ConnThread>& owner) {
-                               auto thr = owner.GetThread();
-                               return !thr;
-                             });
+      auto it = std::find_if(
+          m_connThreads.begin(), m_connThreads.end(),
+          [](const wpi::SafeThreadOwner<ConnThread>& owner) {
+            auto thr = owner.GetThread();
+            return !thr &&
+                   (!thr->m_channel ||
+                    !thr->m_channel
+                         ->isOpen());  // TODO: Check more WebRTC objects?
+          });
       if (it == m_connThreads.end()) {
         m_connThreads.emplace_back();
         it = std::prev(m_connThreads.end());
@@ -155,9 +151,9 @@ WebRTCServerImpl::WebRTCServerImpl(
       thr->m_compression = GetProperty(m_compressionProp)->value;
       thr->m_defaultCompression = GetProperty(m_defaultCompressionProp)->value;
       thr->m_fps = GetProperty(m_fpsProp)->value;
-      thr->m_connection = std::move(connection);
-      thr->m_channel = std::move(channel);
-      thr->m_socket = std::move(socket);
+      thr->m_connection = connection;
+      thr->m_channel = channel;
+      thr->m_socket = socket;
       thr->m_cond.notify_one();
     });
   });
@@ -191,14 +187,6 @@ WebRTCServerImpl::~WebRTCServerImpl() {
 void WebRTCServerImpl::Stop() {
   m_active = false;
 
-  // wake up server thread by shutting down the socket
-  m_acceptor->shutdown();
-
-  // join server thread
-  if (m_serverThread.joinable()) {
-    m_serverThread.join();
-  }
-
   // close streams
   for (auto& connThread : m_connThreads) {
     if (auto thr = connThread.GetThread()) {
@@ -229,7 +217,7 @@ void WebRTCServerImpl::ConnThread::Main() {
   }
 
   StartStream();
-  while (m_active && !m_channel->isClosed()) {
+  while (m_active && m_channel->isOpen() || m_socket->isOpen()) {
     auto source = GetSource();
     if (!source) {
       // Source disconnected; sleep so we don't consume all processor time.
@@ -238,7 +226,7 @@ void WebRTCServerImpl::ConnThread::Main() {
     }
     SDEBUG4("waiting for frame");
     Frame frame = source->GetNextFrame(0.225);  // blocks
-    if (!m_active || m_channel->isClosed()) {
+    if (!m_active || !m_channel->isOpen() || !m_socket->isOpen()) {
       break;
     }
     if (!frame) {
@@ -333,10 +321,8 @@ CS_Sink CreateWebRTCServer(std::string_view name,
   auto& inst = Instance::GetInstance();
   return inst.CreateSink(
       CS_SINK_MJPEG,
-      std::make_shared<WebRTCServerImpl>(
-          name, inst.logger, inst.notifier, inst.telemetry, listenAddress, port,
-          std::unique_ptr<wpi::NetworkAcceptor>(
-              new wpi::TCPAcceptor(port, listenAddress, inst.logger))));
+      std::make_shared<WebRTCServerImpl>(name, inst.logger, inst.notifier,
+                                         inst.telemetry, listenAddress, port));
 }
 
 std::string GetWebRTCServerListenAddress(CS_Sink sink, CS_Status* status) {
