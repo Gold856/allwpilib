@@ -41,6 +41,7 @@ class WebRTCServerImpl::ConnThread : public wpi::SafeThread {
       : m_name(name), m_logger(logger) {}
 
   void Main() override;
+  void SendStream();
 
   std::shared_ptr<SourceImpl> m_source;
   bool m_streaming = false;
@@ -106,6 +107,7 @@ WebRTCServerImpl::WebRTCServerImpl(std::string_view name, wpi::Logger& logger,
       socket->onMessage([socket, connection](rtc::message_variant data) {
         auto sdpAnswer = std::get<std::string>(data);
         if (wpi::contains(sdpAnswer, "sdp")) {
+          wpi::println("SDP answer received");
           auto answer = wpi::json::parse(sdpAnswer);
           rtc::Description desc(answer["sdp"].template get<std::string>(),
                                 answer["type"].template get<std::string>());
@@ -123,9 +125,8 @@ WebRTCServerImpl::WebRTCServerImpl(std::string_view name, wpi::Logger& logger,
           [](const wpi::SafeThreadOwner<ConnThread>& owner) {
             auto thr = owner.GetThread();
             return !thr &&
-                   (!thr->m_channel ||
-                    !thr->m_channel
-                         ->isOpen());  // TODO: Check more WebRTC objects?
+                   (!thr->m_channel || !thr->m_connection ||
+                    !thr->m_socket);  // TODO: Check more WebRTC objects?
           });
       if (it == m_connThreads.end()) {
         m_connThreads.emplace_back();
@@ -203,8 +204,27 @@ void WebRTCServerImpl::Stop() {
   }
 }
 
-// Main server thread
+// worker thread for clients that connected to this server
 void WebRTCServerImpl::ConnThread::Main() {
+  std::unique_lock lock(m_mutex);
+  while (m_active) {
+    while (!m_channel || !m_channel->isOpen() || !m_socket ||
+           !m_socket->isOpen()) {
+      // m_cond.wait(lock); TODO: removing this line fixes things?
+      if (!m_active) {
+        return;
+      }
+    }
+    lock.unlock();
+    SendStream();
+    lock.lock();
+    m_socket = nullptr;
+    m_channel = nullptr;
+    m_connection = nullptr;
+  }
+}
+
+void WebRTCServerImpl::ConnThread::SendStream() {
   Frame::Time lastFrameTime = 0;
   Frame::Time timePerFrame = 0;
   if (m_fps != 0) {
@@ -217,7 +237,7 @@ void WebRTCServerImpl::ConnThread::Main() {
   }
 
   StartStream();
-  while (m_active && m_channel->isOpen() || m_socket->isOpen()) {
+  while (m_active || m_channel->isOpen() || m_socket->isOpen()) {
     auto source = GetSource();
     if (!source) {
       // Source disconnected; sleep so we don't consume all processor time.
