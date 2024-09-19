@@ -23,7 +23,6 @@
 #include <wpinet/raw_socket_istream.h>
 #include <wpinet/raw_socket_ostream.h>
 
-#include "Handle.h"
 #include "Instance.h"
 #include "JpegUtil.h"
 #include "Log.h"
@@ -104,7 +103,7 @@ WebRTCServerImpl::WebRTCServerImpl(std::string_view name, wpi::Logger& logger,
       wpi::json offer{{"type", connection->localDescription()->typeString()},
                       {"sdp", connection->localDescription().value()}};
 
-      socket->onMessage([socket, connection](rtc::message_variant data) {
+      socket->onMessage([connection](rtc::message_variant data) {
         auto sdpAnswer = std::get<std::string>(data);
         if (wpi::contains(sdpAnswer, "sdp")) {
           wpi::println("SDP answer received");
@@ -115,47 +114,49 @@ WebRTCServerImpl::WebRTCServerImpl(std::string_view name, wpi::Logger& logger,
         }
       });
       socket->send(offer.dump());
+      channel->onOpen([this, connection, channel, socket] {
+        auto source = GetSource();
 
-      auto source = GetSource();
+        std::scoped_lock lock(m_mutex);
+        // Find unoccupied worker thread, or create one if necessary
+        auto it = std::find_if(
+            m_connThreads.begin(), m_connThreads.end(),
+            [](const wpi::SafeThreadOwner<ConnThread>& owner) {
+              auto thr = owner.GetThread();
+              return !thr &&
+                     (!thr->m_channel || !thr->m_connection ||
+                      !thr->m_socket);  // TODO: Check more WebRTC objects?
+            });
+        if (it == m_connThreads.end()) {
+          m_connThreads.emplace_back();
+          it = std::prev(m_connThreads.end());
+        }
 
-      std::scoped_lock lock(m_mutex);
-      // Find unoccupied worker thread, or create one if necessary
-      auto it = std::find_if(
-          m_connThreads.begin(), m_connThreads.end(),
-          [](const wpi::SafeThreadOwner<ConnThread>& owner) {
-            auto thr = owner.GetThread();
-            return !thr &&
-                   (!thr->m_channel || !thr->m_connection ||
-                    !thr->m_socket);  // TODO: Check more WebRTC objects?
-          });
-      if (it == m_connThreads.end()) {
-        m_connThreads.emplace_back();
-        it = std::prev(m_connThreads.end());
-      }
+        // Start it if not already started
+        it->Start(GetName(), m_logger);
 
-      // Start it if not already started
-      it->Start(GetName(), m_logger);
+        auto nstreams =
+            std::count_if(m_connThreads.begin(), m_connThreads.end(),
+                          [](const wpi::SafeThreadOwner<ConnThread>& owner) {
+                            auto thr = owner.GetThread();
+                            return thr && thr->m_streaming;
+                          });
 
-      auto nstreams =
-          std::count_if(m_connThreads.begin(), m_connThreads.end(),
-                        [](const wpi::SafeThreadOwner<ConnThread>& owner) {
-                          auto thr = owner.GetThread();
-                          return thr && thr->m_streaming;
-                        });
-
-      // Hand off connection to it
-      auto thr = it->GetThread();
-      thr->m_source = source;
-      thr->m_noStreaming = nstreams >= 10;
-      thr->m_width = GetProperty(m_widthProp)->value;
-      thr->m_height = GetProperty(m_heightProp)->value;
-      thr->m_compression = GetProperty(m_compressionProp)->value;
-      thr->m_defaultCompression = GetProperty(m_defaultCompressionProp)->value;
-      thr->m_fps = GetProperty(m_fpsProp)->value;
-      thr->m_connection = connection;
-      thr->m_channel = channel;
-      thr->m_socket = socket;
-      thr->m_cond.notify_one();
+        // Hand off connection to it
+        auto thr = it->GetThread();
+        thr->m_source = source;
+        thr->m_noStreaming = nstreams >= 10;
+        thr->m_width = GetProperty(m_widthProp)->value;
+        thr->m_height = GetProperty(m_heightProp)->value;
+        thr->m_compression = GetProperty(m_compressionProp)->value;
+        thr->m_defaultCompression =
+            GetProperty(m_defaultCompressionProp)->value;
+        thr->m_fps = GetProperty(m_fpsProp)->value;
+        thr->m_connection = connection;
+        thr->m_channel = channel;
+        thr->m_socket = socket;
+        thr->m_cond.notify_one();
+      });
     });
   });
 
@@ -210,7 +211,7 @@ void WebRTCServerImpl::ConnThread::Main() {
   while (m_active) {
     while (!m_channel || !m_channel->isOpen() || !m_socket ||
            !m_socket->isOpen()) {
-      // m_cond.wait(lock); TODO: removing this line fixes things?
+      m_cond.wait(lock);
       if (!m_active) {
         return;
       }
