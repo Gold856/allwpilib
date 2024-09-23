@@ -6,17 +6,19 @@
 
 #include <chrono>
 #include <memory>
+#include <string_view>
+#include <thread>
+
 #include <rtc/common.hpp>
+#include <rtc/configuration.hpp>
 #include <rtc/datachannel.hpp>
 #include <rtc/peerconnection.hpp>
 #include <rtc/websocketserver.hpp>
-#include <string_view>
-#include <thread>
-#include <wpi/json.h>
-
 #include <wpi/SmallString.h>
+#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fmt/raw_ostream.h>
+#include <wpi/json.h>
 #include <wpi/print.h>
 #include <wpinet/HttpUtil.h>
 #include <wpinet/TCPAcceptor.h>
@@ -30,7 +32,6 @@
 #include "SourceImpl.h"
 #include "c_util.h"
 #include "cscore_cpp.h"
-#include "wpi/SmallVector.h"
 
 using namespace cs;
 
@@ -91,29 +92,29 @@ WebRTCServerImpl::WebRTCServerImpl(std::string_view name, wpi::Logger& logger,
   m_active = true;
 
   rtc::WebSocketServerConfiguration wsConfig;
-  wsConfig.port = 1180;  // FIXME: Casting issue
+  wsConfig.port = port;
   m_signalingServer = std::make_shared<rtc::WebSocketServer>(wsConfig);
   m_signalingServer->onClient([this](std::shared_ptr<rtc::WebSocket> socket) {
     socket->onOpen([socket, this] {
-      auto connection = std::make_shared<rtc::PeerConnection>();
+      rtc::Configuration config{.portRangeBegin = 1180, .portRangeEnd = 1190};
+      auto connection = std::make_shared<rtc::PeerConnection>(config);
+      rtc::DataChannelInit channelConfig{.reliability = {.unordered = true}};
       std::shared_ptr<rtc::DataChannel> channel =
-          connection->createDataChannel("test");
+          connection->createDataChannel("test", channelConfig);
 
       connection->setLocalDescription(rtc::Description::Type::Offer);
       wpi::json offer{{"type", connection->localDescription()->typeString()},
                       {"sdp", connection->localDescription().value()}};
 
-      socket->onMessage([connection](rtc::message_variant data) {
-        auto sdpAnswer = std::get<std::string>(data);
-        if (wpi::contains(sdpAnswer, "sdp")) {
-          wpi::println("SDP answer received");
-          auto answer = wpi::json::parse(sdpAnswer);
-          rtc::Description desc(answer["sdp"].template get<std::string>(),
-                                answer["type"].template get<std::string>());
+      socket->onMessage([connection, this](rtc::message_variant data) {
+        auto message = std::get<std::string>(data);
+        if (wpi::contains(message, "sdp")) {
+          auto sdpAnswer = wpi::json::parse(message);
+          rtc::Description desc(sdpAnswer["sdp"].template get<std::string>(),
+                                sdpAnswer["type"].template get<std::string>());
           connection->setRemoteDescription(desc);
         }
       });
-      socket->send(offer.dump());
       channel->onOpen([this, connection, channel, socket] {
         auto source = GetSource();
 
@@ -157,6 +158,7 @@ WebRTCServerImpl::WebRTCServerImpl(std::string_view name, wpi::Logger& logger,
         thr->m_socket = socket;
         thr->m_cond.notify_one();
       });
+      socket->send(offer.dump());
     });
   });
 
@@ -189,6 +191,8 @@ WebRTCServerImpl::~WebRTCServerImpl() {
 void WebRTCServerImpl::Stop() {
   m_active = false;
 
+  m_signalingServer->stop();
+
   // close streams
   for (auto& connThread : m_connThreads) {
     if (auto thr = connThread.GetThread()) {
@@ -216,6 +220,40 @@ void WebRTCServerImpl::ConnThread::Main() {
         return;
       }
     }
+    m_socket->resetCallbacks();
+    m_socket->onMessage([this](rtc::message_variant data) {
+      auto message = wpi::json::parse(std::get<std::string>(data));
+      if (!message.contains("options")) {
+        return;
+      }
+      message = message["options"];
+      if (message.contains("resolution")) {
+        auto resolution = message["resolution"].template get<std::string>();
+        auto [widthStr, heightStr] = wpi::split(resolution, 'x');
+        int width = wpi::parse_integer<int>(widthStr, 10).value_or(-1);
+        int height = wpi::parse_integer<int>(heightStr, 10).value_or(-1);
+        if (width < 0) {
+          return;
+        }
+        if (height < 0) {
+          return;
+        }
+        m_width = width;
+        m_height = height;
+      } else if (message.contains("compression")) {
+        auto compression = message["compression"].template get<std::string>();
+        if (auto v = wpi::parse_integer<int>(compression, 10)) {
+          m_compression = v.value();
+        } else {
+        }
+      } else if (message.contains("fps")) {
+        auto fps = message["fps"].template get<std::string>();
+        if (auto v = wpi::parse_integer<int>(fps, 10)) {
+          m_fps = v.value();
+        } else {
+        }
+      }
+    });
     lock.unlock();
     SendStream();
     lock.lock();
@@ -323,12 +361,7 @@ void WebRTCServerImpl::ConnThread::SendStream() {
     }
 
     SDEBUG4("sending frame size={} addDHT={}", size, addDHT);
-
-    // print the individual mimetype and the length
-    // sending the content-length fixes random stream disruption observed
-    // with firefox
     lastFrameTime = thisFrameTime;
-    double timestamp = lastFrameTime / 1000000.0;
   }
   StopStream();
 }
@@ -341,7 +374,7 @@ CS_Sink CreateWebRTCServer(std::string_view name,
                            CS_Status* status) {
   auto& inst = Instance::GetInstance();
   return inst.CreateSink(
-      CS_SINK_MJPEG,
+      CS_SINK_WEBRTC,
       std::make_shared<WebRTCServerImpl>(name, inst.logger, inst.notifier,
                                          inst.telemetry, listenAddress, port));
 }

@@ -2,17 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_MJPEGSERVERIMPL_H_
-#define CSCORE_MJPEGSERVERIMPL_H_
+#ifndef CSCORE_WEBRTCSERVERIMPL_H_
+#define CSCORE_WEBRTCSERVERIMPL_H_
 
 #include <atomic>
 #include <memory>
-#include <rtc/websocketserver.hpp>
 #include <string>
 #include <string_view>
-#include <thread>
 #include <vector>
-#include <rtc/rtc.hpp>
+
+#include <rtc/websocketserver.hpp>
 #include <wpi/SafeThread.h>
 #include <wpi/SmallVector.h>
 #include <wpi/raw_istream.h>
@@ -62,4 +61,4 @@ class WebRTCServerImpl : public SinkImpl {
 
 }  // namespace cs
 
-#endif  // CSCORE_MJPEGSERVERIMPL_H_
+#endif  // CSCORE_WEBRTCSERVERIMPL_H_

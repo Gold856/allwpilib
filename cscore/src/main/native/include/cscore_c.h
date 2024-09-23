@@ -136,7 +136,8 @@ enum CS_SinkKind {
   CS_SINK_UNKNOWN = 0,
   CS_SINK_MJPEG = 2,
   CS_SINK_CV = 4,
-  CS_SINK_RAW = 8
+  CS_SINK_RAW = 8,
+  CS_SINK_WEBRTC = 16
 };
 
 /**
