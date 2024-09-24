@@ -31,6 +31,7 @@
 #include "Notifier.h"
 #include "SourceImpl.h"
 #include "c_util.h"
+#include "cscore_c.h"
 #include "cscore_cpp.h"
 
 using namespace cs;
@@ -41,7 +42,9 @@ class WebRTCServerImpl::ConnThread : public wpi::SafeThread {
       : m_name(name), m_logger(logger) {}
 
   void Main() override;
+  void ProcessRequest(wpi::json message);
   void SendStream();
+  void SendJSON();
 
   std::shared_ptr<SourceImpl> m_source;
   bool m_streaming = false;
@@ -110,8 +113,8 @@ WebRTCServerImpl::WebRTCServerImpl(std::string_view name, wpi::Logger& logger,
         auto message = std::get<std::string>(data);
         if (wpi::contains(message, "sdp")) {
           auto sdpAnswer = wpi::json::parse(message);
-          rtc::Description desc(sdpAnswer["sdp"].template get<std::string>(),
-                                sdpAnswer["type"].template get<std::string>());
+          rtc::Description desc(sdpAnswer["sdp"].get<std::string>(),
+                                sdpAnswer["type"].get<std::string>());
           connection->setRemoteDescription(desc);
         }
       });
@@ -223,35 +226,14 @@ void WebRTCServerImpl::ConnThread::Main() {
     m_socket->resetCallbacks();
     m_socket->onMessage([this](rtc::message_variant data) {
       auto message = wpi::json::parse(std::get<std::string>(data));
-      if (!message.contains("options")) {
-        return;
-      }
-      message = message["options"];
-      if (message.contains("resolution")) {
-        auto resolution = message["resolution"].template get<std::string>();
-        auto [widthStr, heightStr] = wpi::split(resolution, 'x');
-        int width = wpi::parse_integer<int>(widthStr, 10).value_or(-1);
-        int height = wpi::parse_integer<int>(heightStr, 10).value_or(-1);
-        if (width < 0) {
-          return;
-        }
-        if (height < 0) {
-          return;
-        }
-        m_width = width;
-        m_height = height;
-      } else if (message.contains("compression")) {
-        auto compression = message["compression"].template get<std::string>();
-        if (auto v = wpi::parse_integer<int>(compression, 10)) {
-          m_compression = v.value();
-        } else {
-        }
-      } else if (message.contains("fps")) {
-        auto fps = message["fps"].template get<std::string>();
-        if (auto v = wpi::parse_integer<int>(fps, 10)) {
-          m_fps = v.value();
-        } else {
-        }
+      auto requestType = message["type"].get<std::string>();
+      if (requestType == "settings") {
+        SendJSON();
+      } else if (requestType == "command") {
+        ProcessRequest(message);
+      } else if (requestType == "config") {
+        CS_Status status = CS_OK;
+        m_socket->send(m_source->GetConfigJson(&status));
       }
     });
     lock.unlock();
@@ -261,6 +243,95 @@ void WebRTCServerImpl::ConnThread::Main() {
     m_channel = nullptr;
     m_connection = nullptr;
   }
+}
+
+void WebRTCServerImpl::ConnThread::ProcessRequest(wpi::json message) {
+  if (!message.contains("options")) {
+    return;
+  }
+  std::string response;
+  // TODO: Use actual integers in the JSON?
+  for (auto& [key, value] : message["options"].items()) {
+    if (key == "resolution") {
+      auto [widthStr, heightStr] = wpi::split(value, 'x');
+      int width = wpi::parse_integer<int>(widthStr, 10).value_or(-1);
+      int height = wpi::parse_integer<int>(heightStr, 10).value_or(-1);
+      if (width < 0) {
+        response += key + ": \"width is not an integer\"\r\n";
+        SWARNING("Parameter \"{}\" width \"{}\" is not an integer", key.c_str(),
+                 widthStr);
+        continue;
+      }
+      if (height < 0) {
+        response += key + ": \"height is not an integer\"\r\n";
+        SWARNING("Parameter \"{}\" height \"{}\" is not an integer",
+                 key.c_str(), heightStr);
+        continue;
+      }
+      m_width = width;
+      m_height = height;
+      response += key + ": \"ok\"\r\n";
+    } else if (key == "compression") {
+      if (auto v = wpi::parse_integer<int>(value, 10)) {
+        m_compression = v.value();
+        response += key + ": \"ok\"\r\n";
+      } else {
+        response += key + ": \"value is not an integer\"\r\n";
+        SWARNING("Parameter \"{}\" value \"{}\" is not an integer", key.c_str(),
+                 value.dump());
+      }
+    } else if (key == "fps") {
+      if (auto v = wpi::parse_integer<int>(value, 10)) {
+        m_fps = v.value();
+        response += key + ": \"ok\"\r\n";
+      } else {
+        response += key + ": \"value is not an integer\"\r\n";
+        SWARNING("Parameter \"{}\" value \"{}\" is not an integer", key.c_str(),
+                 value.dump());
+      }
+    }
+    // ignore name parameter
+    if (message.contains("name")) {
+      continue;
+    }
+
+    // try to assign parameter
+    auto prop = m_source->GetPropertyIndex(key);
+    if (!prop) {
+      response += key + ": \"ignored\"\r\n";
+      SWARNING("ignoring parameter \"{}\"", key.c_str());
+      continue;
+    }
+
+    CS_Status status = 0;
+    auto kind = m_source->GetPropertyKind(prop);
+    switch (kind) {
+      case CS_PROP_BOOLEAN:
+      case CS_PROP_INTEGER:
+      case CS_PROP_ENUM: {
+        if (auto v = wpi::parse_integer<int>(value, 10)) {
+          response += key + ": " + value.dump() + "\r\n";
+          SDEBUG4("Parameter \"{}\" value {}", key.c_str(), value.dump());
+          m_source->SetProperty(prop, v.value(), &status);
+        } else {
+          response += key + ": \"invalid integer\"\r\n";
+          SWARNING("Parameter \"{}\" value \"{}\" is not an integer",
+                   key.c_str(), value.dump());
+        }
+        break;
+      }
+      case CS_PROP_STRING: {
+        response += key + ": \"ok\"\r\n";
+        SDEBUG4("Parameter \"{}\" value \"{}\"", key.c_str(), value.dump());
+        m_source->SetStringProperty(prop, value, &status);
+        break;
+      }
+      default:
+        break;
+    }
+  }
+  wpi::json jsonResponse{{"data", {"message", response}}};
+  m_socket->send(jsonResponse.dump());
 }
 
 void WebRTCServerImpl::ConnThread::SendStream() {
@@ -364,6 +435,94 @@ void WebRTCServerImpl::ConnThread::SendStream() {
     lastFrameTime = thisFrameTime;
   }
   StopStream();
+}
+
+// Send a JSON file which is contains information about the source parameters.
+void WebRTCServerImpl::ConnThread::SendJSON() {
+  wpi::json info;
+  wpi::SmallVector<int, 32> properties_vec;
+  bool first = true;
+  CS_Status status = 0;
+  for (auto prop : m_source->EnumerateProperties(properties_vec, &status)) {
+    wpi::json property;
+    wpi::SmallString<128> name_buf;
+    auto name = m_source->GetPropertyName(prop, name_buf, &status);
+    auto kind = m_source->GetPropertyKind(prop);
+    property["name"] = name;
+    property["id"] = prop;
+    property["type"] = static_cast<int>(kind);
+    property["min"] = m_source->GetPropertyMin(prop, &status);
+    property["max"] = m_source->GetPropertyMax(prop, &status);
+    property["step"] = m_source->GetPropertyStep(prop, &status);
+    property["default"] = m_source->GetPropertyDefault(prop, &status);
+    switch (kind) {
+      case CS_PROP_BOOLEAN:
+      case CS_PROP_INTEGER:
+      case CS_PROP_ENUM:
+        property["value"] = m_source->GetProperty(prop, &status);
+        break;
+      case CS_PROP_STRING: {
+        wpi::SmallString<128> strval_buf;
+        property["value"] =
+            m_source->GetStringProperty(prop, strval_buf, &status);
+        break;
+      }
+      default:
+        break;
+    }
+
+    // append the menu object to the menu typecontrols
+    if (m_source->GetPropertyKind(prop) == CS_PROP_ENUM) {
+      wpi::json menu;
+      auto choices = m_source->GetEnumPropertyChoices(prop, &status);
+      int j = 0;
+      for (auto choice = choices.begin(), end = choices.end(); choice != end;
+           ++j, ++choice) {
+        // replace any non-printable characters in name with spaces
+        wpi::SmallString<128> ch_name;
+        for (char ch : *choice) {
+          ch_name.push_back(std::isprint(ch) ? ch : ' ');
+        }
+        menu[j] = ch_name.str();
+      }
+      property["menu"] = menu;
+    }
+    info["controls"].push_back(property);
+  }
+  wpi::json modes;
+  first = true;
+  for (auto mode : m_source->EnumerateVideoModes(&status)) {
+    switch (mode.pixelFormat) {
+      case VideoMode::kMJPEG:
+        modes["pixelFormat"] = "MJPEG";
+        break;
+      case VideoMode::kYUYV:
+        modes["pixelFormat"] = "YUYV";
+        break;
+      case VideoMode::kRGB565:
+        modes["pixelFormat"] = "RGB565";
+        break;
+      case VideoMode::kBGR:
+        modes["pixelFormat"] = "BGR";
+        break;
+      case VideoMode::kGray:
+        modes["pixelFormat"] = "gray";
+        break;
+      case VideoMode::kY16:
+        modes["pixelFormat"] = "Y16";
+        break;
+      case VideoMode::kUYVY:
+        modes["pixelFormat"] = "UYVY";
+        break;
+      default:
+        modes["pixelFormat"] = "unknown";
+        break;
+    }
+    modes["width"] = mode.width;
+    modes["height"] = mode.height;
+    modes["fps"] = mode.fps;
+  }
+  info["modes"] = modes;
 }
 
 void WebRTCServerImpl::SetSourceImpl(std::shared_ptr<SourceImpl> source) {}
