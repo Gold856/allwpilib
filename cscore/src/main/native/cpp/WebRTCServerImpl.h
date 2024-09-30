@@ -56,6 +56,7 @@ class WebRTCServerImpl : public SinkImpl {
   int m_compressionProp;
   int m_defaultCompressionProp;
   int m_fpsProp;
+  int m_bandwidthLimitProp;  // bits/sec
   std::shared_ptr<rtc::WebSocketServer> m_signalingServer;
 };
 

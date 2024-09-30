@@ -4,7 +4,10 @@
 
 #include "WebRTCServerImpl.h"
 
+#include <stdint.h>
+
 #include <chrono>
+#include <cstdio>
 #include <memory>
 #include <string_view>
 #include <thread>
@@ -20,6 +23,7 @@
 #include <wpi/fmt/raw_ostream.h>
 #include <wpi/json.h>
 #include <wpi/print.h>
+#include <wpi/static_circular_buffer.h>
 #include <wpinet/HttpUtil.h>
 #include <wpinet/TCPAcceptor.h>
 #include <wpinet/raw_socket_istream.h>
@@ -54,6 +58,7 @@ class WebRTCServerImpl::ConnThread : public wpi::SafeThread {
   int m_compression = -1;
   int m_defaultCompression = 80;
   int m_fps = 0;
+  int m_bandwidthLimit = 0;  // bits/sec
   std::shared_ptr<rtc::PeerConnection> m_connection;
   std::shared_ptr<rtc::DataChannel> m_channel;
   std::shared_ptr<rtc::WebSocket> m_socket;
@@ -156,6 +161,7 @@ WebRTCServerImpl::WebRTCServerImpl(std::string_view name, wpi::Logger& logger,
         thr->m_defaultCompression =
             GetProperty(m_defaultCompressionProp)->value;
         thr->m_fps = GetProperty(m_fpsProp)->value;
+        thr->m_bandwidthLimit = GetProperty(m_bandwidthLimitProp)->value;
         thr->m_connection = connection;
         thr->m_channel = channel;
         thr->m_socket = socket;
@@ -184,6 +190,11 @@ WebRTCServerImpl::WebRTCServerImpl(std::string_view name, wpi::Logger& logger,
   });
   m_fpsProp = CreateProperty("fps", [] {
     return std::make_unique<PropertyImpl>("fps", CS_PROP_INTEGER, 1, 0, 0);
+  });
+
+  m_bandwidthLimitProp = CreateProperty("bandwidth_limit", [] {
+    return std::make_unique<PropertyImpl>("bandwidth_limit", CS_PROP_INTEGER, 1,
+                                          4000000, 4000000);
   });
 }
 
@@ -223,7 +234,6 @@ void WebRTCServerImpl::ConnThread::Main() {
         return;
       }
     }
-    m_socket->resetCallbacks();
     m_socket->onMessage([this](rtc::message_variant data) {
       auto message = wpi::json::parse(std::get<std::string>(data));
       auto requestType = message["type"].get<std::string>();
@@ -289,6 +299,14 @@ void WebRTCServerImpl::ConnThread::ProcessRequest(wpi::json message) {
         SWARNING("Parameter \"{}\" value \"{}\" is not an integer", key.c_str(),
                  value.dump());
       }
+    } else if (key == "bandwidth_limit") {
+      if (auto v = wpi::parse_integer<int>(value, 10)) {
+        m_bandwidthLimit = v.value();  // TODO: Cap to 7 Mbit/s
+      } else {
+        response += key + ": \"value is not an integer\"\r\n";
+        SWARNING("Parameter \"{}\" value \"{}\" is not an integer", key.c_str(),
+                 value.dump());
+      }
     }
     // ignore name parameter
     if (message.contains("name")) {
@@ -345,7 +363,9 @@ void WebRTCServerImpl::ConnThread::SendStream() {
   if (averagePeriod < timePerFrame) {
     averagePeriod = timePerFrame * 10;
   }
-
+  uint64_t lastBandwidthSampleTime = 0;
+  uint64_t lastBytesSent = 0;
+  wpi::static_circular_buffer<int, 5> bandwidthBuffer;
   StartStream();
   while (m_active || m_channel->isOpen() || m_socket->isOpen()) {
     auto source = GetSource();
@@ -366,9 +386,8 @@ void WebRTCServerImpl::ConnThread::SendStream() {
     }
 
     auto thisFrameTime = frame.GetTime();
+    Frame::Time deltaTime = thisFrameTime - lastFrameTime;
     if (thisFrameTime != 0 && timePerFrame != 0 && lastFrameTime != 0) {
-      Frame::Time deltaTime = thisFrameTime - lastFrameTime;
-
       // drop frame if it is early compared to the desired frame rate AND
       // the current average is higher than the desired average
       if (deltaTime < timePerFrame && averageFrameTime < timePerFrame) {
@@ -384,6 +403,27 @@ void WebRTCServerImpl::ConnThread::SendStream() {
             deltaTime * timePerFrame / averagePeriod;
       } else {
         averageFrameTime = deltaTime;
+      }
+    }
+    // Sample bandwidth every 200 ms
+    if (lastBandwidthSampleTime - thisFrameTime > 200000) {
+      lastBandwidthSampleTime = thisFrameTime;
+      uint64_t bytesSent = m_connection->bytesSent();
+      uint64_t deltaBits = (bytesSent - lastBytesSent) * 8;
+      if (deltaTime < 1000) {
+        continue;
+      }
+      bandwidthBuffer.push_front(deltaBits / (deltaTime / 1000));
+      lastBytesSent = bytesSent;
+
+      int averageBandwidth = 0;
+      for (int sample : bandwidthBuffer) {
+        // 5 taps and 200 ms period create a rolling average over one second
+        averageBandwidth += sample / 5;
+      }
+      if (averageBandwidth * 1000 > m_bandwidthLimit) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        continue;
       }
     }
 
