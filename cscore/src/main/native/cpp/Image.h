@@ -29,7 +29,9 @@ class Image {
     m_data.resize(0);
   }
 #endif
-
+  explicit Image(const std::vector<std::byte>& bytes)
+      : m_data{reinterpret_cast<const uchar*>(bytes.data()),
+               reinterpret_cast<const uchar*>(bytes.data()) + bytes.size()} {}
   Image(const Image&) = delete;
   Image& operator=(const Image&) = delete;
 

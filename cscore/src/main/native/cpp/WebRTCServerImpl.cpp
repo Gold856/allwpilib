@@ -98,15 +98,15 @@ WebRTCServerImpl::WebRTCServerImpl(std::string_view name, wpi::Logger& logger,
   rtc::WebSocketServerConfiguration wsConfig;
   wsConfig.port = port;
   m_signalingServer = std::make_shared<rtc::WebSocketServer>(wsConfig);
-  m_signalingServer->onClient([this](std::shared_ptr<rtc::WebSocket> socket) {
-    socket->onOpen([socket, this] {
+  m_signalingServer->onClient([this,
+                               name](std::shared_ptr<rtc::WebSocket> socket) {
+    socket->onOpen([this, name, socket] {
       rtc::Configuration config{.portRangeBegin = 1180, .portRangeEnd = 1190};
       auto connection = std::make_shared<rtc::PeerConnection>(config);
       rtc::DataChannelInit channelConfig{.reliability = {.unordered = true}};
       std::shared_ptr<rtc::DataChannel> channel =
-          connection->createDataChannel("test", channelConfig);
+          connection->createDataChannel(std::string{name}, channelConfig);
 
-      connection->setLocalDescription(rtc::Description::Type::Offer);
       wpi::json offer{{"type", connection->localDescription()->typeString()},
                       {"sdp", connection->localDescription().value()}};
 
@@ -115,10 +115,10 @@ WebRTCServerImpl::WebRTCServerImpl(std::string_view name, wpi::Logger& logger,
         auto message = std::get<std::string>(data);
         if (wpi::contains(message, "sdp")) {
           auto sdpAnswer = wpi::json::parse(message);
-          rtc::Description desc(sdpAnswer["sdp"].get<std::string>(),
-                                sdpAnswer["type"].get<std::string>());
           if (auto peerConnection = conn.lock()) {
-            peerConnection->setRemoteDescription(desc);
+            peerConnection->setRemoteDescription(
+                {sdpAnswer["sdp"].get<std::string>(),
+                 sdpAnswer["type"].get<std::string>()});
           }
         }
       });

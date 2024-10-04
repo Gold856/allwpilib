@@ -211,6 +211,11 @@ CS_Source CreateHttpCamera(std::string_view name,
                            CS_HttpCameraKind kind, CS_Status* status);
 CS_Source CreateCvSource(std::string_view name, const VideoMode& mode,
                          CS_Status* status);
+CS_Source CreateWebRTCCamera(std::string_view name, std::string_view address,
+                             CS_WebRTCCameraKind kind, CS_Status* status);
+CS_Source CreateWebRTCCamera(std::string_view name,
+                             std::span<const std::string> addresses,
+                             CS_WebRTCCameraKind kind, CS_Status* status);
 /** @} */
 
 /**
@@ -292,6 +297,18 @@ CS_HttpCameraKind GetHttpCameraKind(CS_Source source, CS_Status* status);
 void SetHttpCameraUrls(CS_Source source, std::span<const std::string> urls,
                        CS_Status* status);
 std::vector<std::string> GetHttpCameraUrls(CS_Source source, CS_Status* status);
+/** @} */
+
+/**
+ * @defgroup cscore_webrtccamera_func WebRTCCamera Source Functions
+ * @{
+ */
+CS_WebRTCCameraKind GetWebRTCCameraKind(CS_Source source, CS_Status* status);
+void SetWebRTCCameraAddresses(CS_Source source,
+                              std::span<const std::string> addresses,
+                              CS_Status* status);
+std::vector<std::string> GetWebRTCCameraAddresses(CS_Source source,
+                                                  CS_Status* status);
 /** @} */
 
 /**

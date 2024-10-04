@@ -903,6 +903,125 @@ class HttpCamera : public VideoCamera {
 };
 
 /**
+ * A source that represents a WebRTC camera.
+ */
+class WebRTCCamera : public VideoCamera {
+ public:
+  /**
+   * WebRTC camera kind.
+   */
+  enum WebRTCCameraKind {
+    /// Unknown camera kind.
+    kUnknown = CS_WEBRTC_UNKNOWN,
+    /// MJPG camera.
+    kMJPG = CS_WEBRTC_MJPG,
+  };
+
+  /**
+   * Create a source for a WebRTC camera.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   * @param address Camera address (e.g. "10.x.y.11:1180")
+   * @param kind Camera kind (e.g. kMJPG)
+   */
+  WebRTCCamera(std::string_view name, std::string_view address,
+               WebRTCCameraKind kind = kUnknown) {
+    m_handle = CreateWebRTCCamera(
+        name, address, static_cast<CS_WebRTCCameraKind>(static_cast<int>(kind)),
+        &m_status);
+  }
+
+  /**
+   * Create a source for a WebRTC camera.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   * @param address Camera address (e.g. "10.x.y.11:1180")
+   * @param kind Camera kind (e.g. kMJPG)
+   */
+  WebRTCCamera(std::string_view name, const char* address,
+               WebRTCCameraKind kind = kUnknown) {
+    m_handle = CreateWebRTCCamera(
+        name, address, static_cast<CS_WebRTCCameraKind>(static_cast<int>(kind)),
+        &m_status);
+  }
+
+  /**
+   * Create a source for a WebRTC camera.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   * @param address Camera address (e.g. "10.x.y.11:1180")
+   * @param kind Camera kind (e.g. kMJPG)
+   */
+  WebRTCCamera(std::string_view name, const std::string& address,
+               WebRTCCameraKind kind = kUnknown)
+      : WebRTCCamera(name, std::string_view{address}, kind) {}
+
+  /**
+   * Create a source for a WebRTC camera.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   * @param addresses Array of Camera addresses
+   * @param kind Camera kind (e.g. kMJPG)
+   */
+  WebRTCCamera(std::string_view name, std::span<const std::string> addresses,
+               WebRTCCameraKind kind = kUnknown) {
+    m_handle = CreateWebRTCCamera(
+        name, addresses,
+        static_cast<CS_WebRTCCameraKind>(static_cast<int>(kind)), &m_status);
+  }
+
+  /**
+   * Create a source for a WebRTC camera.
+   *
+   * @param name Source name (arbitrary unique identifier)
+   * @param addresses Array of camera addresses
+   * @param kind Camera kind (e.g. kMJPG)
+   */
+  template <typename T>
+  WebRTCCamera(std::string_view name, std::initializer_list<T> addresses,
+               WebRTCCameraKind kind = kUnknown) {
+    std::vector<std::string> vec;
+    vec.reserve(addresses.size());
+    for (const auto& address : addresses) {
+      vec.emplace_back(address);
+    }
+    m_handle = CreateWebRTCCamera(
+        name, vec, static_cast<CS_WebRTCCameraKind>(static_cast<int>(kind)),
+        &m_status);
+  }
+
+  /**
+   * Change the addresses used to connect to the camera.
+   */
+  void SetAddresses(std::span<const std::string> addresses) {
+    m_status = 0;
+    ::cs::SetWebRTCCameraAddresses(m_handle, addresses, &m_status);
+  }
+
+  /**
+   * Change the addresses used to connect to the camera.
+   */
+  template <typename T>
+  void SetAddresses(std::initializer_list<T> addresses) {
+    std::vector<std::string> vec;
+    vec.reserve(addresses.size());
+    for (const auto& address : addresses) {
+      vec.emplace_back(address);
+    }
+    m_status = 0;
+    ::cs::SetWebRTCCameraAddresses(m_handle, vec, &m_status);
+  }
+
+  /**
+   * Get the URLs used to connect to the camera.
+   */
+  std::vector<std::string> GetAddresses() const {
+    m_status = 0;
+    return ::cs::GetWebRTCCameraAddresses(m_handle, &m_status);
+  }
+};
+
+/**
  * A source that represents an Axis IP camera.
  *
  * @deprecated Use HttpCamera instead.

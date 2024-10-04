@@ -117,6 +117,7 @@ enum CS_SourceKind {
   CS_SOURCE_HTTP = 2,
   CS_SOURCE_CV = 4,
   CS_SOURCE_RAW = 8,
+  CS_SOURCE_WEBRTC = 16,
 };
 
 /**
@@ -128,6 +129,11 @@ enum CS_HttpCameraKind {
   CS_HTTP_CSCORE = 2,
   CS_HTTP_AXIS = 3
 };
+
+/**
+ * HTTP Camera kinds
+ */
+enum CS_WebRTCCameraKind { CS_WEBRTC_UNKNOWN = 0, CS_WEBRTC_MJPG = 1 };
 
 /**
  * Sink kinds
@@ -274,6 +280,12 @@ CS_Source CS_CreateHttpCameraMulti(const struct WPI_String* name,
                                    CS_Status* status);
 CS_Source CS_CreateCvSource(const struct WPI_String* name,
                             const CS_VideoMode* mode, CS_Status* status);
+CS_Source CS_CreateWebRTCCamera(const struct WPI_String* name,
+                                const struct WPI_String* url,
+                                CS_WebRTCCameraKind kind, CS_Status* status);
+CS_Source CS_CreateWebRTCMulti(const struct WPI_String* name,
+                               const struct WPI_String* urls, int count,
+                               CS_WebRTCCameraKind kind, CS_Status* status);
 /** @} */
 
 /**
@@ -361,6 +373,16 @@ void CS_SetHttpCameraUrls(CS_Source source, const struct WPI_String* urls,
                           int count, CS_Status* status);
 struct WPI_String* CS_GetHttpCameraUrls(CS_Source source, int* count,
                                         CS_Status* status);
+/** @} */
+
+/**
+ * @defgroup cscore_webrtccamera_cfunc WebRTCCamera Source Functions
+ * @{
+ */
+void CS_SetWebRTCCameraUrls(CS_Source source, const struct WPI_String* urls,
+                            int count, CS_Status* status);
+struct WPI_String* CS_GetWebRTCCameraUrls(CS_Source source, int* count,
+                                          CS_Status* status);
 /** @} */
 
 /**
