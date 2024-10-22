@@ -13,7 +13,7 @@
 
 #include "mrcal-types.h"
 #include "poseutils.h"
-#include "stereo.h"
+// #include "stereo.h"
 #include "triangulation.h"
 #include "mrcal-image.h"
 
@@ -30,7 +30,7 @@ const char* const* mrcal_supported_lensmodel_names( void ); // NULL-terminated a
 
 
 // Return true if the given mrcal_lensmodel_type_t specifies a valid lens model
-__attribute__((unused))
+
 static bool mrcal_lensmodel_type_is_valid(mrcal_lensmodel_type_t t)
 {
     return t >= 0;
@@ -197,7 +197,7 @@ bool mrcal_unproject( // out
 
 // Project the given camera-coordinate-system points using a pinhole
 // model. See the docs for projection details:
-// https://mrcal.secretsauce.net/lensmodels.html#lensmodel-pinhole
+// http://mrcal.secretsauce.net/lensmodels.html#lensmodel-pinhole
 //
 // This is a simplified special case of mrcal_project(). We project N
 // camera-coordinate-system points p to N pixel coordinates q
@@ -216,7 +216,7 @@ void mrcal_project_pinhole( // output
 
 // Unproject the given pixel coordinates using a pinhole model.
 // See the docs for projection details:
-// https://mrcal.secretsauce.net/lensmodels.html#lensmodel-pinhole
+// http://mrcal.secretsauce.net/lensmodels.html#lensmodel-pinhole
 //
 // This is a simplified special case of mrcal_unproject(). We unproject N 2D
 // pixel coordinates q to N camera-coordinate-system vectors v. The returned
@@ -235,7 +235,7 @@ void mrcal_unproject_pinhole( // output
 
 // Project the given camera-coordinate-system points using a stereographic
 // model. See the docs for projection details:
-// https://mrcal.secretsauce.net/lensmodels.html#lensmodel-stereographic
+// http://mrcal.secretsauce.net/lensmodels.html#lensmodel-stereographic
 //
 // This is a simplified special case of mrcal_project(). We project N
 // camera-coordinate-system points p to N pixel coordinates q
@@ -254,7 +254,7 @@ void mrcal_project_stereographic( // output
 
 // Unproject the given pixel coordinates using a stereographic model.
 // See the docs for projection details:
-// https://mrcal.secretsauce.net/lensmodels.html#lensmodel-stereographic
+// http://mrcal.secretsauce.net/lensmodels.html#lensmodel-stereographic
 //
 // This is a simplified special case of mrcal_unproject(). We unproject N 2D
 // pixel coordinates q to N camera-coordinate-system vectors v. The returned
@@ -274,7 +274,7 @@ void mrcal_unproject_stereographic( // output
 
 // Project the given camera-coordinate-system points using an equirectangular
 // projection. See the docs for projection details:
-// https://mrcal.secretsauce.net/lensmodels.html#lensmodel-lonlat
+// http://mrcal.secretsauce.net/lensmodels.html#lensmodel-lonlat
 //
 // This is a simplified special case of mrcal_project(). We project N
 // camera-coordinate-system points p to N pixel coordinates q
@@ -294,7 +294,7 @@ void mrcal_project_lonlat( // output
 
 // Unproject the given pixel coordinates using an equirectangular projection.
 // See the docs for projection details:
-// https://mrcal.secretsauce.net/lensmodels.html#lensmodel-lonlat
+// http://mrcal.secretsauce.net/lensmodels.html#lensmodel-lonlat
 //
 // This is a simplified special case of mrcal_unproject(). We unproject N 2D
 // pixel coordinates q to N camera-coordinate-system vectors v. The returned
@@ -316,7 +316,7 @@ void mrcal_unproject_lonlat( // output
 
 // Project the given camera-coordinate-system points using a transverse
 // equirectangular projection. See the docs for projection details:
-// https://mrcal.secretsauce.net/lensmodels.html#lensmodel-latlon
+// http://mrcal.secretsauce.net/lensmodels.html#lensmodel-latlon
 //
 // This is a simplified special case of mrcal_project(). We project N
 // camera-coordinate-system points p to N pixel coordinates q
@@ -336,7 +336,7 @@ void mrcal_project_latlon( // output
 
 // Unproject the given pixel coordinates using a transverse equirectangular
 // projection. See the docs for projection details:
-// https://mrcal.secretsauce.net/lensmodels.html#lensmodel-latlon
+// http://mrcal.secretsauce.net/lensmodels.html#lensmodel-latlon
 //
 // This is a simplified special case of mrcal_unproject(). We unproject N 2D
 // pixel coordinates q to N camera-coordinate-system vectors v. The returned
@@ -360,6 +360,8 @@ void mrcal_unproject_latlon( // output
 ////////////////////////////////////////////////////////////////////////////////
 //////////////////// Optimization
 ////////////////////////////////////////////////////////////////////////////////
+
+
 
 // Return the number of parameters needed in optimizing the given lens model
 //
@@ -483,28 +485,21 @@ mrcal_optimize( // out
                 int Nobservations_board,
                 int Nobservations_point,
 
-                const mrcal_observation_point_triangulated_t* observations_point_triangulated,
-                int Nobservations_point_triangulated,
-
                 // All the board pixel observations, in an array of shape
                 //
                 // ( Nobservations_board,
                 //   calibration_object_height_n,
                 //   calibration_object_width_n )
                 //
-                // .x, .y are the pixel observations .z is the weight of the
-                // observation. Most of the weights are expected to be 1.0. Less
-                // precise observations have lower weights.
+                // .x, .y are the
+                // pixel observations .z is the weight of the observation. Most
+                // of the weights are expected to be 1.0. Less precise
+                // observations have lower weights.
                 //
                 // .z<0 indicates that this is an outlier. This is respected on
                 // input (even if !do_apply_outlier_rejection). New outliers are
                 // marked with .z<0 on output, so this isn't const
                 mrcal_point3_t* observations_board_pool,
-
-                // Same this, but for discrete points. Array of shape
-                //
-                // ( Nobservations_point,)
-                mrcal_point3_t* observations_point_pool,
 
                 const mrcal_lensmodel_t* lensmodel,
                 const int* imagersizes, // Ncameras_intrinsics*2 of these
@@ -518,12 +513,10 @@ mrcal_optimize( // out
                 bool check_gradient);
 
 
-// These are cholmod_sparse, cholmod_factor, cholmod_common. I don't want to
-// include the full header that defines these in mrcal.h, and I don't need to:
-// mrcal.h just needs to know that these are a structure
+// This is cholmod_sparse. I don't want to include the full header that defines
+// it in mrcal.h, and I don't need to: mrcal.h just needs to know that it's a
+// structure
 struct cholmod_sparse_struct;
-struct cholmod_factor_struct;
-struct cholmod_common_struct;
 
 // Evaluate the value of the callback function at the given operating point
 //
@@ -576,9 +569,6 @@ bool mrcal_optimizer_callback(// out
                              int Nobservations_board,
                              int Nobservations_point,
 
-                             const mrcal_observation_point_triangulated_t* observations_point_triangulated,
-                             int Nobservations_point_triangulated,
-
                              // All the board pixel observations, in an array of shape
                              //
                              // ( Nobservations_board,
@@ -593,11 +583,6 @@ bool mrcal_optimizer_callback(// out
                              // .z<0 indicates that this is an outlier
                              const mrcal_point3_t* observations_board_pool,
 
-                             // Same this, but for discrete points. Array of shape
-                             //
-                             // ( Nobservations_point,)
-                             const mrcal_point3_t* observations_point_pool,
-
                              const mrcal_lensmodel_t* lensmodel,
                              const int* imagersizes, // Ncameras_intrinsics*2 of these
                              mrcal_problem_selections_t       problem_selections,
@@ -606,49 +591,6 @@ bool mrcal_optimizer_callback(// out
                              int calibration_object_width_n,
                              int calibration_object_height_n,
                              bool verbose);
-
-bool mrcal_drt_ref_refperturbed__dbpacked(// output
-                                          // Shape (6,Nstate_frames)
-                                          double* Kpackedf,
-                                          int Kpackedf_stride0, // in bytes. <= 0 means "contiguous"
-                                          int Kpackedf_stride1, // in bytes. <= 0 means "contiguous"
-
-                                          // Shape (6,Nstate_points)
-                                          double* Kpackedp,
-                                          int Kpackedp_stride0, // in bytes. <= 0 means "contiguous"
-                                          int Kpackedp_stride1, // in bytes. <= 0 means "contiguous"
-
-                                          // Shape (6,Nstate_calobject_warp)
-                                          double* Kpackedcw,
-                                          int Kpackedcw_stride0, // in bytes. <= 0 means "contiguous"
-                                          int Kpackedcw_stride1, // in bytes. <= 0 means "contiguous"
-
-                                          // inputs
-                                          // stuff that describes this solve
-                                          const double* b_packed,
-                                          // used only to confirm that the user passed-in the buffer they
-                                          // should have passed-in. The size must match exactly
-                                          int buffer_size_b_packed,
-
-                                          // The unitless (packed) Jacobian,
-                                          // used by the internal optimization
-                                          // routines cholmod_analyze() and
-                                          // cholmod_factorize() require
-                                          // non-const
-                                          /* const */
-                                          struct cholmod_sparse_struct* Jt,
-
-                                          // meta-parameters
-                                          int Ncameras_intrinsics, int Ncameras_extrinsics, int Nframes,
-                                          int Npoints, int Npoints_fixed, // at the end of points[]
-                                          int Nobservations_board,
-                                          int Nobservations_point,
-
-                                          const mrcal_lensmodel_t* lensmodel,
-                                          mrcal_problem_selections_t problem_selections,
-
-                                          int calibration_object_width_n,
-                                          int calibration_object_height_n);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -722,45 +664,7 @@ int mrcal_measurement_index_points(int i_observation_point,
                                    int calibration_object_width_n,
                                    int calibration_object_height_n);
 int mrcal_num_measurements_points(int Nobservations_point);
-int mrcal_measurement_index_points_triangulated(int i_point_triangulated,
-                                                int Nobservations_board,
-                                                int Nobservations_point,
-
-                                                // May be NULL if we don't have any of these
-                                                const mrcal_observation_point_triangulated_t* observations_point_triangulated,
-                                                int Nobservations_point_triangulated,
-
-                                                int calibration_object_width_n,
-                                                int calibration_object_height_n);
-int mrcal_num_measurements_points_triangulated(// May be NULL if we don't have any of these
-                                               const mrcal_observation_point_triangulated_t* observations_point_triangulated,
-                                               int Nobservations_point_triangulated);
-int mrcal_num_measurements_points_triangulated_initial_Npoints(// May be NULL if we don't have any of these
-                                                               const mrcal_observation_point_triangulated_t* observations_point_triangulated,
-                                                               int Nobservations_point_triangulated,
-
-                                                               // Only consider the leading Npoints. If Npoints < 0: take ALL the points
-                                                               int Npoints);
-bool mrcal_decode_observation_indices_points_triangulated(
-    // output
-    int* iobservation0,
-    int* iobservation1,
-    int* iobservation_point0,
-    int* Nobservations_this_point,
-    int* Nmeasurements_this_point,
-    int* ipoint,
-
-    // input
-    const int imeasurement,
-
-    const mrcal_observation_point_triangulated_t* observations_point_triangulated,
-    int Nobservations_point_triangulated);
-
-int mrcal_measurement_index_regularization(// May be NULL if we don't have any of these
-                                           const mrcal_observation_point_triangulated_t* observations_point_triangulated,
-                                           int Nobservations_point_triangulated,
-
-                                           int calibration_object_width_n,
+int mrcal_measurement_index_regularization(int calibration_object_width_n,
                                            int calibration_object_height_n,
                                            int Ncameras_intrinsics, int Ncameras_extrinsics,
                                            int Nframes,
@@ -775,11 +679,6 @@ int mrcal_num_measurements_regularization(int Ncameras_intrinsics, int Ncameras_
 
 int mrcal_num_measurements(int Nobservations_board,
                            int Nobservations_point,
-
-                           // May be NULL if we don't have any of these
-                           const mrcal_observation_point_triangulated_t* observations_point_triangulated,
-                           int Nobservations_point_triangulated,
-
                            int calibration_object_width_n,
                            int calibration_object_height_n,
                            int Ncameras_intrinsics, int Ncameras_extrinsics,

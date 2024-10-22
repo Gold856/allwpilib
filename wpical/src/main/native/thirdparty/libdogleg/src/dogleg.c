@@ -1812,7 +1812,7 @@ static void accum_outlierness_factor(// output
   }
 
 
-#warning This is a hack. The threshold should be 1.0, and the scaling should make sure that is the case. I am leaving it for now
+// #warning This is a hack. The threshold should be 1.0, and the scaling should make sure that is the case. I am leaving it for now
   k /= 8.;
 
 

@@ -3,7 +3,7 @@
 import os
 import shutil
 
-from upstream_utils import Lib, walk_cwd_and_copy_if
+from upstream_utils import Lib, comment_out_invalid_includes, walk_cwd_and_copy_if
 
 
 def copy_upstream_src(wpilib_root):
@@ -16,14 +16,29 @@ def copy_upstream_src(wpilib_root):
     ]:
         shutil.rmtree(os.path.join(wpical, d), ignore_errors=True)
 
-    walk_cwd_and_copy_if(
+    files = walk_cwd_and_copy_if(
         lambda dp, f: (f.endswith(".h") or f.endswith(".hh"))
         and not f.endswith("stereo.h")
         and not f.endswith("stereo-matching-libelas.h")
         and not dp.startswith(os.path.join(".", "test")),
         os.path.join(wpical, "src/main/native/thirdparty/mrcal/include"),
     )
-    walk_cwd_and_copy_if(
+    for f in files:
+        comment_out_invalid_includes(
+            f,
+            [
+                os.path.join(wpical, "src/main/native/thirdparty/mrcal/include"),
+                os.path.join(wpical, "src/main/native/thirdparty/mrcal/generated"),
+            ],
+        )
+        with open(f) as file:
+            content = file.read()
+        content = content.replace("__attribute__((unused))", "")
+        content = content.replace('__attribute__ ((visibility ("hidden")))', "")
+        with open(f, "w") as file:
+            file.write(content)
+
+    files = walk_cwd_and_copy_if(
         lambda dp, f: (f.endswith(".c") or f.endswith(".cc") or f.endswith(".pl"))
         and not f.endswith("mrcal-pywrap.c")
         and not f.endswith("image.c")
@@ -34,12 +49,25 @@ def copy_upstream_src(wpilib_root):
         and not dp.startswith(os.path.join(".", "test")),
         os.path.join(wpical, "src/main/native/thirdparty/mrcal/src"),
     )
+    for f in files:
+        comment_out_invalid_includes(
+            f,
+            [
+                os.path.join(wpical, "src/main/native/thirdparty/mrcal/include"),
+                os.path.join(wpical, "src/main/native/thirdparty/mrcal/generated"),
+            ],
+        )
+        with open(f) as file:
+            content = file.read()
+        content = content.replace('__attribute__ ((visibility ("hidden")))', "")
+        with open(f, "w") as file:
+            file.write(content)
 
 
 def main():
     name = "mrcal"
     url = "https://github.com/dkogan/mrcal"
-    tag = "71c89c4e9f268a0f4fb950325e7d551986a281ec"
+    tag = "0d5426b5851be80dd8e51470a0784a73565a3006"
 
     mrcal = Lib(name, url, tag, copy_upstream_src)
     mrcal.main()
