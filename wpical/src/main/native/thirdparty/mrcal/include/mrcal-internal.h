@@ -12,16 +12,16 @@
 // wrapper only
 
 // These models have no precomputed data
-typedef struct {} mrcal_LENSMODEL_PINHOLE__precomputed_t;
-typedef struct {} mrcal_LENSMODEL_STEREOGRAPHIC__precomputed_t;
-typedef struct {} mrcal_LENSMODEL_LONLAT__precomputed_t;
-typedef struct {} mrcal_LENSMODEL_LATLON__precomputed_t;
-typedef struct {} mrcal_LENSMODEL_OPENCV4__precomputed_t;
-typedef struct {} mrcal_LENSMODEL_OPENCV5__precomputed_t;
-typedef struct {} mrcal_LENSMODEL_OPENCV8__precomputed_t;
-typedef struct {} mrcal_LENSMODEL_OPENCV12__precomputed_t;
-typedef struct {} mrcal_LENSMODEL_CAHVOR__precomputed_t;
-typedef struct {} mrcal_LENSMODEL_CAHVORE__precomputed_t;
+// typedef struct {} mrcal_LENSMODEL_PINHOLE__precomputed_t;
+// typedef struct {} mrcal_LENSMODEL_STEREOGRAPHIC__precomputed_t;
+// typedef struct {} mrcal_LENSMODEL_LONLAT__precomputed_t;
+// typedef struct {} mrcal_LENSMODEL_LATLON__precomputed_t;
+// typedef struct {} mrcal_LENSMODEL_OPENCV4__precomputed_t;
+// typedef struct {} mrcal_LENSMODEL_OPENCV5__precomputed_t;
+// typedef struct {} mrcal_LENSMODEL_OPENCV8__precomputed_t;
+// typedef struct {} mrcal_LENSMODEL_OPENCV12__precomputed_t;
+// typedef struct {} mrcal_LENSMODEL_CAHVOR__precomputed_t;
+// typedef struct {} mrcal_LENSMODEL_CAHVORE__precomputed_t;
 
 // The splined stereographic models configuration parameters can be used to
 // compute the segment size. I cache this computation

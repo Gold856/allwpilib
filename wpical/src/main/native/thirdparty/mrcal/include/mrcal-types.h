@@ -39,21 +39,20 @@
 #define MRCAL_LENSMODEL_WITHCONFIG_DYNAMIC_NPARAMS_LIST(_)                       \
     _(LENSMODEL_SPLINED_STEREOGRAPHIC, -1)
 #define MRCAL_LENSMODEL_LIST(_)                         \
-    MRCAL_LENSMODEL_NOCONFIG_LIST(_)                    \
     MRCAL_LENSMODEL_WITHCONFIG_STATIC_NPARAMS_LIST(_)   \
     MRCAL_LENSMODEL_WITHCONFIG_DYNAMIC_NPARAMS_LIST(_)
 
 
 // parametric models have no extra configuration
-typedef struct {} mrcal_LENSMODEL_PINHOLE__config_t;
-typedef struct {} mrcal_LENSMODEL_STEREOGRAPHIC__config_t;
-typedef struct {} mrcal_LENSMODEL_LONLAT__config_t;
-typedef struct {} mrcal_LENSMODEL_LATLON__config_t;
-typedef struct {} mrcal_LENSMODEL_OPENCV4__config_t;
-typedef struct {} mrcal_LENSMODEL_OPENCV5__config_t;
-typedef struct {} mrcal_LENSMODEL_OPENCV8__config_t;
-typedef struct {} mrcal_LENSMODEL_OPENCV12__config_t;
-typedef struct {} mrcal_LENSMODEL_CAHVOR__config_t;
+// typedef struct {} mrcal_LENSMODEL_PINHOLE__config_t;
+// typedef struct {} mrcal_LENSMODEL_STEREOGRAPHIC__config_t;
+// typedef struct {} mrcal_LENSMODEL_LONLAT__config_t;
+// typedef struct {} mrcal_LENSMODEL_LATLON__config_t;
+// typedef struct {} mrcal_LENSMODEL_OPENCV4__config_t;
+// typedef struct {} mrcal_LENSMODEL_OPENCV5__config_t;
+// typedef struct {} mrcal_LENSMODEL_OPENCV8__config_t;
+// typedef struct {} mrcal_LENSMODEL_OPENCV12__config_t;
+// typedef struct {} mrcal_LENSMODEL_CAHVOR__config_t;
 
 #define _MRCAL_ITEM_DEFINE_ELEMENT(name, type, pybuildvaluecode, PRIcode,SCNcode, bitfield, cookie) type name bitfield;
 
