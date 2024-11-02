@@ -97,6 +97,7 @@ WebRTCServerImpl::WebRTCServerImpl(std::string_view name, wpi::Logger& logger,
 
   rtc::WebSocketServerConfiguration wsConfig;
   wsConfig.port = port;
+  wsConfig.bindAddress = listenAddress;
   m_signalingServer = std::make_shared<rtc::WebSocketServer>(wsConfig);
   m_signalingServer->onClient([this,
                                name](std::shared_ptr<rtc::WebSocket> socket) {

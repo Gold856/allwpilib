@@ -201,6 +201,26 @@ public class CameraServerJNI {
   public static native int createHttpCameraMulti(String name, String[] urls, int kind);
 
   /**
+   * Creates a WebRTC camera.
+   *
+   * @param name WebRTC camera name.
+   * @param address WebRTC camera stream address.
+   * @param kind WebRTC camera kind.
+   * @return WebRTC camera handle.
+   */
+  public static native int createWebRTCCamera(String name, String address, int kind);
+
+  /**
+   * Creates a WebRTC camera from multiple URLs.
+   *
+   * @param name WebRTC camera name.
+   * @param addresses WebRTC camera stream addresses.
+   * @param kind WebRTC camera kind.
+   * @return WebRTC camera handle.
+   */
+  public static native int createWebRTCCameraMulti(String name, String[] addresses, int kind);
+
+  /**
    * Creates a raw source.
    *
    * @param name Source name.
@@ -507,6 +527,34 @@ public class CameraServerJNI {
    * @return HTTP camera URLs.
    */
   public static native String[] getHttpCameraUrls(int source);
+
+  //
+  // WebRTCCamera Source Functions
+  //
+
+  /**
+   * Returns WebRTC camera kind.
+   *
+   * @param source Source handle.
+   * @return WebRTC camera kind.
+   */
+  public static native int getWebRTCCameraKind(int source);
+
+  /**
+   * Sets WebRTC camera URLs.
+   *
+   * @param source Source handle.
+   * @param addresses WebRTC camera addresses.
+   */
+  public static native void setWebRTCCameraAddresses(int source, String[] addresses);
+
+  /**
+   * Returns WebRTC camera URLs.
+   *
+   * @param source Source handle.
+   * @return WebRTC camera URLs.
+   */
+  public static native String[] getWebRTCCameraAddresses(int source);
 
   //
   // Image Source Functions
