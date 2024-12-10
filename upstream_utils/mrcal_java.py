@@ -5,17 +5,23 @@ import shutil
 
 from upstream_utils import Lib, walk_cwd_and_copy_if
 
+
 def delete_lines_by_range(file_path, start_line, end_line):
     # Read all lines from the file
-    with open(file_path, 'r') as file:
+    with open(file_path, "r") as file:
         lines = file.readlines()
-    
+
     # Filter out lines that are within the specified range
-    filtered_lines = [line for i, line in enumerate(lines, start=1) if not (start_line <= i <= end_line)]
-    
+    filtered_lines = [
+        line
+        for i, line in enumerate(lines, start=1)
+        if not (start_line <= i <= end_line)
+    ]
+
     # Write the remaining lines back to the file
-    with open(file_path, 'w') as file:
+    with open(file_path, "w") as file:
         file.writelines(filtered_lines)
+
 
 def copy_upstream_src(wpilib_root):
     wpical = os.path.join(wpilib_root, "wpical")
@@ -48,13 +54,33 @@ def copy_upstream_src(wpilib_root):
         with open(f) as file:
             content = file.read()
             content = content.replace("#include <malloc.h>", "")
-            content = content.replace("// mrcal_point3_t *c_observations_point_pool = observations_point;", "mrcal_point3_t *c_observations_point_pool = observations_point;")
-            content = content.replace("// mrcal_observation_point_triangulated_t *observations_point_triangulated =", "mrcal_observation_point_triangulated_t *observations_point_triangulated = NULL;")
-            content = content.replace("// observations_point_triangulated,", "observations_point_triangulated,")
-            content = content.replace("// 0, // hard-coded to 0", "0, // hard-coded to 0")
-            content = content.replace("// observations_point_triangulated, -1,", "observations_point_triangulated, -1,")
-            content = content.replace("c_observations_board_pool, &mrcal_lensmodel, c_imagersizes,", "c_observations_board_pool, c_observations_point_pool, &mrcal_lensmodel, c_imagersizes,")
-            content = content.replace("calobject_warp, stats.Noutliers);", "calobject_warp, stats.Noutliers_board);")
+            content = content.replace(
+                "// mrcal_point3_t *c_observations_point_pool = observations_point;",
+                "mrcal_point3_t *c_observations_point_pool = observations_point;",
+            )
+            content = content.replace(
+                "// mrcal_observation_point_triangulated_t *observations_point_triangulated =",
+                "mrcal_observation_point_triangulated_t *observations_point_triangulated = NULL;",
+            )
+            content = content.replace(
+                "// observations_point_triangulated,",
+                "observations_point_triangulated,",
+            )
+            content = content.replace(
+                "// 0, // hard-coded to 0", "0, // hard-coded to 0"
+            )
+            content = content.replace(
+                "// observations_point_triangulated, -1,",
+                "observations_point_triangulated, -1,",
+            )
+            content = content.replace(
+                "c_observations_board_pool, &mrcal_lensmodel, c_imagersizes,",
+                "c_observations_board_pool, c_observations_point_pool, &mrcal_lensmodel, c_imagersizes,",
+            )
+            content = content.replace(
+                "calobject_warp, stats.Noutliers);",
+                "calobject_warp, stats.Noutliers_board);",
+            )
         with open(f, "w") as file:
             file.write(content)
 
