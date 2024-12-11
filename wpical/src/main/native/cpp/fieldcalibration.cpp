@@ -372,9 +372,8 @@ bool fieldcalibration::process_video_file(
 
       // Add tag ID to poses
       if (poses.find(tag_detection_i->id) == poses.end()) {
-        poses[tag_detection_i->id] = {};
-        poses[tag_detection_i->id].p = Eigen::Vector3d(0.0, 0.0, 0.0);
-        poses[tag_detection_i->id].q = Eigen::Quaterniond(1.0, 0.0, 0.0, 0.0);
+        poses[tag_detection_i->id] = {Eigen::Vector3d(0.0, 0.0, 0.0),
+                                      Eigen::Quaterniond(1.0, 0.0, 0.0, 0.0)};
       }
 
       // Estimate camera to tag pose

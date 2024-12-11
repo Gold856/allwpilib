@@ -121,7 +121,6 @@ nativeUtils.platformConfigs.each {
         it.cppCompiler.args.add("-Wno-deprecated-declarations")
         it.cppCompiler.args.remove("-permissive")
         it.cppCompiler.args.add("-fpermissive")
-        it.cppCompiler.args.add("-Wno-maybe-uninitialized")
     }
 }
 def testResources = "\"$rootDir/wpical/src/main/native/resources\"".replace("\\", "/")

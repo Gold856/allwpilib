@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <memory>
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -57,14 +58,16 @@ int cameracalibration::calibrate(const std::string& input_video,
 
   std::vector<std::vector<cv::Point3f>> all_obj_points;
   std::vector<std::vector<cv::Point2f>> all_img_points;
-
+  std::cout << video_capture.getBackendName() << std::endl;
   while (video_capture.grab()) {
+    std::cout << "Grabbing!";
     cv::Mat frame;
     video_capture.retrieve(frame);
 
     cv::Mat debug_image = frame;
 
     if (frame.empty()) {
+      std::cout << "Empty!";
       break;
     }
 
