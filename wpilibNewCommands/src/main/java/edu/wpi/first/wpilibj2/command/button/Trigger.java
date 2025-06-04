@@ -279,7 +279,7 @@ public class Trigger implements BooleanSupplier {
     return new Trigger(
         m_loop,
         new BooleanSupplier() {
-          final Debouncer m_debouncer = new Debouncer(seconds, type);
+          private final Debouncer m_debouncer = new Debouncer(seconds, type);
 
           @Override
           public boolean getAsBoolean() {

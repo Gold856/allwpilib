@@ -124,4 +124,41 @@
             ]]>
     </example>
   </rule>
+  <rule name="InternalFieldNamingConvention"
+      language="java"
+      message="Non-public fields must follow lowerCamelCase and begin with an m_ prefix."
+      class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+   <description>
+
+   </description>
+   <priority>3</priority>
+   <properties>
+      <property name="xpath">
+         <value>
+<![CDATA[
+//ClassDeclaration[not(matches(@PackageName, "edu.wpi.first.math"))]/ClassBody/FieldDeclaration[not(@Visibility = 'public') and @Static = false()]/VariableDeclarator[not(matches(@Name, "^m_[a-z][a-zA-Z0-9]*$"))]
+]]>
+         </value>
+      </property>
+   </properties>
+</rule>
+<rule name="PublicFieldNamingConvention"
+      language="java"
+      message="Public fields must follow lowerCamelCase."
+      class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+   <description>
+
+   </description>
+   <priority>3</priority>
+   <properties>
+      <property name="xpath">
+         <value>
+<![CDATA[
+//ClassDeclaration[not(matches(@PackageName, "edu.wpi.first.math"))]/ClassBody/FieldDeclaration[@Visibility = 'public' and @Static = false()]/VariableDeclarator[not(matches(@Name, "^[a-z][a-zA-Z0-9]*$"))]
+]]>
+         </value>
+      </property>
+   </properties>
+</rule>
+
 </ruleset>

@@ -26,7 +26,6 @@ import org.opencv.imgproc.Imgproc;
 
 @SuppressWarnings("PMD.MutableStaticState")
 class AprilTagDetectorTest {
-  @SuppressWarnings("MemberName")
   AprilTagDetector detector;
 
   @BeforeAll
@@ -178,8 +177,7 @@ class AprilTagDetectorTest {
       assertEquals(1, results[0].getId());
       assertEquals(0, results[0].getHamming());
 
-      var estimator =
-          new AprilTagPoseEstimator(new AprilTagPoseEstimator.Config(0.2, 500, 500, 320, 240));
+      var estimator = new AprilTagPoseEstimator(new AprilTagPoseEstimator.Config(0.2, 500, 500, 320, 240));
       AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 200);
       assertEquals(Transform3d.kZero, est.pose2);
       Transform3d pose = estimator.estimate(results[0]);
@@ -190,7 +188,8 @@ class AprilTagDetectorTest {
   }
 
   /**
-   * This tag is rotated such that the top is closer to the camera than the bottom. In the camera
+   * This tag is rotated such that the top is closer to the camera than the
+   * bottom. In the camera
    * frame, with +x to the right, this is a rotation about +X by 45 degrees.
    */
   @Test
@@ -208,10 +207,9 @@ class AprilTagDetectorTest {
       AprilTagDetection[] results = detector.detect(image);
       assertEquals(1, results.length);
 
-      var estimator =
-          new AprilTagPoseEstimator(
-              new AprilTagPoseEstimator.Config(
-                  0.2, 500, 500, image.cols() / 2.0, image.rows() / 2.0));
+      var estimator = new AprilTagPoseEstimator(
+          new AprilTagPoseEstimator.Config(
+              0.2, 500, 500, image.cols() / 2.0, image.rows() / 2.0));
       AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 200);
 
       assertEquals(Units.degreesToRadians(45), est.pose1.getRotation().getX(), 0.1);
@@ -223,7 +221,8 @@ class AprilTagDetectorTest {
   }
 
   /**
-   * This tag is rotated such that the right is closer to the camera than the left. In the camera
+   * This tag is rotated such that the right is closer to the camera than the
+   * left. In the camera
    * frame, with +y down, this is a rotation of 45 degrees about +y.
    */
   @Test
@@ -241,10 +240,9 @@ class AprilTagDetectorTest {
       AprilTagDetection[] results = detector.detect(image);
       assertEquals(1, results.length);
 
-      var estimator =
-          new AprilTagPoseEstimator(
-              new AprilTagPoseEstimator.Config(
-                  0.2, 500, 500, image.cols() / 2.0, image.rows() / 2.0));
+      var estimator = new AprilTagPoseEstimator(
+          new AprilTagPoseEstimator.Config(
+              0.2, 500, 500, image.cols() / 2.0, image.rows() / 2.0));
       AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 200);
 
       assertEquals(Units.degreesToRadians(0), est.pose1.getRotation().getX(), 0.1);
@@ -271,10 +269,9 @@ class AprilTagDetectorTest {
       AprilTagDetection[] results = detector.detect(image);
       assertEquals(1, results.length);
 
-      var estimator =
-          new AprilTagPoseEstimator(
-              new AprilTagPoseEstimator.Config(
-                  0.2, 500, 500, image.cols() / 2.0, image.rows() / 2.0));
+      var estimator = new AprilTagPoseEstimator(
+          new AprilTagPoseEstimator.Config(
+              0.2, 500, 500, image.cols() / 2.0, image.rows() / 2.0));
       AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 200);
 
       assertEquals(Units.degreesToRadians(0), est.pose1.getRotation().getX(), 0.1);

@@ -33,13 +33,13 @@ public final class DriverStation {
   public static final int kJoystickPorts = 6;
 
   private static final class HALJoystickButtons {
-    public int m_buttons;
-    public byte m_count;
+    int m_buttons;
+    byte m_count;
   }
 
   private static class HALJoystickAxes {
-    public final float[] m_axes;
-    public int m_count;
+    final float[] m_axes;
+    int m_count;
 
     HALJoystickAxes(int count) {
       m_axes = new float[count];
@@ -47,10 +47,8 @@ public final class DriverStation {
   }
 
   private static class HALJoystickAxesRaw {
-    public final int[] m_axes;
-
-    @SuppressWarnings("unused")
-    public int m_count;
+    final int[] m_axes;
+    int m_count;
 
     HALJoystickAxesRaw(int count) {
       m_axes = new int[count];
@@ -58,8 +56,8 @@ public final class DriverStation {
   }
 
   private static class HALJoystickPOVs {
-    public final short[] m_povs;
-    public int m_count;
+    final short[] m_povs;
+    int m_count;
 
     HALJoystickPOVs(int count) {
       m_povs = new short[count];
@@ -92,7 +90,6 @@ public final class DriverStation {
   private static final double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0;
   private static double m_nextMessageTime;
 
-  @SuppressWarnings("MemberName")
   private static class MatchDataSender {
     private static final String kSmartDashboardType = "FMSInfo";
 
