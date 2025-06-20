@@ -13,7 +13,6 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/ranges.h>
 #include <frc/filter/LinearFilter.h>
 #include <units/time.h>
 #include <wpi/StringMap.h>
@@ -79,7 +78,7 @@ class MissingTestsError : public std::exception {
     errorString = std::format(
         "The following tests were not detected: {}. Make sure to perform all "
         "four tests as described in the SysId documentation.",
-        fmt::join(missingTests, ", "));
+        missingTests);
   }
   const char* what() const noexcept override { return errorString.c_str(); }
 

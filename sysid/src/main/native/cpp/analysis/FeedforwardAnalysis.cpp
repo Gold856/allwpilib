@@ -12,7 +12,6 @@
 #include <vector>
 
 #include <Eigen/Eigenvalues>
-#include <fmt/ranges.h>
 #include <units/math.h>
 #include <units/time.h>
 
@@ -154,8 +153,8 @@ static void CheckOLSDataQuality(const Eigen::MatrixXd& X,
       }
     }
 
-    std::string error = std::format("Insufficient samples to compute {}.\n\n",
-                                    fmt::join(badGainsList, ", "));
+    std::string error =
+        std::format("Insufficient samples to compute {}.\n\n", badGainsList);
 
     // If all gains are bad, the robot may not have moved
     if (badGains.all()) {

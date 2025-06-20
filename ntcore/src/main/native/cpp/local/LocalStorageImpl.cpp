@@ -10,7 +10,6 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/ranges.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/datalog/DataLog.h>
@@ -410,9 +409,25 @@ void StorageImpl::Unpublish(NT_Handle pubentryHandle) {
 // Multi-subscriber functions
 //
 
+// FIXME: Remove when GCC 15 is available and pass span directly
+static std::string join(std::span<const std::string_view> values) {
+  std::string ret;
+  bool isFirst = true;
+  for (auto value : values) {
+    if (isFirst) {
+      isFirst = false;
+      ret += std::format("\"{}\"", value);
+    } else {
+      ret += std::format(", \"{}\"", value);
+    }
+    // However we get a string representation of value
+  }
+  return ret;
+}
+
 LocalMultiSubscriber* StorageImpl::AddMultiSubscriber(
     std::span<const std::string_view> prefixes, const PubSubOptions& options) {
-  DEBUG4("AddMultiSubscriber({})", fmt::join(prefixes, ","));
+  DEBUG4("AddMultiSubscriber({})", join(prefixes));
   if (m_multiSubscribers.size() >= kMaxMultiSubscribers) {
     ERR("reached maximum number of multi-subscribers, not subscribing");
     return nullptr;

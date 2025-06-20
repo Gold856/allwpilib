@@ -5,12 +5,13 @@
 #include "Exporter.h"
 
 #include <atomic>
-#include <ctime>
+#include <cstdint>
 #include <format>
 #include <functional>
 #include <future>
 #include <map>
 #include <memory>
+#include <ranges>
 #include <set>
 #include <string>
 #include <string_view>
@@ -18,7 +19,6 @@
 #include <vector>
 
 #include <fmt/chrono.h>
-#include <fmt/ranges.h>
 #include <glass/Storage.h>
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -454,6 +454,17 @@ static void PrintEscapedCsvString(wpi::raw_ostream& os, std::string_view str) {
   }
 }
 
+static void PrintArray(wpi::raw_ostream& os,
+                       std::ranges::input_range auto& values,
+                       std::string_view delimiter) {
+  if (!values.empty()) {
+    wpi::print(os, "{}", values[0]);
+    for (const auto& value : values | std::views::drop(1)) {
+      wpi::print(os, "{}{}", delimiter, value);
+    }
+  }
+}
+
 static void ValueToCsv(wpi::raw_ostream& os, const Entry& entry,
                        const wpi::log::DataLogRecord& record) {
   // handle systemTime specially
@@ -494,25 +505,25 @@ static void ValueToCsv(wpi::raw_ostream& os, const Entry& entry,
   } else if (entry.type == "boolean[]") {
     std::vector<int> val;
     if (record.GetBooleanArray(&val)) {
-      wpi::print(os, "{}", fmt::join(val, ";"));
+      PrintArray(os, val, ";");
       return;
     }
   } else if (entry.type == "double[]") {
     std::vector<double> val;
     if (record.GetDoubleArray(&val)) {
-      wpi::print(os, "{}", fmt::join(val, ";"));
+      PrintArray(os, val, ";");
       return;
     }
   } else if (entry.type == "float[]") {
     std::vector<float> val;
     if (record.GetFloatArray(&val)) {
-      wpi::print(os, "{}", fmt::join(val, ";"));
+      PrintArray(os, val, ";");
       return;
     }
   } else if (entry.type == "int64[]") {
     std::vector<int64_t> val;
     if (record.GetIntegerArray(&val)) {
-      wpi::print(os, "{}", fmt::join(val, ";"));
+      PrintArray(os, val, ";");
       return;
     }
   } else if (entry.type == "string[]") {

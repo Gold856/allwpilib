@@ -11,11 +11,11 @@
 #include <limits>
 #include <numeric>
 #include <random>
+#include <span>
 #include <string_view>
 #include <thread>
 #include <vector>
 
-#include <fmt/ranges.h>
 #include <wpi/Synchronization.h>
 #include <wpi/print.h>
 #include <wpi/timestamp.h>
@@ -61,6 +61,22 @@ int main(int argc, char* argv[]) {
   wpi::print("{}\n", nt::GetEntryValue(myValue).GetString());
 }
 
+// TODO: Remove when GCC 15 is available
+static std::string join(std::span<int64_t> values) {
+  std::string ret;
+  bool isFirst = true;
+  for (auto value : values) {
+    if (isFirst) {
+      isFirst = false;
+      ret += std::format("{}", value);
+    } else {
+      ret += std::format(", {}", value);
+    }
+    // However we get a string representation of value
+  }
+  return ret;
+}
+
 void PrintTimes(std::vector<int64_t>& times) {
   std::sort(times.begin(), times.end());
   int64_t min = times[0];
@@ -73,8 +89,8 @@ void PrintTimes(std::vector<int64_t>& times) {
   double stdev = std::sqrt(sq_sum / times.size() - mean * mean);
 
   wpi::print("min: {} max: {}, mean: {}, stdev: {}\n", min, max, mean, stdev);
-  wpi::print("min 10: {}\n", fmt::join(times.begin(), times.begin() + 10, ","));
-  wpi::print("max 10: {}\n", fmt::join(times.end() - 10, times.end(), ","));
+  wpi::print("min 10: {}\n", join(std::span(times.begin(), 10)));
+  wpi::print("max 10: {}\n", join(std::span(times.end() - 10, times.end())));
 }
 
 // benchmark

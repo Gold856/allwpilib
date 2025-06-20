@@ -7,7 +7,6 @@
 #include <vector>
 
 #include <fmt/chrono.h>
-#include <fmt/ranges.h>
 #include <wpi/DenseMap.h>
 #include <wpi/MemoryBuffer.h>
 #include <wpi/print.h>
@@ -128,35 +127,35 @@ int main(int argc, const char** argv) {
       } else if (entry->second.type == "boolean[]") {
         std::vector<int> val;
         if (record.GetBooleanArray(&val)) {
-          wpi::print("  {}\n", fmt::join(val, ", "));
+          wpi::print("  {}\n", val);
         } else {
           wpi::print("  invalid\n");
         }
       } else if (entry->second.type == "double[]") {
         std::vector<double> val;
         if (record.GetDoubleArray(&val)) {
-          wpi::print("  {}\n", fmt::join(val, ", "));
+          wpi::print("  {}\n", val);
         } else {
           wpi::print("  invalid\n");
         }
       } else if (entry->second.type == "float[]") {
         std::vector<float> val;
         if (record.GetFloatArray(&val)) {
-          wpi::print("  {}\n", fmt::join(val, ", "));
+          wpi::print("  {}\n", val);
         } else {
           wpi::print("  invalid\n");
         }
       } else if (entry->second.type == "int64[]") {
         std::vector<int64_t> val;
         if (record.GetIntegerArray(&val)) {
-          wpi::print("  {}\n", fmt::join(val, ", "));
+          wpi::print("  {}\n", val);
         } else {
           wpi::print("  invalid\n");
         }
       } else if (entry->second.type == "string[]") {
         std::vector<std::string_view> val;
         if (record.GetStringArray(&val)) {
-          wpi::print("  {}\n", fmt::join(val, ", "));
+          wpi::print("  {}\n", val);
         } else {
           wpi::print("  invalid\n");
         }
