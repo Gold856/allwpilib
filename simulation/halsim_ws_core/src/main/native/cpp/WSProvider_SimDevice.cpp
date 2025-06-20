@@ -6,11 +6,11 @@
 
 #include <algorithm>
 #include <cmath>
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
 
-#include <fmt/format.h>
 #include <hal/Ports.h>
 #include <wpi/StringExtras.h>
 
@@ -145,7 +145,7 @@ void HALSimWSProviderSimDevice::OnValueCreated(const char* name,
         break;
     }
   }
-  std::string key = fmt::format("{}{}", prefix, name);
+  std::string key = std::format("{}{}", prefix, name);
   SimDeviceValueData data;
   data.device = this;
   data.handle = handle;
@@ -268,12 +268,12 @@ void HALSimWSProviderSimDevices::DeviceCreatedCallback(
   auto [type, id] = wpi::split(name, ':');
   std::shared_ptr<HALSimWSProviderSimDevice> dev;
   if (id.empty()) {
-    auto key = fmt::format("SimDevice/{}", type);
+    auto key = std::format("SimDevice/{}", type);
     dev = std::make_shared<HALSimWSProviderSimDevice>(handle, key, "SimDevice",
                                                       type);
     m_providers.Add(key, dev);
   } else {
-    auto key = fmt::format("{}/{}", type, id);
+    auto key = std::format("{}/{}", type, id);
     dev = std::make_shared<HALSimWSProviderSimDevice>(handle, key, type, id);
     m_providers.Add(key, dev);
   }

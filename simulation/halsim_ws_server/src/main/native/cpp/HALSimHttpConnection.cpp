@@ -184,7 +184,7 @@ void HALSimHttpConnection::ProcessRequest() {
     }
 
     if (!fs::exists(nativePath) || fs::is_directory(nativePath)) {
-      MySendError(404, fmt::format("Resource '{}' not found", path));
+      MySendError(404, std::format("Resource '{}' not found", path));
     } else {
       auto contentType = wpi::MimeTypeFromPath(nativePath.string());
       SendFileResponse(200, "OK", contentType, nativePath.string());

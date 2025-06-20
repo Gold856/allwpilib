@@ -6,7 +6,6 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
 #include <wpi/MessagePack.h>
 #include <wpi/mpack.h>
 

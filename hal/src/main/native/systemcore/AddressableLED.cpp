@@ -8,10 +8,10 @@
 
 #include <cstdio>
 #include <cstring>
+#include <format>
 #include <memory>
 #include <thread>
 
-#include <fmt/format.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/RawTopic.h>
 

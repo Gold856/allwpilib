@@ -5,10 +5,10 @@
 #pragma once
 
 #include <concepts>
+#include <format>
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
-#include <fmt/format.h>
 
 // FIXME: Doxygen gives internal inconsistency errors:
 
@@ -21,7 +21,7 @@
 template <typename Derived, typename CharT>
   requires std::derived_from<Derived, Eigen::DenseBase<Derived>> ||
            std::derived_from<Derived, Eigen::SparseCompressedBase<Derived>>
-struct fmt::formatter<Derived, CharT> {
+struct std::formatter<Derived, CharT> {
   template <typename ParseContext>
   constexpr auto parse(ParseContext& ctx) {
     return m_underlying.parse(ctx);
@@ -33,12 +33,12 @@ struct fmt::formatter<Derived, CharT> {
 
     for (int row = 0; row < mat.rows(); ++row) {
       for (int col = 0; col < mat.cols(); ++col) {
-        out = fmt::format_to(out, "  ");
+        out = std::format_to(out, "  ");
         out = m_underlying.format(mat.coeff(row, col), ctx);
       }
 
       if (row < mat.rows() - 1) {
-        out = fmt::format_to(out, "\n");
+        out = std::format_to(out, "\n");
       }
     }
 
@@ -46,6 +46,6 @@ struct fmt::formatter<Derived, CharT> {
   }
 
  private:
-  fmt::formatter<typename Derived::Scalar, CharT> m_underlying;
+  std::formatter<typename Derived::Scalar, CharT> m_underlying;
 };
 //! @endcond

@@ -4,9 +4,8 @@
 
 #include "hal/CTREPCM.h"
 
+#include <format>
 #include <string>
-
-#include <fmt/format.h>
 
 #include "HALInitializer.h"
 #include "HALInternal.h"
@@ -362,7 +361,7 @@ void HAL_FireCTREPCMOneShot(HAL_CTREPCMHandle handle, int32_t index,
     *status = PARAMETER_OUT_OF_RANGE;
     hal::SetLastError(
         status,
-        fmt::format("Only [0-7] are valid index values. Requested {}", index));
+        std::format("Only [0-7] are valid index values. Requested {}", index));
     return;
   }
 
@@ -394,7 +393,7 @@ void HAL_SetCTREPCMOneShotDuration(HAL_CTREPCMHandle handle, int32_t index,
     *status = PARAMETER_OUT_OF_RANGE;
     hal::SetLastError(
         status,
-        fmt::format("Only [0-7] are valid index values. Requested {}", index));
+        std::format("Only [0-7] are valid index values. Requested {}", index));
     return;
   }
 

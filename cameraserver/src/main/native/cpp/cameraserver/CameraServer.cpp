@@ -5,12 +5,12 @@
 #include "cameraserver/CameraServer.h"
 
 #include <atomic>
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
 #include <networktables/BooleanTopic.h>
 #include <networktables/IntegerTopic.h>
 #include <networktables/NetworkTable.h>
@@ -126,7 +126,7 @@ static std::string_view MakeSourceValue(CS_Source source,
 }
 
 static std::string MakeStreamValue(std::string_view address, int port) {
-  return fmt::format("mjpg:http://{}:{}/?action=stream", address, port);
+  return std::format("mjpg:http://{}:{}/?action=stream", address, port);
 }
 
 SourcePublisher* Instance::GetPublisher(CS_Source source) {
@@ -265,7 +265,7 @@ static std::string PixelFormatToString(int pixelFormat) {
 }
 
 static std::string VideoModeToString(const cs::VideoMode& mode) {
-  return fmt::format("{}x{} {} {} fps", mode.width, mode.height,
+  return std::format("{}x{} {} {} fps", mode.width, mode.height,
                      PixelFormatToString(mode.pixelFormat), mode.fps);
 }
 
@@ -283,11 +283,11 @@ PropertyPublisher::PropertyPublisher(nt::NetworkTable& table,
   std::string name;
   std::string infoName;
   if (wpi::starts_with(event.name, "raw_")) {
-    name = fmt::format("RawProperty/{}", event.name);
-    infoName = fmt::format("RawPropertyInfo/{}", event.name);
+    name = std::format("RawProperty/{}", event.name);
+    infoName = std::format("RawPropertyInfo/{}", event.name);
   } else {
-    name = fmt::format("Property/{}", event.name);
-    infoName = fmt::format("PropertyInfo/{}", event.name);
+    name = std::format("Property/{}", event.name);
+    infoName = std::format("PropertyInfo/{}", event.name);
   }
 
   CS_Status status = 0;
@@ -298,18 +298,18 @@ PropertyPublisher::PropertyPublisher(nt::NetworkTable& table,
       break;
     case CS_PROP_ENUM:
       choicesTopic =
-          table.GetStringArrayTopic(fmt::format("{}/choices", infoName));
+          table.GetStringArrayTopic(std::format("{}/choices", infoName));
       [[fallthrough]];
     case CS_PROP_INTEGER:
       integerValueEntry = table.GetIntegerTopic(name).GetEntry(0);
       minPublisher =
-          table.GetIntegerTopic(fmt::format("{}/min", infoName)).Publish();
+          table.GetIntegerTopic(std::format("{}/min", infoName)).Publish();
       maxPublisher =
-          table.GetIntegerTopic(fmt::format("{}/max", infoName)).Publish();
+          table.GetIntegerTopic(std::format("{}/max", infoName)).Publish();
       stepPublisher =
-          table.GetIntegerTopic(fmt::format("{}/step", infoName)).Publish();
+          table.GetIntegerTopic(std::format("{}/step", infoName)).Publish();
       defaultPublisher =
-          table.GetIntegerTopic(fmt::format("{}/default", infoName)).Publish();
+          table.GetIntegerTopic(std::format("{}/default", infoName)).Publish();
 
       integerValueEntry.SetDefault(event.value);
       minPublisher.Set(cs::GetPropertyMin(event.propertyHandle, &status));
@@ -476,10 +476,10 @@ cs::UsbCamera CameraServer::StartAutomaticCapture() {
 
 cs::UsbCamera CameraServer::StartAutomaticCapture(int dev) {
   ::GetInstance();
-  cs::UsbCamera camera{fmt::format("USB Camera {}", dev), dev};
+  cs::UsbCamera camera{std::format("USB Camera {}", dev), dev};
   StartAutomaticCapture(camera);
   auto csShared = GetCameraServerShared();
-  csShared->ReportUsage(fmt::format("UsbCamera[{}]", dev), "auto");
+  csShared->ReportUsage(std::format("UsbCamera[{}]", dev), "auto");
   return camera;
 }
 
@@ -489,7 +489,7 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(std::string_view name,
   cs::UsbCamera camera{name, dev};
   StartAutomaticCapture(camera);
   auto csShared = GetCameraServerShared();
-  csShared->ReportUsage(fmt::format("UsbCamera[{}]", dev), "name");
+  csShared->ReportUsage(std::format("UsbCamera[{}]", dev), "name");
   return camera;
 }
 
@@ -499,7 +499,7 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(std::string_view name,
   cs::UsbCamera camera{name, path};
   StartAutomaticCapture(camera);
   auto csShared = GetCameraServerShared();
-  csShared->ReportUsage(fmt::format("UsbCamera[{}]", path), "path");
+  csShared->ReportUsage(std::format("UsbCamera[{}]", path), "path");
   return camera;
 }
 
@@ -516,7 +516,7 @@ cs::MjpegServer CameraServer::AddSwitchedCamera(std::string_view name) {
 cs::MjpegServer CameraServer::StartAutomaticCapture(
     const cs::VideoSource& camera) {
   AddCamera(camera);
-  auto server = AddServer(fmt::format("serve_{}", camera.GetName()));
+  auto server = AddServer(std::format("serve_{}", camera.GetName()));
   server.SetSource(camera);
   return server;
 }
@@ -674,7 +674,7 @@ cs::VideoSink CameraServer::GetServer() {
       csShared->SetCameraServerError("no camera available");
       return cs::VideoSink{};
     }
-    name = fmt::format("serve_{}", inst.m_primarySourceName);
+    name = std::format("serve_{}", inst.m_primarySourceName);
   }
   return GetServer(name);
 }

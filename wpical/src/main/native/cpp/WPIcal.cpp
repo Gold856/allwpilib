@@ -7,6 +7,7 @@
 #include <fieldmap.h>
 #include <fmap.h>
 
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -16,7 +17,6 @@
 #include <vector>
 
 #include <GLFW/glfw3.h>
-#include <fmt/format.h>
 #include <imgui.h>
 #include <portable-file-dialogs.h>
 #include <wpi/json.h>
@@ -132,7 +132,7 @@ std::string getFileName(std::string path) {
 
 static bool EmitEntryTarget(int tag_id, std::string& file) {
   if (!file.empty()) {
-    auto text = fmt::format("{}: {}", tag_id, file);
+    auto text = std::format("{}: {}", tag_id, file);
     ImGui::TextUnformatted(text.c_str());
   } else {
     ImGui::Text("Tag ID %i: <none (DROP HERE)>", tag_id);

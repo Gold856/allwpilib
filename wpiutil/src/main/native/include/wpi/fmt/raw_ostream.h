@@ -5,14 +5,14 @@
 #ifndef WPIUTIL_WPI_FMT_RAW_OSTREAM_H_
 #define WPIUTIL_WPI_FMT_RAW_OSTREAM_H_
 
-#include <fmt/format.h>
+#include <format>
 
 #include "wpi/raw_ostream.h"
 
 namespace wpi {
 
-inline void vprint(wpi::raw_ostream& os, fmt::string_view format_str,
-                   fmt::format_args args) {
+inline void vprint(wpi::raw_ostream& os, std::string_view format_str,
+                   std::format_args args) {
   fmt::memory_buffer buffer;
   fmt::detail::vformat_to(buffer, format_str, args);
   os.write(buffer.data(), buffer.size());
@@ -23,7 +23,7 @@ inline void vprint(wpi::raw_ostream& os, fmt::string_view format_str,
  */
 template <typename S, typename... Args>
 void print(wpi::raw_ostream& os, const S& format_str, Args&&... args) {
-  vprint(os, format_str, fmt::make_format_args(args...));
+  vprint(os, format_str, std::make_format_args(args...));
 }
 
 }  // namespace wpi

@@ -12,7 +12,7 @@
 #include <string>
 #include <utility>
 
-#include <fmt/format.h>
+#include <format>
 #include <wpi/DenseMap.h>
 #include <wpi/MemoryBuffer.h>
 #include <wpi/SmallString.h>
@@ -258,14 +258,14 @@ void MyHttpConnection::ProcessRequest() {
 
   const bool isGET = m_request.GetMethod() == wpi::HTTP_GET;
   if (isGET && wpi::starts_with(path, '/') && !wpi::contains(path, "..")) {
-    fs::path fullpath = fmt::format("{}{}", m_path, path);
+    fs::path fullpath = std::format("{}{}", m_path, path);
     std::error_code ec;
     bool isdir = fs::is_directory(fullpath, ec);
     if (isdir) {
       if (!wpi::ends_with(path, '/')) {
         // redirect to trailing / location
         SendResponse(301, "Moved Permanently", "text/plain", "",
-                     fmt::format("Location: {}/\r\n\r\n", path));
+                     std::format("Location: {}/\r\n\r\n", path));
         return;
       }
       // generate directory listing
@@ -301,20 +301,20 @@ void MyHttpConnection::ProcessRequest() {
           wpi::SmallString<128> nameUriBuf, nameHtmlBuf;
           if (subdir) {
             dirs.emplace(
-                name, fmt::format(
+                name, std::format(
                           "<tr><td><a href=\"{}/\">{}/</a></td><td></td></tr>",
                           EscapeURI(name, nameUriBuf),
                           EscapeHTML(name, nameHtmlBuf)));
           } else {
             files.emplace(
-                name, fmt::format(
+                name, std::format(
                           "<tr><td><a href=\"{}\">{}</a></td><td>{}</td></tr>",
                           EscapeURI(name, nameUriBuf),
                           EscapeHTML(name, nameHtmlBuf), entry.file_size(ec)));
           }
         }
 
-        std::string html = fmt::format(
+        std::string html = std::format(
             "<html><head><title>{}</title></head><body>"
             "<table><tr><th>Name</th><th>Size</th></tr>\n",
             path);

@@ -27,7 +27,7 @@ CAN::CAN(int busId, int deviceId, int deviceManufacturer, int deviceType) {
                        deviceManufacturer, deviceType);
 
   HAL_ReportUsage(
-      fmt::format("CAN[{}][{}][{}]", deviceType, deviceManufacturer, deviceId),
+      std::format("CAN[{}][{}][{}]", deviceType, deviceManufacturer, deviceId),
       "");
 }
 

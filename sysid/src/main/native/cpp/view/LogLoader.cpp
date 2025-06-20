@@ -42,7 +42,7 @@ void LogLoader::Display() {
       auto fileBuffer = wpi::MemoryBuffer::GetFile(m_filename);
       if (!fileBuffer) {
         ImGui::OpenPopup("Error");
-        m_error = fmt::format("Could not open file: {}",
+        m_error = std::format("Could not open file: {}",
                               fileBuffer.error().message());
         return;
       }

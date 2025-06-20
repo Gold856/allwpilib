@@ -4,7 +4,7 @@
 
 #include "hal/AddressableLED.h"
 
-#include <fmt/format.h>
+#include <format>
 
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
@@ -103,7 +103,7 @@ void HAL_SetAddressableLEDLength(HAL_AddressableLEDHandle handle,
     *status = PARAMETER_OUT_OF_RANGE;
     hal::SetLastError(
         status,
-        fmt::format(
+        std::format(
             "LED length must be less than or equal to {}. {} was requested",
             HAL_kAddressableLEDMaxLength, length));
     return;

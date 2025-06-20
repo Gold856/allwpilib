@@ -4,10 +4,10 @@
 
 #include "frc/PneumaticsControlModule.h"
 
+#include <format>
 #include <memory>
 #include <string>
 
-#include <fmt/format.h>
 #include <hal/CTREPCM.h>
 #include <hal/Ports.h>
 #include <hal/UsageReporting.h>
@@ -300,7 +300,7 @@ Compressor PneumaticsControlModule::MakeCompressor() {
 
 void PneumaticsControlModule::ReportUsage(std::string_view device,
                                           std::string_view data) {
-  HAL_ReportUsage(fmt::format("PCM[{}]/{}", m_module, device), data);
+  HAL_ReportUsage(std::format("PCM[{}]/{}", m_module, device), data);
 }
 
 std::shared_ptr<PneumaticsBase> PneumaticsControlModule::GetForModule(

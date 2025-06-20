@@ -5,11 +5,11 @@
 #pragma once
 
 #include <algorithm>
+#include <format>
 #include <stdexcept>
 #include <string>
 #include <string_view>
 
-#include <fmt/format.h>
 #include <gcem.hpp>
 #include <wpi/StringExtras.h>
 #include <wpi/ct_string.h>
@@ -785,7 +785,7 @@ class Color {
         !wpi::isHexDigit(hexString[3]) || !wpi::isHexDigit(hexString[4]) ||
         !wpi::isHexDigit(hexString[5]) || !wpi::isHexDigit(hexString[6])) {
       throw std::invalid_argument(
-          fmt::format("Invalid hex string for Color \"{}\"", hexString));
+          std::format("Invalid hex string for Color \"{}\"", hexString));
     }
 
     int r = wpi::hexDigitValue(hexString[1]) * 16 +

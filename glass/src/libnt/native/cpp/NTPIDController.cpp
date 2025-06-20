@@ -4,9 +4,9 @@
 
 #include "glass/networktables/NTPIDController.h"
 
+#include <format>
 #include <utility>
 
-#include <fmt/format.h>
 #include <wpi/StringExtras.h>
 
 using namespace glass;
@@ -17,20 +17,20 @@ NTPIDControllerModel::NTPIDControllerModel(std::string_view path)
 NTPIDControllerModel::NTPIDControllerModel(nt::NetworkTableInstance inst,
                                            std::string_view path)
     : m_inst{inst},
-      m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
-      m_controllable{inst.GetBooleanTopic(fmt::format("{}/.controllable", path))
+      m_name{inst.GetStringTopic(std::format("{}/.name", path)).Subscribe("")},
+      m_controllable{inst.GetBooleanTopic(std::format("{}/.controllable", path))
                          .Subscribe(false)},
-      m_p{inst.GetDoubleTopic(fmt::format("{}/p", path)).GetEntry(0)},
-      m_i{inst.GetDoubleTopic(fmt::format("{}/i", path)).GetEntry(0)},
-      m_d{inst.GetDoubleTopic(fmt::format("{}/d", path)).GetEntry(0)},
+      m_p{inst.GetDoubleTopic(std::format("{}/p", path)).GetEntry(0)},
+      m_i{inst.GetDoubleTopic(std::format("{}/i", path)).GetEntry(0)},
+      m_d{inst.GetDoubleTopic(std::format("{}/d", path)).GetEntry(0)},
       m_setpoint{
-          inst.GetDoubleTopic(fmt::format("{}/setpoint", path)).GetEntry(0)},
-      m_iZone{inst.GetDoubleTopic(fmt::format("{}/izone", path)).GetEntry(0)},
-      m_pData{fmt::format("NTPIDCtrlP:{}", path)},
-      m_iData{fmt::format("NTPIDCtrlI:{}", path)},
-      m_dData{fmt::format("NTPIDCtrlD:{}", path)},
-      m_setpointData{fmt::format("NTPIDCtrlStpt:{}", path)},
-      m_iZoneData{fmt::format("NTPIDCtrlIZone:{}", path)},
+          inst.GetDoubleTopic(std::format("{}/setpoint", path)).GetEntry(0)},
+      m_iZone{inst.GetDoubleTopic(std::format("{}/izone", path)).GetEntry(0)},
+      m_pData{std::format("NTPIDCtrlP:{}", path)},
+      m_iData{std::format("NTPIDCtrlI:{}", path)},
+      m_dData{std::format("NTPIDCtrlD:{}", path)},
+      m_setpointData{std::format("NTPIDCtrlStpt:{}", path)},
+      m_iZoneData{std::format("NTPIDCtrlIZone:{}", path)},
       m_nameValue{wpi::rsplit(path, '/').second} {}
 
 void NTPIDControllerModel::SetP(double value) {

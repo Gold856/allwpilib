@@ -4,12 +4,12 @@
 
 #include <algorithm>
 #include <chrono>
+#include <format>
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
 #include <gtest/gtest.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/StringArrayTopic.h>
@@ -33,7 +33,7 @@ class AlertsTest : public ::testing::Test {
   std::string GetGroupName() {
     const ::testing::TestInfo* testInfo =
         ::testing::UnitTest::GetInstance()->current_test_info();
-    return fmt::format("{}_{}", testInfo->test_suite_name(), testInfo->name());
+    return std::format("{}_{}", testInfo->test_suite_name(), testInfo->name());
   }
 
   template <typename... Args>
@@ -70,7 +70,7 @@ class AlertsTest : public ::testing::Test {
 
   const nt::StringArraySubscriber GetSubscriberForType(Alert::AlertType type) {
     return nt::NetworkTableInstance::GetDefault()
-        .GetStringArrayTopic(fmt::format("/SmartDashboard/{}/{}",
+        .GetStringArrayTopic(std::format("/SmartDashboard/{}/{}",
                                          GetGroupName(), GetSubtableName(type)))
         .Subscribe({});
   }

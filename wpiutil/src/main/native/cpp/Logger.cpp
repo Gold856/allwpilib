@@ -15,7 +15,7 @@ void Logger::DoLog(unsigned int level, const char* file, unsigned int line,
 }
 
 void Logger::LogV(unsigned int level, const char* file, unsigned int line,
-                  fmt::string_view format, fmt::format_args args) {
+                  std::string_view format, std::format_args args) {
   if (!m_func || level < m_min_level) {
     return;
   }

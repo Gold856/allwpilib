@@ -12,9 +12,10 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <format>
+#include <iterator>
 #include <string>
 
-#include <fmt/format.h>
 #include <wpi/EventVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
@@ -177,12 +178,12 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
     if (printMsg) {
       fmt::memory_buffer buf;
       if (location && location[0] != '\0') {
-        fmt::format_to(fmt::appender{buf},
+        std::format_to(fmt::appender{buf},
                        "{} at {}: ", isError ? "Error" : "Warning", location);
       }
-      fmt::format_to(fmt::appender{buf}, "{}\n", details);
+      std::format_to(fmt::appender{buf}, "{}\n", details);
       if (callStack && callStack[0] != '\0') {
-        fmt::format_to(fmt::appender{buf}, "{}\n", callStack);
+        std::format_to(fmt::appender{buf}, "{}\n", callStack);
       }
       auto printError = gPrintErrorImpl.load();
       printError(buf.data(), buf.size());

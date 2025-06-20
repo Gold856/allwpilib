@@ -5,10 +5,10 @@
 #include "wpinet/HttpUtil.h"
 
 #include <cctype>
+#include <format>
 #include <string>
 #include <utility>
 
-#include <fmt/format.h>
 #include <wpi/Base64.h>
 #include <wpi/StringExtras.h>
 #include <wpi/raw_ostream.h>
@@ -307,13 +307,13 @@ HttpLocation::HttpLocation(std::string_view url_, bool* error,
     SmallString<64> userBuf, passBuf;
     user = UnescapeURI(rawUser, userBuf, error);
     if (*error) {
-      *errorMsg = fmt::format("could not unescape user \"{}\"", rawUser);
+      *errorMsg = std::format("could not unescape user \"{}\"", rawUser);
       return;
     }
     password = UnescapeURI(rawPassword, passBuf, error);
     if (*error) {
       *errorMsg =
-          fmt::format("could not unescape password \"{}\"", rawPassword);
+          std::format("could not unescape password \"{}\"", rawPassword);
       return;
     }
   }
@@ -330,7 +330,7 @@ HttpLocation::HttpLocation(std::string_view url_, bool* error,
   } else if (auto p = parse_integer<int>(portStr, 10)) {
     port = p.value();
   } else {
-    *errorMsg = fmt::format("port \"{}\" is not an integer", portStr);
+    *errorMsg = std::format("port \"{}\" is not an integer", portStr);
     *error = true;
     return;
   }
@@ -354,7 +354,7 @@ HttpLocation::HttpLocation(std::string_view url_, bool* error,
     SmallString<64> paramBuf;
     std::string_view param = UnescapeURI(rawParam, paramBuf, error);
     if (*error) {
-      *errorMsg = fmt::format("could not unescape parameter \"{}\"", rawParam);
+      *errorMsg = std::format("could not unescape parameter \"{}\"", rawParam);
       return;
     }
 
@@ -362,7 +362,7 @@ HttpLocation::HttpLocation(std::string_view url_, bool* error,
     SmallString<64> valueBuf;
     std::string_view value = UnescapeURI(rawValue, valueBuf, error);
     if (*error) {
-      *errorMsg = fmt::format("could not unescape value \"{}\"", rawValue);
+      *errorMsg = std::format("could not unescape value \"{}\"", rawValue);
       return;
     }
 
@@ -410,7 +410,7 @@ bool HttpConnection::Handshake(const HttpRequest& request,
     return false;
   }
   if (code != "200") {
-    *warnMsg = fmt::format("received {} {} response", code, codeText);
+    *warnMsg = std::format("received {} {} response", code, codeText);
     return false;
   }
 

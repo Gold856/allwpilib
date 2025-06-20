@@ -6,9 +6,9 @@
 
 #include <stdint.h>
 
+#include <format>
 #include <utility>
 
-#include <fmt/format.h>
 #include <wpi/SmallVector.h>
 #include <wpi/timestamp.h>
 
@@ -20,23 +20,23 @@ NTFMSModel::NTFMSModel(std::string_view path)
 NTFMSModel::NTFMSModel(nt::NetworkTableInstance inst, std::string_view path)
     : m_inst{inst},
       m_gameSpecificMessage{
-          inst.GetStringTopic(fmt::format("{}/GameSpecificMessage", path))
+          inst.GetStringTopic(std::format("{}/GameSpecificMessage", path))
               .Subscribe("")},
-      m_alliance{inst.GetBooleanTopic(fmt::format("{}/IsRedAlliance", path))
+      m_alliance{inst.GetBooleanTopic(std::format("{}/IsRedAlliance", path))
                      .Subscribe(false)},
-      m_station{inst.GetIntegerTopic(fmt::format("{}/StationNumber", path))
+      m_station{inst.GetIntegerTopic(std::format("{}/StationNumber", path))
                     .Subscribe(0)},
-      m_controlWord{inst.GetIntegerTopic(fmt::format("{}/FMSControlData", path))
+      m_controlWord{inst.GetIntegerTopic(std::format("{}/FMSControlData", path))
                         .Subscribe(0)},
-      m_fmsAttached{fmt::format("NT_FMS:FMSAttached:{}", path)},
-      m_dsAttached{fmt::format("NT_FMS:DSAttached:{}", path)},
-      m_allianceStationId{fmt::format("NT_FMS:AllianceStationID:{}", path)},
-      m_estop{fmt::format("NT_FMS:EStop:{}", path)},
-      m_enabled{fmt::format("NT_FMS:RobotEnabled:{}", path)},
-      m_test{fmt::format("NT_FMS:TestMode:{}", path)},
-      m_autonomous{fmt::format("NT_FMS:AutonomousMode:{}", path)},
+      m_fmsAttached{std::format("NT_FMS:FMSAttached:{}", path)},
+      m_dsAttached{std::format("NT_FMS:DSAttached:{}", path)},
+      m_allianceStationId{std::format("NT_FMS:AllianceStationID:{}", path)},
+      m_estop{std::format("NT_FMS:EStop:{}", path)},
+      m_enabled{std::format("NT_FMS:RobotEnabled:{}", path)},
+      m_test{std::format("NT_FMS:TestMode:{}", path)},
+      m_autonomous{std::format("NT_FMS:AutonomousMode:{}", path)},
       m_gameSpecificMessageData{
-          fmt::format("NT_FMS:GameSpecificMessage:{}", path)} {}
+          std::format("NT_FMS:GameSpecificMessage:{}", path)} {}
 
 void NTFMSModel::Update() {
   for (auto&& v : m_alliance.ReadQueue()) {

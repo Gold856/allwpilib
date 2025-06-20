@@ -4,9 +4,8 @@
 
 #include "glass/networktables/NTSubsystem.h"
 
+#include <format>
 #include <utility>
-
-#include <fmt/format.h>
 
 using namespace glass;
 
@@ -16,11 +15,11 @@ NTSubsystemModel::NTSubsystemModel(std::string_view path)
 NTSubsystemModel::NTSubsystemModel(nt::NetworkTableInstance inst,
                                    std::string_view path)
     : m_inst{inst},
-      m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
+      m_name{inst.GetStringTopic(std::format("{}/.name", path)).Subscribe("")},
       m_defaultCommand{
-          inst.GetStringTopic(fmt::format("{}/.default", path)).Subscribe("")},
+          inst.GetStringTopic(std::format("{}/.default", path)).Subscribe("")},
       m_currentCommand{
-          inst.GetStringTopic(fmt::format("{}/.command", path)).Subscribe("")} {
+          inst.GetStringTopic(std::format("{}/.command", path)).Subscribe("")} {
 }
 
 void NTSubsystemModel::Update() {

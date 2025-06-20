@@ -4,9 +4,9 @@
 
 #include "hal/UsageReporting.h"
 
-#include <fmt/format.h>
+#include <format>
 
 int32_t HAL_ReportUsage(std::string_view resource, int instanceNumber,
                         std::string_view data) {
-  return HAL_ReportUsage(fmt::format("{}[{}]", resource, instanceNumber), data);
+  return HAL_ReportUsage(std::format("{}[{}]", resource, instanceNumber), data);
 }

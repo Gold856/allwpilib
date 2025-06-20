@@ -12,10 +12,9 @@
 #include <hal/handles/IndexedHandleResource.h>
 
 #include <cstring>
+#include <format>
 #include <string>
 #include <thread>
-
-#include <fmt/format.h>
 
 #include "HALInitializer.h"
 #include "HALInternal.h"

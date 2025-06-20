@@ -5,6 +5,7 @@
 #pragma once
 
 #include <exception>
+#include <format>
 #include <functional>
 #include <string>
 #include <string_view>
@@ -12,7 +13,6 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
 #include <fmt/ranges.h>
 #include <frc/filter/LinearFilter.h>
 #include <units/time.h>
@@ -40,7 +40,7 @@ class InvalidDataError : public std::exception {
    * @param message The error message
    */
   explicit InvalidDataError(std::string_view message) {
-    m_message = fmt::format(
+    m_message = std::format(
         "{} Please verify that your units and data is reasonable and then "
         "adjust your velocity threshold, test duration, and/or window size to "
         "try to fix this issue.",
@@ -76,7 +76,7 @@ class MissingTestsError : public std::exception {
  public:
   explicit MissingTestsError(std::vector<std::string> MissingTests)
       : missingTests(std::move(MissingTests)) {
-    errorString = fmt::format(
+    errorString = std::format(
         "The following tests were not detected: {}. Make sure to perform all "
         "four tests as described in the SysId documentation.",
         fmt::join(missingTests, ", "));

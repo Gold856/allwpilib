@@ -5,11 +5,10 @@
 #include "hal/Counter.h"
 
 #include <cstdio>
+#include <format>
 #include <limits>
 #include <memory>
 #include <thread>
-
-#include <fmt/format.h>
 
 #include "HALInitializer.h"
 #include "HALInternal.h"

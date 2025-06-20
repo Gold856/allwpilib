@@ -22,7 +22,7 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
+#include <format>
 
 #include "wpi/Logger.h"
 #include "wpi/fs.h"
@@ -36,13 +36,13 @@ static std::string FormatBytesSize(uintmax_t value) {
   static constexpr uintmax_t kMiB = kKiB * 1024;
   static constexpr uintmax_t kGiB = kMiB * 1024;
   if (value >= kGiB) {
-    return fmt::format("{:.1f} GiB", static_cast<double>(value) / kGiB);
+    return std::format("{:.1f} GiB", static_cast<double>(value) / kGiB);
   } else if (value >= kMiB) {
-    return fmt::format("{:.1f} MiB", static_cast<double>(value) / kMiB);
+    return std::format("{:.1f} MiB", static_cast<double>(value) / kMiB);
   } else if (value >= kKiB) {
-    return fmt::format("{:.1f} KiB", static_cast<double>(value) / kKiB);
+    return std::format("{:.1f} KiB", static_cast<double>(value) / kKiB);
   } else {
-    return fmt::format("{} B", value);
+    return std::format("{} B", value);
   }
 }
 
@@ -198,7 +198,7 @@ struct DataLogBackgroundWriter::WriterThreadState {
 
   void IncrementFilename() {
     fs::path basePath{baseFilename};
-    filename = fmt::format("{}.{}{}", basePath.stem().string(), ++segmentCount,
+    filename = std::format("{}.{}{}", basePath.stem().string(), ++segmentCount,
                            basePath.extension().string());
     path = dirPath / filename;
   }

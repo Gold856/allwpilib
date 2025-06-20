@@ -6,7 +6,6 @@
 
 #include <stdexcept>
 
-#include <fmt/format.h>
 #include <wpi/protobuf/Protobuf.h>
 #include <wpi/protobuf/ProtobufCallbacks.h>
 

@@ -4,9 +4,8 @@
 
 #include "frc/sysid/SysIdRoutineLog.h"
 
+#include <format>
 #include <string>
-
-#include <fmt/format.h>
 
 #include "frc/DataLogManager.h"
 
@@ -30,7 +29,7 @@ SysIdRoutineLog::MotorLog& SysIdRoutineLog::MotorLog::value(
     wpi::log::DataLog& log = frc::DataLogManager::GetLog();
 
     motorEntries[name] = wpi::log::DoubleLogEntry(
-        log, fmt::format("{}-{}-{}", name, m_motorName, m_logName), unit);
+        log, std::format("{}-{}-{}", name, m_motorName, m_logName), unit);
   }
 
   motorEntries[name].Append(value);
@@ -45,7 +44,7 @@ void SysIdRoutineLog::RecordState(State state) {
   if (!m_stateInitialized) {
     m_state =
         wpi::log::StringLogEntry{frc::DataLogManager::GetLog(),
-                                 fmt::format("sysid-test-state-{}", m_logName)};
+                                 std::format("sysid-test-state-{}", m_logName)};
     m_stateInitialized = true;
   }
   m_state.Append(StateEnumToString(state));

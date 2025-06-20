@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 
+#include <format>
 #include <set>
 #include <string>
 
@@ -135,7 +136,31 @@ class Alert {
   bool m_active = false;
   uint64_t m_activeStartTime;
 };
-
-std::string format_as(Alert::AlertType type);
-
 }  // namespace frc
+
+template <>
+struct std::formatter<frc::Alert::AlertType, char> {
+  template <typename ParseContext>
+  constexpr auto parse(ParseContext& ctx) {
+    return ctx.begin();
+  }
+
+  template <typename FmtContext>
+  auto format(const frc::Alert::AlertType& type, FmtContext& ctx) const {
+    auto out = ctx.out();
+    switch (type) {
+      case frc::Alert::AlertType::kInfo:
+        std::format_to(out, "kInfo");
+        return out;
+      case frc::Alert::AlertType::kWarning:
+        std::format_to(out, "kWarning");
+        return out;
+      case frc::Alert::AlertType::kError:
+        std::format_to(out, "kError");
+        return out;
+      default:
+        std::format_to(out, "{}", std::to_underlying(type));
+        return out;
+    }
+  }
+};

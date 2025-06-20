@@ -7,7 +7,6 @@
 #include <vector>
 
 #include <fmt/chrono.h>
-#include <fmt/format.h>
 #include <fmt/ranges.h>
 #include <wpi/DenseMap.h>
 #include <wpi/MemoryBuffer.h>

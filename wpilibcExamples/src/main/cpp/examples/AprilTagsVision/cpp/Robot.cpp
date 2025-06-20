@@ -3,13 +3,13 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cstdio>
+#include <format>
 #include <span>
 #include <string>
 #include <thread>
 #include <vector>
 
 #include <cameraserver/CameraServer.h>
-#include <fmt/format.h>
 #include <frc/TimedRobot.h>
 #include <frc/apriltag/AprilTagDetection.h>
 #include <frc/apriltag/AprilTagDetector.h>
@@ -142,7 +142,7 @@ class Robot : public frc::TimedRobot {
 
         // put pose into NT
         frc::Rotation3d rotation = pose.Rotation();
-        tagsTable->GetEntry(fmt::format("pose_{}", detection->GetId()))
+        tagsTable->GetEntry(std::format("pose_{}", detection->GetId()))
             .SetDoubleArray(
                 {{ pose.X().value(),
                    pose.Y().value(),

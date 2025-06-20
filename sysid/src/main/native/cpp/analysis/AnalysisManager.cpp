@@ -5,11 +5,11 @@
 #include "sysid/analysis/AnalysisManager.h"
 
 #include <cmath>
+#include <format>
 #include <limits>
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
 #include <units/angle.h>
 #include <wpi/MathExtras.h>
 #include <wpi/StringExtras.h>
@@ -94,8 +94,8 @@ static void CopyRawData(wpi::StringMap<MotorData>* dataset) {
     auto& motorData = it.second;
 
     if (!wpi::contains(key, "raw")) {
-      data[fmt::format("raw-{}", key)] = motorData;
-      data[fmt::format("original-raw-{}", key)] = motorData;
+      data[std::format("raw-{}", key)] = motorData;
+      data[std::format("original-raw-{}", key)] = motorData;
     }
   }
 }
@@ -203,7 +203,7 @@ AnalysisManager::FeedforwardGains AnalysisManager::CalculateFeedforward() {
       .gain = Ks, .descriptor = "Voltage needed to overcome static friction."};
   if (Ks < 0) {
     KsGain.isValidGain = false;
-    KsGain.errorMessage = fmt::format(
+    KsGain.errorMessage = std::format(
         "Calculated Ks gain of: {0:.3f} is erroneous! Ks should be >= 0.", Ks);
   }
 
@@ -216,7 +216,7 @@ AnalysisManager::FeedforwardGains AnalysisManager::CalculateFeedforward() {
           "friction."};
   if (Kv < 0) {
     KvGain.isValidGain = false;
-    KvGain.errorMessage = fmt::format(
+    KvGain.errorMessage = std::format(
         "Calculated Kv gain of: {0:.3f} is erroneous! Kv should be >= 0.", Kv);
   }
 
@@ -227,7 +227,7 @@ AnalysisManager::FeedforwardGains AnalysisManager::CalculateFeedforward() {
           "Voltage needed to induce a given acceleration in the motor shaft."};
   if (Ka <= 0) {
     KaGain.isValidGain = false;
-    KaGain.errorMessage = fmt::format(
+    KaGain.errorMessage = std::format(
         "Calculated Ka gain of: {0:.3f} is erroneous! Ka should be > 0.", Ka);
   }
 
@@ -242,7 +242,7 @@ AnalysisManager::FeedforwardGains AnalysisManager::CalculateFeedforward() {
         Kg, "Voltage needed to counteract the force of gravity."};
     if (Kg < 0) {
       KgGain.isValidGain = false;
-      KgGain.errorMessage = fmt::format(
+      KgGain.errorMessage = std::format(
           "Calculated Kg gain of: {0:.3f} is erroneous! Kg should be >= 0.",
           Ka);
     }

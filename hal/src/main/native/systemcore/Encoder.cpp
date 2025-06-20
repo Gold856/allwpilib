@@ -4,9 +4,8 @@
 
 #include "hal/Encoder.h"
 
+#include <format>
 #include <memory>
-
-#include <fmt/format.h>
 
 #include "HALInitializer.h"
 #include "HALInternal.h"

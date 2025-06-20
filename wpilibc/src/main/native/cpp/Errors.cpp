@@ -27,7 +27,7 @@ RuntimeError::RuntimeError(int32_t code, const char* fileName, int lineNumber,
                            std::string&& message)
     : RuntimeError{
           code,
-          fmt::format("{} [{}:{}]", funcName,
+          std::format("{} [{}:{}]", funcName,
                       fs::path{fileName}.filename().string(), lineNumber),
           std::move(stack), std::move(message)} {}
 
@@ -54,13 +54,13 @@ const char* frc::GetErrorMessage(int32_t* code) {
 }
 
 void frc::ReportErrorV(int32_t status, const char* fileName, int lineNumber,
-                       const char* funcName, fmt::string_view format,
-                       fmt::format_args args) {
+                       const char* funcName, std::string_view format,
+                       std::format_args args) {
   if (status == 0) {
     return;
   }
   fmt::memory_buffer out;
-  fmt::format_to(fmt::appender{out}, "{}: ", GetErrorMessage(&status));
+  std::format_to(fmt::appender{out}, "{}: ", GetErrorMessage(&status));
   fmt::vformat_to(fmt::appender{out}, format, args);
   out.push_back('\0');
   HAL_SendError(status < 0, status, 0, out.data(), funcName,
@@ -69,9 +69,9 @@ void frc::ReportErrorV(int32_t status, const char* fileName, int lineNumber,
 
 RuntimeError frc::MakeErrorV(int32_t status, const char* fileName,
                              int lineNumber, const char* funcName,
-                             fmt::string_view format, fmt::format_args args) {
+                             std::string_view format, std::format_args args) {
   fmt::memory_buffer out;
-  fmt::format_to(fmt::appender{out}, "{}: ", GetErrorMessage(&status));
+  std::format_to(fmt::appender{out}, "{}: ", GetErrorMessage(&status));
   fmt::vformat_to(fmt::appender{out}, format, args);
   return RuntimeError{status,
                       fileName,

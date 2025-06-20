@@ -4,8 +4,6 @@
 
 #include "hal/PowerDistribution.h"
 
-#include <fmt/format.h>
-
 #include "CANAPIInternal.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"

@@ -10,9 +10,9 @@
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
+#include <format>
 #include <string>
 
-#include <fmt/format.h>
 #include <wpi/jni_util.h>
 
 #include "edu_wpi_first_hal_HALUtil.h"
@@ -92,13 +92,13 @@ void ThrowUncleanStatusException(JNIEnv* env, std::string_view msg,
 void ThrowAllocationException(JNIEnv* env, const char* lastError,
                               int32_t status) {
   allocationExCls.Throw(env,
-                        fmt::format("Code: {}\n{}", status, lastError).c_str());
+                        std::format("Code: {}\n{}", status, lastError).c_str());
 }
 
 void ThrowHalHandleException(JNIEnv* env, int32_t status) {
   const char* message = HAL_GetLastError(&status);
   halHandleExCls.Throw(env,
-                       fmt::format(" Code: {}. {}", status, message).c_str());
+                       std::format(" Code: {}. {}", status, message).c_str());
 }
 
 void ReportError(JNIEnv* env, int32_t status, bool doThrow) {
@@ -112,7 +112,7 @@ void ReportError(JNIEnv* env, int32_t status, bool doThrow) {
   }
   if (doThrow && status < 0) {
     ThrowUncleanStatusException(
-        env, fmt::format(" Code: {}. {}", status, message).c_str(), status);
+        env, std::format(" Code: {}. {}", status, message).c_str(), status);
   } else {
     std::string func;
     auto stack = GetJavaStackTrace(env, &func, "edu.wpi.first");
@@ -140,7 +140,7 @@ void ThrowError(JNIEnv* env, int32_t status, int32_t minRange, int32_t maxRange,
     return;
   }
   ThrowUncleanStatusException(
-      env, fmt::format(" Code: {}. {}", status, lastError).c_str(), status);
+      env, std::format(" Code: {}. {}", status, lastError).c_str(), status);
 }
 
 void ThrowNullPointerException(JNIEnv* env, std::string_view msg) {

@@ -4,10 +4,9 @@
 
 #include "hal/REVPH.h"
 
+#include <format>
 #include <string>
 #include <thread>
-
-#include <fmt/format.h>
 
 #include "HALInitializer.h"
 #include "HALInternal.h"
@@ -603,7 +602,7 @@ void HAL_FireREVPHOneShot(HAL_REVPHHandle handle, int32_t index, int32_t durMs,
     *status = PARAMETER_OUT_OF_RANGE;
     hal::SetLastError(
         status,
-        fmt::format("Only [0-15] are valid index values. Requested {}", index));
+        std::format("Only [0-15] are valid index values. Requested {}", index));
     return;
   }
 
@@ -611,7 +610,7 @@ void HAL_FireREVPHOneShot(HAL_REVPHHandle handle, int32_t index, int32_t durMs,
     *status = PARAMETER_OUT_OF_RANGE;
     hal::SetLastError(
         status,
-        fmt::format("Time not within expected range [0-65534]. Requested {}",
+        std::format("Time not within expected range [0-65534]. Requested {}",
                     durMs));
     return;
   }

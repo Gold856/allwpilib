@@ -7,7 +7,6 @@
 #include <bit>
 #include <string>
 
-#include <fmt/format.h>
 #include <wpi/Endian.h>
 #include <wpi/json.h>
 

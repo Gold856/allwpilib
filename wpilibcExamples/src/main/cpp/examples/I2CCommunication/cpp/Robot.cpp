@@ -4,9 +4,9 @@
 
 #include "Robot.h"
 
+#include <format>
 #include <string>
 
-#include <fmt/format.h>
 #include <frc/DriverStation.h>
 #include <frc/Timer.h>
 
@@ -32,7 +32,7 @@ void Robot::RobotPeriodic() {
   }
 
   auto string =
-      fmt::format("{}{}{}{:03}", allianceString,
+      std::format("{}{}{}{:03}", allianceString,
                   frc::DriverStation::IsEnabled() ? "E" : "D",
                   frc::DriverStation::IsAutonomous() ? "A" : "T",
                   static_cast<int>(frc::Timer::GetMatchTime().value()));

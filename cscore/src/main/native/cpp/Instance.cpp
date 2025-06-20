@@ -8,7 +8,6 @@
 #include <string_view>
 #include <utility>
 
-#include <fmt/format.h>
 #include <wpi/fs.h>
 #include <wpi/print.h>
 

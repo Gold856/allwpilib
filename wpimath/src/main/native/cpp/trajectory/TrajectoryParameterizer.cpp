@@ -28,9 +28,8 @@
 
 #include "frc/trajectory/TrajectoryParameterizer.h"
 
+#include <format>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "units/math.h"
 
@@ -195,7 +194,7 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
         // delta_x = vt
         dt = ds / v;
       } else {
-        throw std::runtime_error(fmt::format(
+        throw std::runtime_error(std::format(
             "Something went wrong at iteration {} of time parameterization.",
             i));
       }

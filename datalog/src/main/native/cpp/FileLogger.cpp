@@ -17,7 +17,6 @@
 #include <tuple>
 #include <utility>
 
-#include <fmt/format.h>
 #include <wpi/StringExtras.h>
 
 namespace wpi::log {

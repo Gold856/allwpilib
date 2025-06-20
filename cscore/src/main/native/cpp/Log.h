@@ -13,7 +13,7 @@ namespace cs {
 
 void NamedLogV(wpi::Logger& logger, unsigned int level, const char* file,
                unsigned int line, std::string_view name,
-               fmt::string_view format, fmt::format_args args);
+               std::string_view format, std::format_args args);
 
 template <typename S, typename... Args>
 inline void NamedLog(wpi::Logger& logger, unsigned int level, const char* file,
@@ -21,7 +21,7 @@ inline void NamedLog(wpi::Logger& logger, unsigned int level, const char* file,
                      Args&&... args) {
   if (logger.HasLogger() && level >= logger.min_level()) {
     NamedLogV(logger, level, file, line, name, format,
-              fmt::make_format_args(args...));
+              std::make_format_args(args...));
   }
 }
 

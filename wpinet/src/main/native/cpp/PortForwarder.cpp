@@ -7,7 +7,6 @@
 #include <memory>
 #include <string>
 
-#include <fmt/format.h>
 #include <wpi/DenseMap.h>
 #include <wpi/print.h>
 

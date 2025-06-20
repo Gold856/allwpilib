@@ -5,11 +5,11 @@
 #include <jni.h>
 
 #include <cassert>
+#include <format>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
 #include <wpi/ConvertUTF.h>
 #include <wpi/jni_util.h>
 #include <wpi/json.h>
@@ -751,7 +751,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setTopicProperty
     j = wpi::json::parse(std::string_view{JStringRef{env, value}});
   } catch (wpi::json::parse_error& err) {
     illegalArgEx.Throw(
-        env, fmt::format("could not parse value JSON: {}", err.what()));
+        env, std::format("could not parse value JSON: {}", err.what()));
     return;
   }
   nt::SetTopicProperty(topic, JStringRef{env, name}, j);
@@ -795,7 +795,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setTopicProperties
     j = wpi::json::parse(std::string_view{JStringRef{env, properties}});
   } catch (wpi::json::parse_error& err) {
     illegalArgEx.Throw(
-        env, fmt::format("could not parse properties JSON: {}", err.what()));
+        env, std::format("could not parse properties JSON: {}", err.what()));
     return;
   }
   if (!j.is_object()) {
@@ -860,7 +860,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_publishEx
     j = wpi::json::parse(std::string_view{JStringRef{env, properties}});
   } catch (wpi::json::parse_error& err) {
     illegalArgEx.Throw(
-        env, fmt::format("could not parse properties JSON: {}", err.what()));
+        env, std::format("could not parse properties JSON: {}", err.what()));
     return 0;
   }
   if (!j.is_object()) {

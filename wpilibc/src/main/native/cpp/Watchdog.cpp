@@ -9,7 +9,6 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
 #include <hal/Notifier.h>
 #include <wpi/mutex.h>
 #include <wpi/priority_queue.h>

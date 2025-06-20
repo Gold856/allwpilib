@@ -21,7 +21,7 @@ I2C::I2C(Port port, int deviceAddress)
   FRC_CheckErrorStatus(status, "Port {}", static_cast<int>(port));
 
   HAL_ReportUsage(
-      fmt::format("I2C[{}][{}]", static_cast<int>(port), deviceAddress), "");
+      std::format("I2C[{}][{}]", static_cast<int>(port), deviceAddress), "");
 }
 
 I2C::Port I2C::GetPort() const {

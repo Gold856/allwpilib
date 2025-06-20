@@ -5,12 +5,12 @@
 #include "networktables/NetworkTable.h"
 
 #include <algorithm>
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
@@ -100,7 +100,7 @@ NetworkTableEntry NetworkTable::GetEntry(std::string_view key) const {
   NT_Entry& entry = m_entries[key];
   if (entry == 0) {
     fmt::memory_buffer buf;
-    fmt::format_to(fmt::appender{buf}, "{}/{}", m_path, key);
+    std::format_to(fmt::appender{buf}, "{}/{}", m_path, key);
     entry = nt::GetEntry(m_inst, {buf.data(), buf.size()});
   }
   return NetworkTableEntry{entry};
@@ -108,7 +108,7 @@ NetworkTableEntry NetworkTable::GetEntry(std::string_view key) const {
 
 Topic NetworkTable::GetTopic(std::string_view name) const {
   fmt::memory_buffer buf;
-  fmt::format_to(fmt::appender{buf}, "{}/{}", m_path, name);
+  std::format_to(fmt::appender{buf}, "{}/{}", m_path, name);
   return Topic{::nt::GetTopic(m_inst, {buf.data(), buf.size()})};
 }
 
@@ -163,7 +163,7 @@ StringArrayTopic NetworkTable::GetStringArrayTopic(
 std::shared_ptr<NetworkTable> NetworkTable::GetSubTable(
     std::string_view key) const {
   return std::make_shared<NetworkTable>(
-      m_inst, fmt::format("{}/{}", m_path, key), private_init{});
+      m_inst, std::format("{}/{}", m_path, key), private_init{});
 }
 
 bool NetworkTable::ContainsKey(std::string_view key) const {
@@ -174,7 +174,7 @@ bool NetworkTable::ContainsKey(std::string_view key) const {
 }
 
 bool NetworkTable::ContainsSubTable(std::string_view key) const {
-  return !::nt::GetTopics(m_inst, fmt::format("{}/{}/", m_path, key), 0)
+  return !::nt::GetTopics(m_inst, std::format("{}/{}/", m_path, key), 0)
               .empty();
 }
 
@@ -182,7 +182,7 @@ std::vector<TopicInfo> NetworkTable::GetTopicInfo(int types) const {
   std::vector<TopicInfo> infos;
   size_t prefix_len = m_path.size() + 1;
   for (auto&& info :
-       ::nt::GetTopicInfo(m_inst, fmt::format("{}/", m_path), types)) {
+       ::nt::GetTopicInfo(m_inst, std::format("{}/", m_path), types)) {
     auto relative_key = wpi::substr(info.name, prefix_len);
     if (relative_key.find(PATH_SEPARATOR_CHAR) != std::string_view::npos) {
       continue;
@@ -196,7 +196,7 @@ std::vector<Topic> NetworkTable::GetTopics(int types) const {
   std::vector<Topic> topics;
   size_t prefix_len = m_path.size() + 1;
   for (auto&& info :
-       ::nt::GetTopicInfo(m_inst, fmt::format("{}/", m_path), types)) {
+       ::nt::GetTopicInfo(m_inst, std::format("{}/", m_path), types)) {
     auto relative_key = wpi::substr(info.name, prefix_len);
     if (relative_key.find(PATH_SEPARATOR_CHAR) != std::string_view::npos) {
       continue;
@@ -210,7 +210,7 @@ std::vector<std::string> NetworkTable::GetKeys(int types) const {
   std::vector<std::string> keys;
   size_t prefix_len = m_path.size() + 1;
   for (auto&& info :
-       ::nt::GetTopicInfo(m_inst, fmt::format("{}/", m_path), types)) {
+       ::nt::GetTopicInfo(m_inst, std::format("{}/", m_path), types)) {
     auto relative_key = wpi::substr(info.name, prefix_len);
     if (relative_key.find(PATH_SEPARATOR_CHAR) != std::string_view::npos) {
       continue;
@@ -224,7 +224,7 @@ std::vector<std::string> NetworkTable::GetSubTables() const {
   std::vector<std::string> keys;
   size_t prefix_len = m_path.size() + 1;
   for (auto&& topic :
-       ::nt::GetTopicInfo(m_inst, fmt::format("{}/", m_path), 0)) {
+       ::nt::GetTopicInfo(m_inst, std::format("{}/", m_path), 0)) {
     auto relative_key = wpi::substr(topic.name, prefix_len);
     size_t end_subtable = relative_key.find(PATH_SEPARATOR_CHAR);
     if (end_subtable == std::string_view::npos) {
@@ -372,7 +372,7 @@ std::string_view NetworkTable::GetPath() const {
 NT_Listener NetworkTable::AddListener(int eventMask,
                                       TableEventListener listener) {
   return NetworkTableInstance{m_inst}.AddListener(
-      {{fmt::format("{}/", m_path)}}, eventMask,
+      {{std::format("{}/", m_path)}}, eventMask,
       [this, cb = std::move(listener)](const Event& event) {
         std::string topicNameStr;
         std::string_view topicName;
@@ -406,7 +406,7 @@ NT_Listener NetworkTable::AddSubTableListener(SubTableListener listener) {
   auto notified_tables = std::make_shared<wpi::StringMap<char>>();
 
   return NetworkTableInstance{m_inst}.AddListener(
-      {{fmt::format("{}/", m_path)}}, NT_EVENT_PUBLISH | NT_EVENT_IMMEDIATE,
+      {{std::format("{}/", m_path)}}, NT_EVENT_PUBLISH | NT_EVENT_IMMEDIATE,
       [this, cb = std::move(listener), notified_tables](const Event& event) {
         auto topicInfo = event.GetTopicInfo();
         if (!topicInfo) {

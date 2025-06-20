@@ -8,11 +8,11 @@
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
+#include <format>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
 #include <wpi/json.h>
 #include <wpi/timestamp.h>
 
@@ -680,7 +680,7 @@ void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
     servers.reserve(5);
 
     // 10.te.am.2
-    servers.emplace_back(fmt::format("10.{}.{}.2", static_cast<int>(team / 100),
+    servers.emplace_back(std::format("10.{}.{}.2", static_cast<int>(team / 100),
                                      static_cast<int>(team % 100)),
                          port);
 
@@ -688,13 +688,13 @@ void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
     servers.emplace_back("172.22.11.2", port);
 
     // roboRIO-<team>-FRC.local
-    servers.emplace_back(fmt::format("roboRIO-{}-FRC.local", team), port);
+    servers.emplace_back(std::format("roboRIO-{}-FRC.local", team), port);
 
     // roboRIO-<team>-FRC.lan
-    servers.emplace_back(fmt::format("roboRIO-{}-FRC.lan", team), port);
+    servers.emplace_back(std::format("roboRIO-{}-FRC.lan", team), port);
 
     // roboRIO-<team>-FRC.frc-field.local
-    servers.emplace_back(fmt::format("roboRIO-{}-FRC.frc-field.local", team),
+    servers.emplace_back(std::format("roboRIO-{}-FRC.frc-field.local", team),
                          port);
 
     ii->SetServers(servers);

@@ -8,12 +8,12 @@
 
 #include <array>
 #include <atomic>
+#include <format>
 #include <memory>
 #include <span>
 #include <string>
 #include <string_view>
 
-#include <fmt/format.h>
 #include <hal/DriverStation.h>
 #include <hal/DriverStationTypes.h>
 #include <hal/HALBase.h>
@@ -164,7 +164,7 @@ static void SendMatchData();
 template <typename S, typename... Args>
 static inline void ReportJoystickUnpluggedError(const S& format,
                                                 Args&&... args) {
-  ReportJoystickUnpluggedErrorV(format, fmt::make_format_args(args...));
+  ReportJoystickUnpluggedErrorV(format, std::make_format_args(args...));
 }
 
 /**
@@ -172,13 +172,13 @@ static inline void ReportJoystickUnpluggedError(const S& format,
  *
  * Throttles the errors so that they don't overwhelm the DS.
  */
-static void ReportJoystickUnpluggedWarningV(fmt::string_view format,
-                                            fmt::format_args args);
+static void ReportJoystickUnpluggedWarningV(std::string_view format,
+                                            std::format_args args);
 
 template <typename S, typename... Args>
 static inline void ReportJoystickUnpluggedWarning(const S& format,
                                                   Args&&... args) {
-  ReportJoystickUnpluggedWarningV(format, fmt::make_format_args(args...));
+  ReportJoystickUnpluggedWarningV(format, std::make_format_args(args...));
 }
 
 Instance::Instance() {
@@ -710,8 +710,8 @@ void DriverStation::StartDataLog(wpi::log::DataLog& log, bool logJoysticks) {
   }
 }
 
-void ReportJoystickUnpluggedWarningV(fmt::string_view format,
-                                     fmt::format_args args) {
+void ReportJoystickUnpluggedWarningV(std::string_view format,
+                                     std::format_args args) {
   auto& inst = GetInstance();
   if (DriverStation::IsFMSAttached() || !inst.silenceJoystickWarning) {
     auto currentTime = Timer::GetTimestamp();
@@ -780,11 +780,11 @@ void JoystickLogSender::Init(wpi::log::DataLog& log, unsigned int stick,
   m_stick = stick;
 
   m_logButtons = wpi::log::BooleanArrayLogEntry{
-      log, fmt::format("DS:joystick{}/buttons", stick), timestamp};
+      log, std::format("DS:joystick{}/buttons", stick), timestamp};
   m_logAxes = wpi::log::FloatArrayLogEntry{
-      log, fmt::format("DS:joystick{}/axes", stick), timestamp};
+      log, std::format("DS:joystick{}/axes", stick), timestamp};
   m_logPOVs = wpi::log::IntegerArrayLogEntry{
-      log, fmt::format("DS:joystick{}/povs", stick), timestamp};
+      log, std::format("DS:joystick{}/povs", stick), timestamp};
 
   HAL_GetJoystickButtons(m_stick, &m_prevButtons);
   HAL_GetJoystickAxes(m_stick, &m_prevAxes);

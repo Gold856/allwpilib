@@ -7,6 +7,7 @@
 #include <chrono>
 #include <cmath>
 #include <cstdlib>
+#include <format>
 #include <limits>
 #include <numeric>
 #include <random>
@@ -14,7 +15,6 @@
 #include <thread>
 #include <vector>
 
-#include <fmt/format.h>
 #include <fmt/ranges.h>
 #include <wpi/Synchronization.h>
 #include <wpi/print.h>
@@ -164,7 +164,7 @@ void bench2() {
   for (int i = 0; i < 1000; ++i) {
     pubs[i] = nt::GetEntry(
         nt::GetTopic(server,
-                     fmt::format("/some/long/name/with/lots/of/slashes/{}", i)),
+                     std::format("/some/long/name/with/lots/of/slashes/{}", i)),
         NT_DOUBLE_ARRAY, "double[]");
   }
 
@@ -252,7 +252,7 @@ void stress() {
         NT_Publisher pub[30];
         for (int i = 0; i < 30; ++i) {
           pub[i] =
-              nt::Publish(nt::GetTopic(server, fmt::format("{}_{}", count, i)),
+              nt::Publish(nt::GetTopic(server, std::format("{}_{}", count, i)),
                           NT_DOUBLE, "double", {});
         }
 

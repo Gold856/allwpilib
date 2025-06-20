@@ -5,9 +5,9 @@
 #include "HALSimWSClientConnection.h"
 
 #include <cstdio>
+#include <format>
 #include <string>
 
-#include <fmt/format.h>
 #include <wpi/print.h>
 #include <wpinet/raw_uv_ostream.h>
 
@@ -23,7 +23,7 @@ void HALSimWSClientConnection::Initialize() {
 
   auto ws = wpi::WebSocket::CreateClient(
       *m_stream, m_client->GetTargetUri(),
-      fmt::format("{}:{}", m_client->GetTargetHost(),
+      std::format("{}:{}", m_client->GetTargetHost(),
                   m_client->GetTargetPort()));
 
   ws->SetData(self);

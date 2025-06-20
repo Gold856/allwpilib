@@ -4,12 +4,12 @@
 
 #include "frc/Alert.h"
 
+#include <format>
 #include <set>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
 #include <networktables/NTSendable.h>
 #include <networktables/NTSendableBuilder.h>
 #include <wpi/StringMap.h>
@@ -170,18 +170,5 @@ void Alert::SetText(std::string_view text) {
     auto iter = m_activeAlerts->find({m_activeStartTime, oldText});
     auto hint = m_activeAlerts->erase(iter);
     m_activeAlerts->emplace_hint(hint, m_activeStartTime, m_text);
-  }
-}
-
-std::string frc::format_as(Alert::AlertType type) {
-  switch (type) {
-    case Alert::AlertType::kInfo:
-      return "kInfo";
-    case Alert::AlertType::kWarning:
-      return "kWarning";
-    case Alert::AlertType::kError:
-      return "kError";
-    default:
-      return std::to_string(static_cast<int>(type));
   }
 }

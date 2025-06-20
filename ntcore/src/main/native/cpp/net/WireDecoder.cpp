@@ -6,11 +6,11 @@
 
 #include <algorithm>
 #include <concepts>
+#include <format>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
 #include <wpi/Logger.h>
 #include <wpi/SpanExtras.h>
 #include <wpi/json.h>
@@ -51,12 +51,12 @@ static std::string* ObjGetString(wpi::json::object_t& obj, std::string_view key,
                                  std::string* error) {
   auto it = obj.find(key);
   if (it == obj.end()) {
-    *error = fmt::format("no {} key", key);
+    *error = std::format("no {} key", key);
     return nullptr;
   }
   auto val = it->second.get_ptr<std::string*>();
   if (!val) {
-    *error = fmt::format("{} must be a string", key);
+    *error = std::format("{} must be a string", key);
   }
   return val;
 }
@@ -65,11 +65,11 @@ static bool ObjGetNumber(wpi::json::object_t& obj, std::string_view key,
                          std::string* error, int64_t* num) {
   auto it = obj.find(key);
   if (it == obj.end()) {
-    *error = fmt::format("no {} key", key);
+    *error = std::format("no {} key", key);
     return false;
   }
   if (!GetNumber(it->second, num)) {
-    *error = fmt::format("{} must be a number", key);
+    *error = std::format("{} must be a number", key);
     return false;
   }
   return true;
@@ -81,12 +81,12 @@ static bool ObjGetStringArray(wpi::json::object_t& obj, std::string_view key,
   // prefixes
   auto it = obj.find(key);
   if (it == obj.end()) {
-    *error = fmt::format("no {} key", key);
+    *error = std::format("no {} key", key);
     return false;
   }
   auto jarr = it->second.get_ptr<wpi::json::array_t*>();
   if (!jarr) {
-    *error = fmt::format("{} must be an array", key);
+    *error = std::format("{} must be an array", key);
     return false;
   }
   out->resize(0);
@@ -94,7 +94,7 @@ static bool ObjGetStringArray(wpi::json::object_t& obj, std::string_view key,
   for (auto&& jval : *jarr) {
     auto str = jval.get_ptr<std::string*>();
     if (!str) {
-      *error = fmt::format("{}/{} must be a string", key, out->size());
+      *error = std::format("{}/{} must be a string", key, out->size());
       return false;
     }
     out->emplace_back(std::move(*str));
@@ -331,7 +331,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
           out.ClientUnsubscribe(subuid);
           rv = true;
         } else {
-          error = fmt::format("unrecognized method '{}'", *method);
+          error = std::format("unrecognized method '{}'", *method);
           goto err;
         }
       } else if constexpr (std::same_as<T, ServerMessageHandler>) {
@@ -447,7 +447,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
           // complete
           out.ServerPropertiesUpdate(*name, *update, ack);
         } else {
-          error = fmt::format("unrecognized method '{}'", *method);
+          error = std::format("unrecognized method '{}'", *method);
           goto err;
         }
       }
@@ -601,7 +601,7 @@ bool nt::net::WireDecodeBinary(std::span<const uint8_t>* in, int* outId,
       break;
     }
     default:
-      *error = fmt::format("unrecognized type {}", type);
+      *error = std::format("unrecognized type {}", type);
       return false;
   }
   mpack_done_array(&reader);

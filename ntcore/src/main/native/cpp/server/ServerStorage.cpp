@@ -4,12 +4,12 @@
 
 #include "ServerStorage.h"
 
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
 #include <wpi/Base64.h>
 #include <wpi/MessagePack.h>
 #include <wpi/json.h>
@@ -47,8 +47,8 @@ ServerTopic* ServerStorage::CreateTopic(ServerClient* client,
 
     // create meta topics; don't create if topic is itself a meta topic
     if (!special) {
-      topic->metaPub = CreateMetaTopic(fmt::format("$pub${}", name));
-      topic->metaSub = CreateMetaTopic(fmt::format("$sub${}", name));
+      topic->metaPub = CreateMetaTopic(std::format("$pub${}", name));
+      topic->metaSub = CreateMetaTopic(std::format("$sub${}", name));
       UpdateMetaTopicPub(topic);
       UpdateMetaTopicSub(topic);
     }
@@ -376,12 +376,12 @@ static std::string* ObjGetString(wpi::json::object_t& obj, std::string_view key,
                                  std::string* error) {
   auto it = obj.find(key);
   if (it == obj.end()) {
-    *error = fmt::format("no {} key", key);
+    *error = std::format("no {} key", key);
     return nullptr;
   }
   auto val = it->second.get_ptr<std::string*>();
   if (!val) {
-    *error = fmt::format("{} must be a string", key);
+    *error = std::format("{} must be a string", key);
   }
   return val;
 }
@@ -395,7 +395,7 @@ std::string ServerStorage::LoadPersistent(std::string_view in) {
   try {
     j = wpi::json::parse(in);
   } catch (wpi::json::parse_error& err) {
-    return fmt::format("could not decode JSON: {}", err.what());
+    return std::format("could not decode JSON: {}", err.what());
   }
 
   if (!j.is_array()) {
@@ -599,7 +599,7 @@ std::string ServerStorage::LoadPersistent(std::string_view in) {
       continue;
     }
   err:
-    allerrors += fmt::format("{}: {}\n", i, error);
+    allerrors += std::format("{}: {}\n", i, error);
   }
 
   m_persistentChanged = persistentChanged;  // restore flag

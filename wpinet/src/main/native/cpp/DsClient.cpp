@@ -4,9 +4,9 @@
 
 #include "wpinet/DsClient.h"
 
+#include <format>
 #include <memory>
 
-#include <fmt/format.h>
 #include <wpi/Logger.h>
 #include <wpi/StringExtras.h>
 #include <wpi/json.h>
@@ -104,7 +104,7 @@ void DsClient::ParseJson() {
     clearIp();
   } else {
     // Convert number into dotted quad
-    auto newip = fmt::format("{}.{}.{}.{}", (ip >> 24) & 0xff,
+    auto newip = std::format("{}.{}.{}.{}", (ip >> 24) & 0xff,
                              (ip >> 16) & 0xff, (ip >> 8) & 0xff, ip & 0xff);
     WPI_INFO(m_logger, "DS received server IP: {}", newip);
     setIp(newip);

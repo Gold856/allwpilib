@@ -124,7 +124,7 @@ void HttpServerConnection::SendStaticResponse(
   SmallVector<uv::Buffer, 4> bufs;
   raw_uv_ostream os{bufs, 4096};
   BuildHeader(os, code, codeText, contentType, content.size(),
-              fmt::format("{}{}", extraHeader, contentEncodingHeader));
+              std::format("{}{}", extraHeader, contentEncodingHeader));
   // can send content without copying
   bufs.emplace_back(content);
 

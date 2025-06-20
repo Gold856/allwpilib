@@ -4,11 +4,11 @@
 
 #include "frc/Preferences.h"
 
+#include <format>
 #include <memory>
 #include <string>
 #include <vector>
 
-#include <fmt/format.h>
 #include <hal/UsageReporting.h>
 #include <networktables/MultiSubscriber.h>
 #include <networktables/NetworkTable.h>
@@ -31,7 +31,7 @@ struct Instance {
   nt::StringPublisher typePublisher{table->GetStringTopic(".type").PublishEx(
       nt::StringTopic::kTypeString, {{"SmartDashboard", kSmartDashboardType}})};
   nt::MultiSubscriber tableSubscriber{nt::NetworkTableInstance::GetDefault(),
-                                      {{fmt::format("{}/", table->GetPath())}}};
+                                      {{std::format("{}/", table->GetPath())}}};
   nt::NetworkTableListener listener;
 };
 }  // namespace

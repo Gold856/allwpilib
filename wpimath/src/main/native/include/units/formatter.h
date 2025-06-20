@@ -4,9 +4,8 @@
 
 #pragma once
 
+#include <format>
 #include <type_traits>
-
-#include <fmt/format.h>
 
 #include "units/base.h"
 
@@ -18,7 +17,7 @@
  * Formatter for unit types.
  */
 template <typename Unit, typename CharT>
-struct fmt::formatter<Unit, CharT,
+struct std::formatter<Unit, CharT,
                       std::enable_if_t<units::traits::is_unit_t_v<Unit>>> {
   template <typename ParseContext>
   constexpr auto parse(ParseContext& ctx) {
@@ -44,171 +43,171 @@ struct fmt::formatter<Unit, CharT,
 
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::meter_ratio::num != 0) {
-      out = fmt::format_to(out, " m");
+      out = std::format_to(out, " m");
     }
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::meter_ratio::num != 0 &&
                   units::traits::unit_traits<
                       Units>::base_unit_type::meter_ratio::num != 1) {
-      out = fmt::format_to(
+      out = std::format_to(
           out, "^{}",
           units::traits::unit_traits<Units>::base_unit_type::meter_ratio::num);
     }
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::meter_ratio::den != 1) {
-      out = fmt::format_to(
+      out = std::format_to(
           out, "/{}",
           units::traits::unit_traits<Units>::base_unit_type::meter_ratio::den);
     }
 
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::kilogram_ratio::num != 0) {
-      out = fmt::format_to(out, " kg");
+      out = std::format_to(out, " kg");
     }
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::kilogram_ratio::num != 0 &&
                   units::traits::unit_traits<
                       Units>::base_unit_type::kilogram_ratio::num != 1) {
-      out = fmt::format_to(out, "^{}",
+      out = std::format_to(out, "^{}",
                            units::traits::unit_traits<
                                Units>::base_unit_type::kilogram_ratio::num);
     }
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::kilogram_ratio::den != 1) {
-      out = fmt::format_to(out, "/{}",
+      out = std::format_to(out, "/{}",
                            units::traits::unit_traits<
                                Units>::base_unit_type::kilogram_ratio::den);
     }
 
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::second_ratio::num != 0) {
-      out = fmt::format_to(out, " s");
+      out = std::format_to(out, " s");
     }
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::second_ratio::num != 0 &&
                   units::traits::unit_traits<
                       Units>::base_unit_type::second_ratio::num != 1) {
-      out = fmt::format_to(
+      out = std::format_to(
           out, "^{}",
           units::traits::unit_traits<Units>::base_unit_type::second_ratio::num);
     }
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::second_ratio::den != 1) {
-      out = fmt::format_to(
+      out = std::format_to(
           out, "/{}",
           units::traits::unit_traits<Units>::base_unit_type::second_ratio::den);
     }
 
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::ampere_ratio::num != 0) {
-      out = fmt::format_to(out, " A");
+      out = std::format_to(out, " A");
     }
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::ampere_ratio::num != 0 &&
                   units::traits::unit_traits<
                       Units>::base_unit_type::ampere_ratio::num != 1) {
-      out = fmt::format_to(
+      out = std::format_to(
           out, "^{}",
           units::traits::unit_traits<Units>::base_unit_type::ampere_ratio::num);
     }
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::ampere_ratio::den != 1) {
-      out = fmt::format_to(
+      out = std::format_to(
           out, "/{}",
           units::traits::unit_traits<Units>::base_unit_type::ampere_ratio::den);
     }
 
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::kelvin_ratio::num != 0) {
-      out = fmt::format_to(out, " K");
+      out = std::format_to(out, " K");
     }
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::kelvin_ratio::num != 0 &&
                   units::traits::unit_traits<
                       Units>::base_unit_type::kelvin_ratio::num != 1) {
-      out = fmt::format_to(
+      out = std::format_to(
           out, "^{}",
           units::traits::unit_traits<Units>::base_unit_type::kelvin_ratio::num);
     }
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::kelvin_ratio::den != 1) {
-      out = fmt::format_to(
+      out = std::format_to(
           out, "/{}",
           units::traits::unit_traits<Units>::base_unit_type::kelvin_ratio::den);
     }
 
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::mole_ratio::num != 0) {
-      out = fmt::format_to(out, " mol");
+      out = std::format_to(out, " mol");
     }
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::mole_ratio::num != 0 &&
                   units::traits::unit_traits<
                       Units>::base_unit_type::mole_ratio::num != 1) {
-      out = fmt::format_to(
+      out = std::format_to(
           out, "^{}",
           units::traits::unit_traits<Units>::base_unit_type::mole_ratio::num);
     }
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::mole_ratio::den != 1) {
-      out = fmt::format_to(
+      out = std::format_to(
           out, "/{}",
           units::traits::unit_traits<Units>::base_unit_type::mole_ratio::den);
     }
 
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::candela_ratio::num != 0) {
-      out = fmt::format_to(out, " cd");
+      out = std::format_to(out, " cd");
     }
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::candela_ratio::num != 0 &&
                   units::traits::unit_traits<
                       Units>::base_unit_type::candela_ratio::num != 1) {
-      out = fmt::format_to(out, "^{}",
+      out = std::format_to(out, "^{}",
                            units::traits::unit_traits<
                                Units>::base_unit_type::candela_ratio::num);
     }
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::candela_ratio::den != 1) {
-      out = fmt::format_to(out, "/{}",
+      out = std::format_to(out, "/{}",
                            units::traits::unit_traits<
                                Units>::base_unit_type::candela_ratio::den);
     }
 
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::radian_ratio::num != 0) {
-      out = fmt::format_to(out, " rad");
+      out = std::format_to(out, " rad");
     }
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::radian_ratio::num != 0 &&
                   units::traits::unit_traits<
                       Units>::base_unit_type::radian_ratio::num != 1) {
-      out = fmt::format_to(
+      out = std::format_to(
           out, "^{}",
           units::traits::unit_traits<Units>::base_unit_type::radian_ratio::num);
     }
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::radian_ratio::den != 1) {
-      out = fmt::format_to(
+      out = std::format_to(
           out, "/{}",
           units::traits::unit_traits<Units>::base_unit_type::radian_ratio::den);
     }
 
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::byte_ratio::num != 0) {
-      out = fmt::format_to(out, " b");
+      out = std::format_to(out, " b");
     }
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::byte_ratio::num != 0 &&
                   units::traits::unit_traits<
                       Units>::base_unit_type::byte_ratio::num != 1) {
-      out = fmt::format_to(
+      out = std::format_to(
           out, "^{}",
           units::traits::unit_traits<Units>::base_unit_type::byte_ratio::num);
     }
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::byte_ratio::den != 1) {
-      out = fmt::format_to(
+      out = std::format_to(
           out, "/{}",
           units::traits::unit_traits<Units>::base_unit_type::byte_ratio::den);
     }
@@ -217,5 +216,5 @@ struct fmt::formatter<Unit, CharT,
   }
 
  private:
-  fmt::formatter<typename Unit::underlying_type, CharT> m_underlying;
+  std::formatter<typename Unit::underlying_type, CharT> m_underlying;
 };

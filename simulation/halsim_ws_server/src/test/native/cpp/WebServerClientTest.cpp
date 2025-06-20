@@ -5,10 +5,10 @@
 #include "WebServerClientTest.h"
 
 #include <cstdio>
+#include <format>
 #include <memory>
 #include <string>
 
-#include <fmt/format.h>
 #include <wpi/SmallString.h>
 #include <wpi/print.h>
 #include <wpinet/raw_uv_ostream.h>
@@ -25,7 +25,7 @@ void WebServerClientTest::InitializeWebSocket(const std::string& host, int port,
                                               const std::string& uri) {
   wpi::print("Will attempt to connect to: {}:{}{}\n", host, port, uri);
   m_websocket = wpi::WebSocket::CreateClient(*m_tcp_client.get(), uri,
-                                             fmt::format("{}:{}", host, port));
+                                             std::format("{}:{}", host, port));
 
   // Hook up events
   m_websocket->open.connect_extended([this](auto conn, auto) {

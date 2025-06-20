@@ -4,12 +4,12 @@
 
 #include "LocalStorageImpl.h"
 
+#include <format>
 #include <memory>
 #include <string_view>
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
 #include <fmt/ranges.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>

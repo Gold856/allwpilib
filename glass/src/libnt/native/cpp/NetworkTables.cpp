@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cinttypes>
 #include <cstring>
+#include <format>
 #include <functional>
 #include <initializer_list>
 #include <map>
@@ -17,7 +18,6 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
 #include <imgui.h>
 #include <imgui_stdlib.h>
 #include <networktables/NetworkTableInstance.h>
@@ -173,8 +173,8 @@ static void UpdateMsgpackValueSource(NetworkTablesModel& model,
       unsigned int i = 0;
       for (auto&& child : out->valueChildren) {
         if (child.name.empty()) {
-          child.name = fmt::format("[{}]", i);
-          child.path = fmt::format("{}{}", name, child.name);
+          child.name = std::format("[{}]", i);
+          child.path = std::format("{}{}", name, child.name);
         }
         ++i;
         UpdateMsgpackValueSource(model, &child, r, child.path,
@@ -207,7 +207,7 @@ static void UpdateMsgpackValueSource(NetworkTablesModel& model,
             out->valueChildren.emplace_back();
             auto& child = out->valueChildren.back();
             child.name = std::move(key);
-            child.path = fmt::format("{}/{}", name, child.name);
+            child.path = std::format("{}/{}", name, child.name);
             UpdateMsgpackValueSource(model, &child, r, child.path, time);
           }
         }
@@ -259,7 +259,7 @@ static void UpdateStructValueSource(NetworkTablesModel& model,
       out->valueChildren.emplace_back();
       auto& child = out->valueChildren.back();
       child.name = field.GetName();
-      child.path = fmt::format("{}/{}", name, child.name);
+      child.path = std::format("{}/{}", name, child.name);
     }
   }
   auto outIt = out->valueChildren.begin();
@@ -373,8 +373,8 @@ static void UpdateStructValueSource(NetworkTablesModel& model,
           unsigned int i = 0;
           for (auto&& child2 : child.valueChildren) {
             if (child2.name.empty()) {
-              child2.name = fmt::format("[{}]", i);
-              child2.path = fmt::format("{}{}", name, child.name);
+              child2.name = std::format("[{}]", i);
+              child2.path = std::format("{}{}", name, child.name);
             }
             UpdateStructValueSource(model, &child2, s.GetStructField(&field, i),
                                     child2.path, time);  // recurse
@@ -394,7 +394,7 @@ static void UpdateProtobufValueSource(NetworkTablesModel& model,
                                       const upb_Message* msg,
                                       const upb_MessageDef* msgDef,
                                       std::string_view name, int64_t time) {
-  out->typeStr = fmt::format("proto:{}", upb_MessageDef_FullName(msgDef));
+  out->typeStr = std::format("proto:{}", upb_MessageDef_FullName(msgDef));
   int fieldCount = upb_MessageDef_FieldCount(msgDef);
   if (!out->valueChildrenMap ||
       fieldCount != static_cast<int>(out->valueChildren.size())) {
@@ -405,7 +405,7 @@ static void UpdateProtobufValueSource(NetworkTablesModel& model,
       out->valueChildren.emplace_back();
       auto& child = out->valueChildren.back();
       child.name = upb_FieldDef_Name(upb_MessageDef_Field(msgDef, i));
-      child.path = fmt::format("{}/{}", name, child.name);
+      child.path = std::format("{}/{}", name, child.name);
     }
   }
   auto outIt = out->valueChildren.begin();
@@ -606,8 +606,8 @@ static void UpdateProtobufValueSource(NetworkTablesModel& model,
           unsigned int i = 0;
           for (auto&& child2 : child.valueChildren) {
             if (child2.name.empty()) {
-              child2.name = fmt::format("[{}]", i);
-              child2.path = fmt::format("{}{}", name, child.name);
+              child2.name = std::format("[{}]", i);
+              child2.path = std::format("{}{}", name, child.name);
             }
             const upb_Message* submsg = upb_Array_Get(arr, i).msg_val;
             const upb_MessageDef* submsgDef = upb_FieldDef_MessageSubDef(field);
@@ -654,7 +654,7 @@ static void UpdateJsonValueSource(NetworkTablesModel& model,
           out->valueChildren.emplace_back();
           auto& child = out->valueChildren.back();
           child.name = kv.key();
-          child.path = fmt::format("{}/{}", name, child.name);
+          child.path = std::format("{}/{}", name, child.name);
           UpdateJsonValueSource(model, &child, kv.value(), child.path, time);
         }
       }
@@ -680,8 +680,8 @@ static void UpdateJsonValueSource(NetworkTablesModel& model,
       unsigned int i = 0;
       for (auto&& child : out->valueChildren) {
         if (child.name.empty()) {
-          child.name = fmt::format("[{}]", i);
-          child.path = fmt::format("{}{}", name, child.name);
+          child.name = std::format("[{}]", i);
+          child.path = std::format("{}{}", name, child.name);
         }
         // recurse
         UpdateJsonValueSource(model, &child, j[i++], child.path, time);
@@ -751,7 +751,7 @@ void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
   valueChildren.clear();
   auto s = dynamic_cast<BooleanSource*>(source.get());
   if (!s) {
-    source = std::make_unique<BooleanSource>(fmt::format("NT:{}", name));
+    source = std::make_unique<BooleanSource>(std::format("NT:{}", name));
     s = static_cast<BooleanSource*>(source.get());
   }
   s->SetValue(value, time);
@@ -762,7 +762,7 @@ void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
   valueChildren.clear();
   auto s = dynamic_cast<FloatSource*>(source.get());
   if (!s) {
-    source = std::make_unique<FloatSource>(fmt::format("NT:{}", name));
+    source = std::make_unique<FloatSource>(std::format("NT:{}", name));
     s = static_cast<FloatSource*>(source.get());
   }
   s->SetValue(value, time);
@@ -773,7 +773,7 @@ void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
   valueChildren.clear();
   auto s = dynamic_cast<DoubleSource*>(source.get());
   if (!s) {
-    source = std::make_unique<DoubleSource>(fmt::format("NT:{}", name));
+    source = std::make_unique<DoubleSource>(std::format("NT:{}", name));
     s = static_cast<DoubleSource*>(source.get());
   }
   s->SetValue(value, time);
@@ -784,7 +784,7 @@ void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
   valueChildren.clear();
   auto s = dynamic_cast<IntegerSource*>(source.get());
   if (!s) {
-    source = std::make_unique<IntegerSource>(fmt::format("NT:{}", name));
+    source = std::make_unique<IntegerSource>(std::format("NT:{}", name));
     s = static_cast<IntegerSource*>(source.get());
   }
   s->SetValue(value, time);
@@ -802,8 +802,8 @@ void NetworkTablesModel::ValueSource::UpdateDiscreteArray(
   unsigned int i = 0;
   for (auto&& child : valueChildren) {
     if (child.name.empty()) {
-      child.name = fmt::format("[{}]", i);
-      child.path = fmt::format("{}{}", name, child.name);
+      child.name = std::format("[{}]", i);
+      child.path = std::format("{}{}", name, child.name);
     }
     child.value = makeValue(arr[i], time);
     if constexpr (IsBoolean) {
@@ -857,8 +857,8 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
       unsigned int i = 0;
       for (auto&& child : valueChildren) {
         if (child.name.empty()) {
-          child.name = fmt::format("[{}]", i);
-          child.path = fmt::format("{}{}", name, child.name);
+          child.name = std::format("[{}]", i);
+          child.path = std::format("{}{}", name, child.name);
         }
         child.value = nt::Value::MakeString(arr[i++], value.time());
         child.UpdateFromValue(model, child.path, "");
@@ -884,7 +884,7 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
 
         auto s = dynamic_cast<StringSource*>(source.get());
         if (!s) {
-          source = std::make_unique<StringSource>(fmt::format("NT:{}", name));
+          source = std::make_unique<StringSource>(std::format("NT:{}", name));
           s = static_cast<StringSource*>(source.get());
         }
         s->SetValue(value.GetString(), value.time());
@@ -916,8 +916,8 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
             unsigned int i = 0;
             for (auto&& child : valueChildren) {
               if (child.name.empty()) {
-                child.name = fmt::format("[{}]", i);
-                child.path = fmt::format("{}{}", name, child.name);
+                child.name = std::format("[{}]", i);
+                child.path = std::format("{}{}", name, child.name);
               }
               wpi::DynamicStruct s{desc, raw};
               UpdateStructValueSource(model, &child, s, child.path,
@@ -1251,12 +1251,12 @@ void NetworkTablesModel::UpdateClients(std::span<const uint8_t> data) {
       newClient.subscribers = std::move(it->second.subscribers);
     } else {
       // initially populate
-      if (Entry* entry = GetEntry(fmt::format("$clientpub${}", newClient.id))) {
+      if (Entry* entry = GetEntry(std::format("$clientpub${}", newClient.id))) {
         if (entry->value.IsRaw() && entry->info.type_str == "msgpack") {
           newClient.UpdatePublishers(entry->value.GetRaw());
         }
       }
-      if (Entry* entry = GetEntry(fmt::format("$clientsub${}", newClient.id))) {
+      if (Entry* entry = GetEntry(std::format("$clientsub${}", newClient.id))) {
         if (entry->value.IsRaw() && entry->info.type_str == "msgpack") {
           newClient.UpdateSubscribers(entry->value.GetRaw());
         }
@@ -1359,7 +1359,7 @@ static void EmitEntryValueReadonly(const NetworkTablesModel::ValueSource& entry,
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 #endif
-      ImGui::LabelText(typeStr, fmt::format("%.{}f", precision).c_str(),
+      ImGui::LabelText(typeStr, std::format("%.{}f", precision).c_str(),
                        val.GetDouble());
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
@@ -1463,7 +1463,7 @@ bool ArrayEditorImpl<NTType, T>::Emit() {
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 #endif
           ImGui::InputDouble(label, &m_arr[row], 0, 0,
-                             fmt::format("%.{}f", precision).c_str());
+                             std::format("%.{}f", precision).c_str());
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
@@ -1603,7 +1603,7 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 #endif
       if (InputExpr<double>(typeStr, &v,
-                            fmt::format("%.{}f", precision).c_str(),
+                            std::format("%.{}f", precision).c_str(),
                             ImGuiInputTextFlags_EnterReturnsTrue)) {
         if (entry.publisher == 0) {
           entry.publisher = nt::Publish(entry.info.topic, NT_DOUBLE, "double");
@@ -1780,7 +1780,7 @@ void glass::DisplayNetworkTablesAddMenu(NetworkTablesModel* model,
     if (path == "/") {
       path = "";
     }
-    fullNewPath = fmt::format("{}/{}", path, nameBuffer);
+    fullNewPath = std::format("{}/{}", path, nameBuffer);
 
     ImGui::Text("Adding: %s", fullNewPath.c_str());
     ImGui::Separator();

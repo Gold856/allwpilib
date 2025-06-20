@@ -5,12 +5,12 @@
 #include "glass/networktables/NTMechanism2D.h"
 
 #include <algorithm>
+#include <format>
 #include <memory>
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include <fmt/format.h>
 #include <imgui.h>
 #include <ntcore_cpp.h>
 #include <wpi/StringExtras.h>
@@ -58,7 +58,7 @@ void NTMechanism2DModel::NTMechanismGroupImpl::NTUpdate(const nt::Event& event,
       if (!match) {
         it = m_objects.emplace(
             it, std::make_unique<NTMechanismObjectModel>(
-                    m_inst, fmt::format("{}/{}", m_path, name), name));
+                    m_inst, std::format("{}/{}", m_path, name), name));
         match = true;
       }
     }
@@ -151,11 +151,11 @@ NTMechanism2DModel::NTMechanism2DModel(std::string_view path)
 NTMechanism2DModel::NTMechanism2DModel(nt::NetworkTableInstance inst,
                                        std::string_view path)
     : m_inst{inst},
-      m_path{fmt::format("{}/", path)},
+      m_path{std::format("{}/", path)},
       m_tableSub{inst, {{m_path}}, {.periodic = 0.05, .sendAll = true}},
-      m_nameTopic{m_inst.GetTopic(fmt::format("{}/.name", path))},
-      m_dimensionsTopic{m_inst.GetTopic(fmt::format("{}/dims", path))},
-      m_bgColorTopic{m_inst.GetTopic(fmt::format("{}/backgroundColor", path))},
+      m_nameTopic{m_inst.GetTopic(std::format("{}/.name", path))},
+      m_dimensionsTopic{m_inst.GetTopic(std::format("{}/dims", path))},
+      m_bgColorTopic{m_inst.GetTopic(std::format("{}/backgroundColor", path))},
       m_poller{m_inst},
       m_dimensionsValue{1_m, 1_m} {
   m_poller.AddListener(m_tableSub, nt::EventFlags::kTopic |
@@ -188,7 +188,7 @@ void NTMechanism2DModel::Update() {
         if (!match) {
           it = m_roots.emplace(
               it, std::make_unique<RootModel>(
-                      m_inst, fmt::format("{}{}", m_path, name), name));
+                      m_inst, std::format("{}{}", m_path, name), name));
           match = true;
         }
       }

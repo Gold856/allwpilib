@@ -8,7 +8,6 @@
 #include <type_traits>
 
 #include <Eigen/Core>
-#include <fmt/format.h>
 #include <gcem.hpp>
 #include <wpi/SymbolExports.h>
 #include <wpi/json_fwd.h>

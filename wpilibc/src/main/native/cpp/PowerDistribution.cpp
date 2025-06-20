@@ -4,9 +4,9 @@
 
 #include "frc/PowerDistribution.h"
 
+#include <format>
 #include <vector>
 
-#include <fmt/format.h>
 #include <hal/Ports.h>
 #include <hal/PowerDistribution.h>
 #include <hal/UsageReporting.h>
@@ -326,7 +326,7 @@ void PowerDistribution::InitSendable(wpi::SendableBuilder& builder) {
   // Use manual reads to avoid printing errors
   for (int i = 0; i < numChannels; ++i) {
     builder.AddDoubleProperty(
-        fmt::format("Chan{}", i),
+        std::format("Chan{}", i),
         [=, this] {
           int32_t lStatus = 0;
           return HAL_GetPowerDistributionChannelCurrent(m_handle, i, &lStatus);

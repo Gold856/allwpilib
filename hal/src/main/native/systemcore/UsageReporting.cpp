@@ -4,7 +4,8 @@
 
 #include <stdint.h>
 
-#include <fmt/format.h>
+#include <format>
+
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/StringTopic.h>
 #include <wpi/StringMap.h>
@@ -34,7 +35,7 @@ int32_t HAL_ReportUsage(const struct WPI_String* resource,
   if (!publisher) {
     publisher =
         systemServerUsage->ntInst
-            .GetStringTopic(fmt::format("/UsageReporting/{}", resourceStr))
+            .GetStringTopic(std::format("/UsageReporting/{}", resourceStr))
             .Publish();
   }
   publisher.Set(wpi::to_string_view(data));

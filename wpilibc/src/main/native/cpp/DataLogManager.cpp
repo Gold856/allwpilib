@@ -228,7 +228,7 @@ void Thread::Main() {
         if (RobotController::IsSystemTimeValid()) {
           std::time_t now = std::time(nullptr);
           auto tm = std::gmtime(&now);
-          m_log.SetFilename(fmt::format("FRC_{:%Y%m%d_%H%M%S}.wpilog", *tm));
+          m_log.SetFilename(std::format("FRC_{:%Y%m%d_%H%M%S}.wpilog", *tm));
           dsRenamed = true;
         } else {
           dsAttachCount = 0;  // wait a bit and try again
@@ -266,7 +266,7 @@ void Thread::Main() {
           }
           std::time_t now = std::time(nullptr);
           m_log.SetFilename(
-              fmt::format("FRC_{:%Y%m%d_%H%M%S}_{}_{}{}.wpilog",
+              std::format("FRC_{:%Y%m%d_%H%M%S}_{}_{}{}.wpilog",
                           *std::gmtime(&now), DriverStation::GetEventName(),
                           matchTypeChar, DriverStation::GetMatchNumber()));
           fmsRenamed = true;

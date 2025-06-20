@@ -4,13 +4,14 @@
 
 #include "frc2/command/WaitCommand.h"
 
-#include <fmt/format.h>
+#include <format>
+
 #include <wpi/sendable/SendableBuilder.h>
 
 using namespace frc2;
 
 WaitCommand::WaitCommand(units::second_t duration) : m_duration{duration} {
-  SetName(fmt::format("{}: {}", GetName(), duration));
+  SetName(std::format("{}: {}", GetName(), duration));
 }
 
 void WaitCommand::Initialize() {

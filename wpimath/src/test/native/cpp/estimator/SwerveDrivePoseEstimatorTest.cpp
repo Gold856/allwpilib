@@ -8,7 +8,6 @@
 #include <tuple>
 #include <vector>
 
-#include <fmt/format.h>
 #include <gtest/gtest.h>
 #include <wpi/print.h>
 #include <wpi/timestamp.h>

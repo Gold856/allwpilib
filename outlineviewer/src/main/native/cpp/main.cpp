@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <format>
 #include <memory>
 #include <string>
 
 #include <GLFW/glfw3.h>
-#include <fmt/format.h>
 #include <glass/Context.h>
 #include <glass/MainMenuBar.h>
 #include <glass/Model.h>
@@ -48,11 +48,11 @@ static std::string MakeTitle(NT_Inst inst, nt::Event event) {
   auto mode = nt::GetNetworkMode(inst);
   if (mode & NT_NET_MODE_SERVER) {
     auto numClients = nt::GetConnections(inst).size();
-    return fmt::format("OutlineViewer - {} Client{} Connected", numClients,
+    return std::format("OutlineViewer - {} Client{} Connected", numClients,
                        (numClients == 1 ? "" : "s"));
   } else if (mode & NT_NET_MODE_CLIENT) {
     if (event.Is(NT_EVENT_CONNECTED)) {
-      return fmt::format("OutlineViewer - Connected ({})",
+      return std::format("OutlineViewer - Connected ({})",
                          event.GetConnectionInfo()->remote_ip);
     }
   }
@@ -89,7 +89,7 @@ static void NtInitialize() {
         } else if (msg->level >= NT_LOG_WARNING) {
           level = "WARNING: ";
         }
-        gLog.Append(fmt::format("{}{} ({}:{})\n", level, msg->message,
+        gLog.Append(std::format("{}{} ({}:{})\n", level, msg->message,
                                 msg->filename, msg->line));
       }
     }

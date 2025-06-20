@@ -7,9 +7,9 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
+#include <format>
 #include <thread>
 
-#include <fmt/format.h>
 #include <wpi/print.h>
 
 #include "HALInitializer.h"
@@ -118,7 +118,7 @@ void HAL_SetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
     *status = PARAMETER_OUT_OF_RANGE;
     hal::SetLastError(
         status,
-        fmt::format("Pulse time {} out of range. Expect [0-4096) or 0xFFFF",
+        std::format("Pulse time {} out of range. Expect [0-4096) or 0xFFFF",
                     microsecondPulseTime));
     return;
   }

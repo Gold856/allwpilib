@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <fmt/format.h>
 #include <wpi/ct_string.h>
 #include <wpi/struct/Struct.h>
 

@@ -5,12 +5,12 @@
 #include "glass/networktables/NTField2D.h"
 
 #include <algorithm>
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
 #include <networktables/DoubleArrayTopic.h>
 #include <networktables/MultiSubscriber.h>
 #include <ntcore_cpp.h>
@@ -113,10 +113,10 @@ NTField2DModel::NTField2DModel(std::string_view path)
 
 NTField2DModel::NTField2DModel(nt::NetworkTableInstance inst,
                                std::string_view path)
-    : m_path{fmt::format("{}/", path)},
+    : m_path{std::format("{}/", path)},
       m_inst{inst},
       m_tableSub{inst, {{m_path}}, {.periodic = 0.05, .sendAll = true}},
-      m_nameTopic{inst.GetTopic(fmt::format("{}/.name", path))},
+      m_nameTopic{inst.GetTopic(std::format("{}/.name", path))},
       m_poller{inst} {
   m_poller.AddListener(m_tableSub, nt::EventFlags::kTopic |
                                        nt::EventFlags::kValueAll |
@@ -179,7 +179,7 @@ bool NTField2DModel::IsReadOnly() {
 }
 
 FieldObjectModel* NTField2DModel::AddFieldObject(std::string_view name) {
-  auto fullName = fmt::format("{}{}", m_path, name);
+  auto fullName = std::format("{}{}", m_path, name);
   auto [it, match] = Find(fullName);
   if (!match) {
     it = m_objects.emplace(it,
@@ -190,7 +190,7 @@ FieldObjectModel* NTField2DModel::AddFieldObject(std::string_view name) {
 }
 
 void NTField2DModel::RemoveFieldObject(std::string_view name) {
-  auto [it, match] = Find(fmt::format("{}{}", m_path, name));
+  auto [it, match] = Find(std::format("{}{}", m_path, name));
   if (match) {
     m_objects.erase(it);
   }

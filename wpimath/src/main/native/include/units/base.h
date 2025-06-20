@@ -75,10 +75,10 @@
 	#include <locale>
 	#include <string>
 #endif
-#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
+#if !defined(UNIT_LIB_DISABLE_FMT)
+	#include <format>
 	#include <locale>
 	#include <string>
-	#include <fmt/format.h>
 #endif
 
 #include <gcem.hpp>

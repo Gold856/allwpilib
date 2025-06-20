@@ -178,9 +178,4 @@ class AddressableLED {
   int m_length{0};
   ColorOrder m_colorOrder{kGRB};
 };
-
-constexpr auto format_as(AddressableLED::ColorOrder order) {
-  return static_cast<int32_t>(order);
-}
-
 }  // namespace frc

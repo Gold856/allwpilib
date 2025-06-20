@@ -8,9 +8,9 @@
 #include <libgen.h>
 #include <sys/ioctl.h>
 
+#include <format>
 #include <string>
 
-#include <fmt/format.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
@@ -31,8 +31,8 @@ static std::string GetUsbNameFromFile(int vendor, int product) {
   wpi::raw_fd_istream is{fd, true};
 
   // build vendor and product 4-char hex strings
-  auto vendorStr = fmt::format("{:04x}", vendor);
-  auto productStr = fmt::format("{:04x}", product);
+  auto vendorStr = std::format("{:04x}", vendor);
+  auto productStr = std::format("{:04x}", product);
 
   // scan file
   wpi::SmallString<128> lineBuf;
@@ -143,7 +143,7 @@ std::string GetUsbNameFromId(int vendor, int product) {
           productStr = "Webcam C930e";
           break;
       }
-      return fmt::format("Logitech, Inc. {}", productStr);
+      return std::format("Logitech, Inc. {}", productStr);
     }
   }
 

@@ -13,7 +13,6 @@
 #include <cassert>
 #include <cstring>
 
-#include <fmt/format.h>
 #include <wpi/jni_util.h>
 
 #include "HALUtil.h"
@@ -31,10 +30,10 @@ extern "C" {
  * Method:    initialize
  * Signature: (II)Z
  */
-JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_HAL_initialize
-  (JNIEnv*, jclass, jint timeout, jint mode)
-{
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_hal_HAL_initialize(JNIEnv*,
+                                                                 jclass,
+                                                                 jint timeout,
+                                                                 jint mode) {
   return HAL_Initialize(timeout, mode);
 }
 
@@ -43,10 +42,7 @@ Java_edu_wpi_first_hal_HAL_initialize
  * Method:    shutdown
  * Signature: ()V
  */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_HAL_shutdown
-  (JNIEnv*, jclass)
-{
+JNIEXPORT void JNICALL Java_edu_wpi_first_hal_HAL_shutdown(JNIEnv*, jclass) {
   return HAL_Shutdown();
 }
 
@@ -55,10 +51,7 @@ Java_edu_wpi_first_hal_HAL_shutdown
  * Method:    hasMain
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_HAL_hasMain
-  (JNIEnv*, jclass)
-{
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_hal_HAL_hasMain(JNIEnv*, jclass) {
   return HAL_HasMain();
 }
 
@@ -67,10 +60,7 @@ Java_edu_wpi_first_hal_HAL_hasMain
  * Method:    runMain
  * Signature: ()V
  */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_HAL_runMain
-  (JNIEnv*, jclass)
-{
+JNIEXPORT void JNICALL Java_edu_wpi_first_hal_HAL_runMain(JNIEnv*, jclass) {
   HAL_RunMain();
 }
 
@@ -79,10 +69,7 @@ Java_edu_wpi_first_hal_HAL_runMain
  * Method:    exitMain
  * Signature: ()V
  */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_HAL_exitMain
-  (JNIEnv*, jclass)
-{
+JNIEXPORT void JNICALL Java_edu_wpi_first_hal_HAL_exitMain(JNIEnv*, jclass) {
   HAL_ExitMain();
 }
 
@@ -91,10 +78,7 @@ Java_edu_wpi_first_hal_HAL_exitMain
  * Method:    terminate
  * Signature: ()V
  */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_HAL_terminate
-  (JNIEnv*, jclass)
-{
+JNIEXPORT void JNICALL Java_edu_wpi_first_hal_HAL_terminate(JNIEnv*, jclass) {
 #ifdef __FRC_SYSTEMCORE__
   ::raise(SIGKILL);
 #endif
@@ -106,9 +90,7 @@ Java_edu_wpi_first_hal_HAL_terminate
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_HAL_simPeriodicBeforeNative
-  (JNIEnv*, jclass)
-{
+Java_edu_wpi_first_hal_HAL_simPeriodicBeforeNative(JNIEnv*, jclass) {
   HAL_SimPeriodicBefore();
 }
 
@@ -118,9 +100,7 @@ Java_edu_wpi_first_hal_HAL_simPeriodicBeforeNative
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_HAL_simPeriodicAfterNative
-  (JNIEnv*, jclass)
-{
+Java_edu_wpi_first_hal_HAL_simPeriodicAfterNative(JNIEnv*, jclass) {
   HAL_SimPeriodicAfter();
 }
 
@@ -130,9 +110,7 @@ Java_edu_wpi_first_hal_HAL_simPeriodicAfterNative
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_HAL_getSystemActive
-  (JNIEnv* env, jclass)
-{
+Java_edu_wpi_first_hal_HAL_getSystemActive(JNIEnv* env, jclass) {
   int32_t status = 0;
   bool val = HAL_GetSystemActive(&status);
   CheckStatus(env, status);
@@ -144,10 +122,8 @@ Java_edu_wpi_first_hal_HAL_getSystemActive
  * Method:    getBrownedOut
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_HAL_getBrownedOut
-  (JNIEnv* env, jclass)
-{
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_hal_HAL_getBrownedOut(JNIEnv* env,
+                                                                    jclass) {
   int32_t status = 0;
   bool val = HAL_GetBrownedOut(&status);
   CheckStatus(env, status);
@@ -160,9 +136,7 @@ Java_edu_wpi_first_hal_HAL_getBrownedOut
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_HAL_getCommsDisableCount
-  (JNIEnv* env, jclass)
-{
+Java_edu_wpi_first_hal_HAL_getCommsDisableCount(JNIEnv* env, jclass) {
   int32_t status = 0;
   int32_t val = HAL_GetCommsDisableCount(&status);
   CheckStatus(env, status);
@@ -174,10 +148,8 @@ Java_edu_wpi_first_hal_HAL_getCommsDisableCount
  * Method:    getRSLState
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_HAL_getRSLState
-  (JNIEnv* env, jclass)
-{
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_hal_HAL_getRSLState(JNIEnv* env,
+                                                                  jclass) {
   int32_t status = 0;
   bool val = HAL_GetRSLState(&status);
   CheckStatus(env, status);
@@ -190,9 +162,7 @@ Java_edu_wpi_first_hal_HAL_getRSLState
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_HAL_getSystemTimeValid
-  (JNIEnv* env, jclass)
-{
+Java_edu_wpi_first_hal_HAL_getSystemTimeValid(JNIEnv* env, jclass) {
   int32_t status = 0;
   bool val = HAL_GetSystemTimeValid(&status);
   CheckStatus(env, status);

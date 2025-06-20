@@ -4,9 +4,9 @@
 
 #include "frc/motorcontrol/PWMMotorController.h"
 
+#include <format>
 #include <string>
 
-#include <fmt/format.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
@@ -79,7 +79,7 @@ void PWMMotorController::StopMotor() {
 }
 
 std::string PWMMotorController::GetDescription() const {
-  return fmt::format("PWM {}", GetChannel());
+  return std::format("PWM {}", GetChannel());
 }
 
 int PWMMotorController::GetChannel() const {

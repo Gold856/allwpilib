@@ -13,7 +13,6 @@
 #include <memory>
 #include <string>
 
-#include <fmt/format.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpi/print.h>

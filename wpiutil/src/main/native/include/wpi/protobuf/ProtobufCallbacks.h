@@ -8,8 +8,6 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
-
 #include "pb.h"
 #include "wpi/SmallVector.h"
 #include "wpi/array.h"

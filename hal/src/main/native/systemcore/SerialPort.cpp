@@ -14,11 +14,10 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <format>
 #include <stdexcept>
 #include <string>
 #include <thread>
-
-#include <fmt/format.h>
 
 #include "HALInternal.h"
 #include "hal/handles/HandlesInternal.h"

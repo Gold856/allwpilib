@@ -5,12 +5,12 @@
 #include "wpinet/ParallelTcpConnector.h"
 
 #include <cstring>
+#include <format>
 #include <functional>
 #include <memory>
 #include <string>
 #include <utility>
 
-#include <fmt/format.h>
 #include <wpi/Logger.h>
 
 #include "wpinet/uv/GetAddrInfo.h"
@@ -198,7 +198,7 @@ void ParallelTcpConnector::Connect() {
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
     hints.ai_flags = AI_NUMERICSERV | AI_ADDRCONFIG;
-    uv::GetAddrInfo(m_loop, req, server.first, fmt::format("{}", server.second),
+    uv::GetAddrInfo(m_loop, req, server.first, std::format("{}", server.second),
                     hints);
   }
 }

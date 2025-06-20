@@ -25,7 +25,7 @@ inline void NamedLog(UsbCameraImplObjc* objc, unsigned int level,
 
   if (logger.HasLogger() && level >= logger.min_level()) {
     cs::NamedLogV(logger, level, file, line, name, format,
-                  fmt::make_format_args(args...));
+                  std::make_format_args(args...));
   }
 }
 

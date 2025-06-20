@@ -6,9 +6,9 @@
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
+#include <format>
 #include <string>
 
-#include <fmt/format.h>
 #include <gtest/gtest.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/StringTopic.h>
@@ -18,7 +18,7 @@ class SendableChooserTest : public ::testing::TestWithParam<int> {};
 TEST_P(SendableChooserTest, ReturnsSelected) {
   frc::SendableChooser<int> chooser;
   frc::sim::SendableChooserSim chooserSim{
-      fmt::format("/SmartDashboard/ReturnsSelectedChooser{}/", GetParam())};
+      std::format("/SmartDashboard/ReturnsSelectedChooser{}/", GetParam())};
 
   for (int i = 1; i <= 3; i++) {
     chooser.AddOption(std::to_string(i), i);
@@ -26,7 +26,7 @@ TEST_P(SendableChooserTest, ReturnsSelected) {
   chooser.SetDefaultOption("0", 0);
 
   frc::SmartDashboard::PutData(
-      fmt::format("ReturnsSelectedChooser{}", GetParam()), &chooser);
+      std::format("ReturnsSelectedChooser{}", GetParam()), &chooser);
   frc::SmartDashboard::UpdateValues();
   chooserSim.SetSelected(std::to_string(GetParam()));
   frc::SmartDashboard::UpdateValues();

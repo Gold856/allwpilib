@@ -19,7 +19,7 @@ using namespace frc;
 AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
   auto fileBuffer = wpi::MemoryBuffer::GetFile(path);
   if (!fileBuffer) {
-    throw std::runtime_error(fmt::format("Cannot open file: {}", path));
+    throw std::runtime_error(std::format("Cannot open file: {}", path));
   }
 
   wpi::json json = wpi::json::parse(fileBuffer.value()->GetCharBuffer());
@@ -93,7 +93,7 @@ void AprilTagFieldLayout::Serialize(std::string_view path) {
 
   wpi::raw_fd_ostream output{path, error_code};
   if (error_code) {
-    throw std::runtime_error(fmt::format("Cannot open file: {}", path));
+    throw std::runtime_error(std::format("Cannot open file: {}", path));
   }
 
   wpi::json json = *this;

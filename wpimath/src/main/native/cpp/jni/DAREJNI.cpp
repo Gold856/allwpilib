@@ -127,16 +127,16 @@ Java_edu_wpi_first_math_jni_DAREJNI_dareABQR
   } else if (result.error() == frc::DAREError::QNotSymmetric ||
              result.error() == frc::DAREError::QNotPositiveSemidefinite) {
     illegalArgEx.Throw(
-        env, fmt::format("{}\n\nQ =\n{}\n", to_string(result.error()), Qmat));
+        env, std::format("{}\n\nQ =\n{}\n", to_string(result.error()), Qmat));
   } else if (result.error() == frc::DAREError::RNotSymmetric ||
              result.error() == frc::DAREError::RNotPositiveDefinite) {
     illegalArgEx.Throw(
-        env, fmt::format("{}\n\nR =\n{}\n", to_string(result.error()), Rmat));
+        env, std::format("{}\n\nR =\n{}\n", to_string(result.error()), Rmat));
   } else if (result.error() == frc::DAREError::ABNotStabilizable) {
-    illegalArgEx.Throw(env, fmt::format("{}\n\nA =\n{}\nB =\n{}\n",
+    illegalArgEx.Throw(env, std::format("{}\n\nA =\n{}\nB =\n{}\n",
                                         to_string(result.error()), Amat, Bmat));
   } else if (result.error() == frc::DAREError::ACNotDetectable) {
-    illegalArgEx.Throw(env, fmt::format("{}\n\nA =\n{}\nQ =\n{}\n",
+    illegalArgEx.Throw(env, std::format("{}\n\nA =\n{}\nQ =\n{}\n",
                                         to_string(result.error()), Amat, Qmat));
   }
 }
@@ -179,20 +179,20 @@ Java_edu_wpi_first_math_jni_DAREJNI_dareABQRN
   } else if (result.error() == frc::DAREError::QNotSymmetric ||
              result.error() == frc::DAREError::QNotPositiveSemidefinite) {
     illegalArgEx.Throw(
-        env, fmt::format("{}\n\nQ =\n{}\n", to_string(result.error()), Qmat));
+        env, std::format("{}\n\nQ =\n{}\n", to_string(result.error()), Qmat));
   } else if (result.error() == frc::DAREError::RNotSymmetric ||
              result.error() == frc::DAREError::RNotPositiveDefinite) {
     illegalArgEx.Throw(
-        env, fmt::format("{}\n\nR =\n{}\n", to_string(result.error()), Rmat));
+        env, std::format("{}\n\nR =\n{}\n", to_string(result.error()), Rmat));
   } else if (result.error() == frc::DAREError::ABNotStabilizable) {
     illegalArgEx.Throw(
         env,
-        fmt::format("{}\n\nA =\n{}\nB =\n{}\n", to_string(result.error()),
+        std::format("{}\n\nA =\n{}\nB =\n{}\n", to_string(result.error()),
                     Amat - Bmat * Rmat.llt().solve(Nmat.transpose()), Bmat));
   } else if (result.error() == frc::DAREError::ACNotDetectable) {
     auto R_llt = Rmat.llt();
     illegalArgEx.Throw(
-        env, fmt::format("{}\n\nA =\n{}\nQ =\n{}\n", to_string(result.error()),
+        env, std::format("{}\n\nA =\n{}\nQ =\n{}\n", to_string(result.error()),
                          Amat - Bmat * R_llt.solve(Nmat.transpose()),
                          Qmat - Nmat * R_llt.solve(Nmat.transpose())));
   }

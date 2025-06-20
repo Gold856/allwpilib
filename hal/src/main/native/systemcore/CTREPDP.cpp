@@ -4,9 +4,9 @@
 
 #include "CTREPDP.h"
 
+#include <format>
 #include <string>
 
-#include <fmt/format.h>
 #include <wpi/mutex.h>
 
 #include "HALInitializer.h"
@@ -232,7 +232,7 @@ double HAL_GetPDPChannelCurrent(HAL_PDPHandle handle, int32_t channel,
                                 int32_t* status) {
   if (!HAL_CheckPDPChannel(channel)) {
     *status = PARAMETER_OUT_OF_RANGE;
-    hal::SetLastError(status, fmt::format("Invalid pdp channel {}", channel));
+    hal::SetLastError(status, std::format("Invalid pdp channel {}", channel));
     return 0;
   }
 

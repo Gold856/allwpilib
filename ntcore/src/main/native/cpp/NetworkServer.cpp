@@ -48,7 +48,7 @@ class NetworkServer::ServerConnection {
   ServerConnection(NetworkServer& server, std::string_view addr,
                    unsigned int port, wpi::Logger& logger)
       : m_server{server},
-        m_connInfo{fmt::format("{}:{}", addr, port)},
+        m_connInfo{std::format("{}:{}", addr, port)},
         m_logger{logger} {
     m_info.remote_ip = addr;
     m_info.remote_port = port;
@@ -180,7 +180,7 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
     INFO("invalid path '{}' (from {}), must match /nt/[clientId], closing",
          path, m_connInfo);
     m_websocket->Fail(
-        404, fmt::format("invalid path '{}', must match /nt/[clientId]", path));
+        404, std::format("invalid path '{}', must match /nt/[clientId]", path));
     return;
   }
 
@@ -202,7 +202,7 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
           Value value;
           std::string error;
           if (!net::WireDecodeBinary(&data, &pubuid, &value, &error, 0)) {
-            m_wire->Disconnect(fmt::format("binary decode error: {}", error));
+            m_wire->Disconnect(std::format("binary decode error: {}", error));
             break;
           }
 
@@ -329,7 +329,7 @@ void NetworkServer::LoadPersistent() {
 void NetworkServer::SavePersistent(std::string_view filename,
                                    std::string_view data) {
   // write to temporary file
-  auto tmp = fmt::format("{}.tmp", filename);
+  auto tmp = std::format("{}.tmp", filename);
   std::error_code ec;
   wpi::raw_fd_ostream os{tmp, ec, fs::F_Text};
   if (ec.value() != 0) {
@@ -345,7 +345,7 @@ void NetworkServer::SavePersistent(std::string_view filename,
   }
 
   // move to real file
-  auto bak = fmt::format("{}.bck", filename);
+  auto bak = std::format("{}.bck", filename);
   fs::remove(bak, ec);
   fs::rename(filename, bak, ec);
   fs::rename(tmp, filename, ec);

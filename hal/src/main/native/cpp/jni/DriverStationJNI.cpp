@@ -6,7 +6,6 @@
 
 #include <cassert>
 
-#include <fmt/format.h>
 #include <wpi/jni_util.h>
 
 #include "HALUtil.h"

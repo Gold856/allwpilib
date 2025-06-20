@@ -6,12 +6,12 @@
 
 #include <algorithm>
 #include <ctime>
+#include <format>
 #include <random>
 #include <string>
 #include <vector>
 
 #include <fmt/chrono.h>
-#include <fmt/format.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/SafeThread.h>
 #include <wpi/StringExtras.h>
@@ -31,15 +31,15 @@ static constexpr int Warning = 16;
 
 namespace frc {
 void ReportErrorV(int32_t status, const char* fileName, int lineNumber,
-                  const char* funcName, fmt::string_view format,
-                  fmt::format_args args) {
+                  const char* funcName, std::string_view format,
+                  std::format_args args) {
   // TODO when we get a low level interface
   // #ifdef __FRC_SYSTEMCORE__
   //   if (status == 0) {
   //     return;
   //   }
   //   fmt::memory_buffer out;
-  //   fmt::format_to(fmt::appender{out}, "Warning: ");
+  //   std::format_to(fmt::appender{out}, "Warning: ");
   //   fmt::vformat_to(fmt::appender{out}, format, args);
   //   out.push_back('\0');
   //   FRC_NetworkCommunication_sendError(status < 0, status, 0, out.data(),
@@ -49,10 +49,10 @@ void ReportErrorV(int32_t status, const char* fileName, int lineNumber,
 
 template <typename... Args>
 inline void ReportError(int32_t status, const char* fileName, int lineNumber,
-                        const char* funcName, fmt::string_view format,
+                        const char* funcName, std::string_view format,
                         Args&&... args) {
   ReportErrorV(status, fileName, lineNumber, funcName, format,
-               fmt::make_format_args(args...));
+               std::make_format_args(args...));
 }
 }  // namespace frc
 
@@ -375,7 +375,7 @@ void Thread::Main() {
         if (RobotController::IsSystemTimeValid()) {
           std::time_t now = std::time(nullptr);
           auto tm = std::gmtime(&now);
-          m_log.SetFilename(fmt::format("FRC_{:%Y%m%d_%H%M%S}.wpilog", *tm));
+          m_log.SetFilename(std::format("FRC_{:%Y%m%d_%H%M%S}.wpilog", *tm));
           dsRenamed = true;
         } else {
           dsAttachCount = 0;  // wait a bit and try again
@@ -414,7 +414,7 @@ void Thread::Main() {
           }
           std::time_t now = std::time(nullptr);
           m_log.SetFilename(
-              fmt::format("FRC_{:%Y%m%d_%H%M%S}_{}_{}{}.wpilog",
+              std::format("FRC_{:%Y%m%d_%H%M%S}_{}_{}{}.wpilog",
                           *std::gmtime(&now), DriverStation::GetEventName(),
                           matchTypeChar, DriverStation::GetMatchNumber()));
           fmsRenamed = true;

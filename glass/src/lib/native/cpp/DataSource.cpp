@@ -5,9 +5,9 @@
 #include "glass/DataSource.h"
 
 #include <cstdio>
+#include <format>
 #include <string>
 
-#include <fmt/format.h>
 #include <imgui.h>
 
 #include "glass/ContextInternal.h"
@@ -17,11 +17,11 @@ using namespace glass;
 wpi::sig::Signal<const char*, DataSource*> DataSource::sourceCreated;
 
 std::string glass::MakeSourceId(std::string_view id, int index) {
-  return fmt::format("{}[{}]", id, index);
+  return std::format("{}[{}]", id, index);
 }
 
 std::string glass::MakeSourceId(std::string_view id, int index, int index2) {
-  return fmt::format("{}[{},{}]", id, index, index2);
+  return std::format("{}[{},{}]", id, index, index2);
 }
 
 DataSource::~DataSource() {

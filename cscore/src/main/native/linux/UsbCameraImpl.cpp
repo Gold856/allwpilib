@@ -20,12 +20,12 @@
 #include <unistd.h>
 
 #include <algorithm>
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
 #include <wpi/MemAlloc.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
@@ -191,7 +191,7 @@ int UsbCameraImpl::PercentageToRaw(const UsbCameraProperty& rawProp,
 
 static bool GetVendorProduct(int dev, int* vendor, int* product) {
   auto ifpath =
-      fmt::format("/sys/class/video4linux/video{}/device/modalias", dev);
+      std::format("/sys/class/video4linux/video{}/device/modalias", dev);
 
   int fd = open(ifpath.c_str(), O_RDONLY);
   if (fd < 0) {
@@ -224,7 +224,7 @@ static bool GetVendorProduct(int dev, int* vendor, int* product) {
 
 static bool GetDescriptionSysV4L(int dev, std::string* desc) {
   auto ifpath =
-      fmt::format("/sys/class/video4linux/video{}/device/interface", dev);
+      std::format("/sys/class/video4linux/video{}/device/interface", dev);
 
   int fd = open(ifpath.c_str(), O_RDONLY);
   if (fd < 0) {
@@ -1615,7 +1615,7 @@ namespace cs {
 
 CS_Source CreateUsbCameraDev(std::string_view name, int dev,
                              CS_Status* status) {
-  return CreateUsbCameraPath(name, fmt::format("/dev/video{}", dev), status);
+  return CreateUsbCameraPath(name, std::format("/dev/video{}", dev), status);
 }
 
 CS_Source CreateUsbCameraPath(std::string_view name, std::string_view path,
