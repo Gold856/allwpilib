@@ -6,6 +6,8 @@
 #define WPIUTIL_WPI_FMT_RAW_OSTREAM_H_
 
 #include <format>
+#include <iterator>
+#include <vector>
 
 #include "wpi/raw_ostream.h"
 
@@ -13,8 +15,8 @@ namespace wpi {
 
 inline void vprint(wpi::raw_ostream& os, std::string_view format_str,
                    std::format_args args) {
-  fmt::memory_buffer buffer;
-  fmt::detail::vformat_to(buffer, format_str, args);
+  std::vector<char> buffer;
+  std::vformat_to(std::back_inserter(buffer), format_str, args);
   os.write(buffer.data(), buffer.size());
 }
 

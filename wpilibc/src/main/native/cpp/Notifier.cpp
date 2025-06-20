@@ -5,7 +5,9 @@
 #include "frc/Notifier.h"
 
 #include <format>
+#include <iterator>
 #include <utility>
+#include <vector>
 
 #include <hal/DriverStation.h>
 #include <hal/Notifier.h>
@@ -153,8 +155,8 @@ Notifier& Notifier::operator=(Notifier&& rhs) {
 }
 
 void Notifier::SetName(std::string_view name) {
-  fmt::memory_buffer buf;
-  std::format_to(fmt::appender{buf}, "{}", name);
+  std::vector<char> buf;
+  std::format_to(std::back_inserter(buf), "{}", name);
   buf.push_back('\0');  // null terminate
   int32_t status = 0;
   HAL_SetNotifierName(m_notifier, buf.data(), &status);

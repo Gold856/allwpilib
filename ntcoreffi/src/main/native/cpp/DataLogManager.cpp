@@ -38,9 +38,9 @@ void ReportErrorV(int32_t status, const char* fileName, int lineNumber,
   //   if (status == 0) {
   //     return;
   //   }
-  //   fmt::memory_buffer out;
-  //   std::format_to(fmt::appender{out}, "Warning: ");
-  //   fmt::vformat_to(fmt::appender{out}, format, args);
+  //   std::vector<char> out;
+  //   std::format_to(std::back_inserter(out), "Warning: ");
+  //   std::vformat_to(std::back_inserter(out), format, args);
   //   out.push_back('\0');
   //   FRC_NetworkCommunication_sendError(status < 0, status, 0, out.data(),
   //                                      "DataLogManager", "");

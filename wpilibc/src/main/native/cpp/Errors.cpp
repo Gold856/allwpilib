@@ -4,8 +4,10 @@
 
 #include "frc/Errors.h"
 
+#include <iterator>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include <hal/DriverStation.h>
 #include <hal/HALBase.h>
@@ -59,9 +61,9 @@ void frc::ReportErrorV(int32_t status, const char* fileName, int lineNumber,
   if (status == 0) {
     return;
   }
-  fmt::memory_buffer out;
-  std::format_to(fmt::appender{out}, "{}: ", GetErrorMessage(&status));
-  fmt::vformat_to(fmt::appender{out}, format, args);
+  std::vector<char> out;
+  std::format_to(std::back_inserter(out), "{}: ", GetErrorMessage(&status));
+  std::vformat_to(std::back_inserter(out), format, args);
   out.push_back('\0');
   HAL_SendError(status < 0, status, 0, out.data(), funcName,
                 wpi::GetStackTrace(2).c_str(), 1);
@@ -70,9 +72,9 @@ void frc::ReportErrorV(int32_t status, const char* fileName, int lineNumber,
 RuntimeError frc::MakeErrorV(int32_t status, const char* fileName,
                              int lineNumber, const char* funcName,
                              std::string_view format, std::format_args args) {
-  fmt::memory_buffer out;
-  std::format_to(fmt::appender{out}, "{}: ", GetErrorMessage(&status));
-  fmt::vformat_to(fmt::appender{out}, format, args);
+  std::vector<char> out;
+  std::format_to(std::back_inserter(out), "{}: ", GetErrorMessage(&status));
+  std::vformat_to(std::back_inserter(out), format, args);
   return RuntimeError{status,
                       fileName,
                       lineNumber,

@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <format>
+#include <iterator>
 #include <memory>
 #include <string>
 #include <utility>
@@ -99,16 +100,16 @@ NetworkTableEntry NetworkTable::GetEntry(std::string_view key) const {
   std::scoped_lock lock(m_mutex);
   NT_Entry& entry = m_entries[key];
   if (entry == 0) {
-    fmt::memory_buffer buf;
-    std::format_to(fmt::appender{buf}, "{}/{}", m_path, key);
+    std::vector<char> buf;
+    std::format_to(std::back_inserter(buf), "{}/{}", m_path, key);
     entry = nt::GetEntry(m_inst, {buf.data(), buf.size()});
   }
   return NetworkTableEntry{entry};
 }
 
 Topic NetworkTable::GetTopic(std::string_view name) const {
-  fmt::memory_buffer buf;
-  std::format_to(fmt::appender{buf}, "{}/{}", m_path, name);
+  std::vector<char> buf;
+  std::format_to(std::back_inserter(buf), "{}/{}", m_path, name);
   return Topic{::nt::GetTopic(m_inst, {buf.data(), buf.size()})};
 }
 

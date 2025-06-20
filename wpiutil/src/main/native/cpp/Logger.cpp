@@ -4,6 +4,9 @@
 
 #include "wpi/Logger.h"
 
+#include <iterator>
+#include <vector>
+
 using namespace wpi;
 
 void Logger::DoLog(unsigned int level, const char* file, unsigned int line,
@@ -19,8 +22,8 @@ void Logger::LogV(unsigned int level, const char* file, unsigned int line,
   if (!m_func || level < m_min_level) {
     return;
   }
-  fmt::memory_buffer out;
-  fmt::vformat_to(fmt::appender{out}, format, args);
+  std::vector<char> out;
+  std::vformat_to(std::back_inserter(out), format, args);
   out.push_back('\0');
   m_func(level, file, line, out.data());
 }

@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <format>
+#include <iterator>
 #include <limits>
 #include <string>
 #include <string_view>
@@ -25,6 +26,7 @@
 #include <wpi/SmallVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
+#include <wpi/print.h>
 #include <wpi/timestamp.h>
 
 #include "HALInitializer.h"
@@ -416,14 +418,14 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
     systemServerDs->errorInfoPublisher.Set(errorInfo);
 
     if (printMsg) {
-      fmt::memory_buffer buf;
+      std::vector<char> buf;
       if (location && location[0] != '\0') {
-        std::format_to(fmt::appender{buf},
+        std::format_to(std::back_inserter(buf),
                        "{} at {}: ", isError ? "Error" : "Warning", location);
       }
-      std::format_to(fmt::appender{buf}, "{}\n", details);
+      std::format_to(std::back_inserter(buf), "{}\n", details);
       if (callStack && callStack[0] != '\0') {
-        std::format_to(fmt::appender{buf}, "{}\n", callStack);
+        std::format_to(std::back_inserter(buf), "{}\n", callStack);
       }
       auto printError = gPrintErrorImpl.load();
       printError(buf.data(), buf.size());
