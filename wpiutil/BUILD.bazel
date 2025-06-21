@@ -102,13 +102,6 @@ third_party_cc_lib_helper(
 )
 
 third_party_cc_lib_helper(
-    name = "fmtlib",
-    include_root = "src/main/native/thirdparty/fmtlib/include",
-    src_root = "src/main/native/thirdparty/fmtlib/src",
-    visibility = ["//visibility:public"],
-)
-
-third_party_cc_lib_helper(
     name = "json",
     include_root = "src/main/native/thirdparty/json/include",
     visibility = ["//visibility:public"],
@@ -183,7 +176,6 @@ wpilib_cc_library(
     ],
     third_party_libraries = [
         ":debugging",
-        ":fmtlib",
         ":llvm",
         ":mpack",
         ":nanopb",
@@ -217,11 +209,9 @@ cc_library(
     hdrs = glob([
         "src/main/native/include/**",
         "src/main/native/thirdparty/llvm/include/**",
-        "src/main/native/thirdparty/fmtlib/include/**",
     ]),
     includes = [
         "src/main/native/include",
-        "src/main/native/thirdparty/fmtlib/include",
         "src/main/native/thirdparty/llvm/include",
     ],
 )

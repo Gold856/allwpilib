@@ -80,5 +80,5 @@ RuntimeError frc::MakeErrorV(int32_t status, const char* fileName,
                       lineNumber,
                       funcName,
                       wpi::GetStackTrace(2),
-                      fmt::to_string(out)};
+                      std::string(out.begin(), out.end())};
 }

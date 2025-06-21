@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Sat, 12 Apr 2025 16:28:47 -0700
-Subject: [PATCH 8/8] Revert "Use multidimensional array subscript operator
+Subject: [PATCH 4/4] Revert "Use multidimensional array subscript operator
  (#843)"
 
 This reverts commit f9b2c450bbbf6f14b194b8b81708d032a6431ee0.

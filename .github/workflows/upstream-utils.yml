@@ -54,12 +54,6 @@ jobs:
           ./expected.py clone
           ./expected.py copy-src
           ./expected.py format-patch
-      - name: Run fmt.py
-        run: |
-          cd upstream_utils
-          ./fmt.py clone
-          ./fmt.py copy-src
-          ./fmt.py format-patch
       - name: Run gcem.py
         run: |
           cd upstream_utils

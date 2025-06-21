@@ -135,7 +135,7 @@ void PortForwarder::Add(unsigned int port, std::string_view remoteHost,
               CopyStream(*remotePtr, clientWeak);
             });
           },
-          host, fmt::to_string(remotePort));
+          host, std::format("{}", remotePort));
 
       // time out for connection
       uv::Timer::SingleShot(loop, uv::Timer::Time{500},

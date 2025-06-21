@@ -125,8 +125,6 @@ file(GLOB_RECURSE wpiutil_linux_src src/main/native/linux/*.cpp)
 file(GLOB_RECURSE wpiutil_macos_src src/main/native/macOS/*.cpp)
 file(GLOB_RECURSE wpiutil_windows_src src/main/native/windows/*.cpp)
 
-file(GLOB fmtlib_native_src src/main/native/thirdparty/fmtlib/src/*.cpp)
-
 add_library(wpiutil ${wpiutil_native_src} ${wpiutil_resources_src})
 set_target_properties(wpiutil PROPERTIES DEBUG_POSTFIX "d")
 
@@ -145,29 +143,6 @@ target_link_libraries(wpiutil Threads::Threads ${CMAKE_DL_LIBS})
 
 if(ATOMIC)
     target_link_libraries(wpiutil ${ATOMIC})
-endif()
-
-if(NOT USE_SYSTEM_FMTLIB)
-    target_sources(wpiutil PRIVATE ${fmtlib_native_src})
-    install(
-        DIRECTORY src/main/native/thirdparty/fmtlib/include/
-        DESTINATION "${include_dest}/wpiutil"
-    )
-    target_include_directories(
-        wpiutil
-        PUBLIC
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/fmtlib/include>
-    )
-else()
-    find_package(fmt CONFIG REQUIRED)
-    target_link_libraries(wpiutil fmt::fmt)
-    if(MSVC)
-        get_target_property(fmt_includes fmt::fmt INTERFACE_INCLUDE_DIRECTORIES)
-        foreach(dir ${fmt_includes})
-            target_compile_options(wpiutil PUBLIC /external:I "${dir}")
-        endforeach()
-        target_compile_options(wpiutil PUBLIC /external:W0)
-    endif()
 endif()
 
 if(MSVC)

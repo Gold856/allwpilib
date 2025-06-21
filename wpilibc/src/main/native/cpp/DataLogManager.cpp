@@ -7,12 +7,11 @@
 #include <frc/Errors.h>
 
 #include <algorithm>
-#include <ctime>
+#include <chrono>
 #include <random>
 #include <string>
 #include <vector>
 
-#include <fmt/chrono.h>
 #include <hal/UsageReporting.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/SafeThread.h>
@@ -226,9 +225,8 @@ void Thread::Main() {
       }
       if (dsAttachCount > 50) {  // 1 second
         if (RobotController::IsSystemTimeValid()) {
-          std::time_t now = std::time(nullptr);
-          auto tm = std::gmtime(&now);
-          m_log.SetFilename(std::format("FRC_{:%Y%m%d_%H%M%S}.wpilog", *tm));
+          m_log.SetFilename(std::format("FRC_{:%Y%m%d_%H%M%S}.wpilog",
+                                        std::chrono::system_clock::now()));
           dsRenamed = true;
         } else {
           dsAttachCount = 0;  // wait a bit and try again
@@ -264,11 +262,10 @@ void Thread::Main() {
               matchTypeChar = '_';
               break;
           }
-          std::time_t now = std::time(nullptr);
-          m_log.SetFilename(
-              std::format("FRC_{:%Y%m%d_%H%M%S}_{}_{}{}.wpilog",
-                          *std::gmtime(&now), DriverStation::GetEventName(),
-                          matchTypeChar, DriverStation::GetMatchNumber()));
+          m_log.SetFilename(std::format(
+              "FRC_{:%Y%m%d_%H%M%OS}_{}_{}{}.wpilog",
+              std::chrono::system_clock::now(), DriverStation::GetEventName(),
+              matchTypeChar, DriverStation::GetMatchNumber()));
           fmsRenamed = true;
           dsRenamed = true;  // don't override FMS rename
         }

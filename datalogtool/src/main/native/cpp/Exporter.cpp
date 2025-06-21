@@ -18,7 +18,6 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/chrono.h>
 #include <glass/Storage.h>
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -471,9 +470,9 @@ static void ValueToCsv(wpi::raw_ostream& os, const Entry& entry,
   if (entry.name == "systemTime" && entry.type == "int64") {
     int64_t val;
     if (record.GetInteger(&val)) {
-      std::time_t timeval = val / 1000000;
-      wpi::print(os, "{:%Y-%m-%d %H:%M:%S}.{:06}", *std::localtime(&timeval),
-                 val % 1000000);
+      std::chrono::time_point<std::chrono::system_clock> timeval{
+          std::chrono::microseconds(val)};
+      wpi::print(os, "{:%Y-%m-%d %H:%M:%OS}.{:06}", timeval, val % 1000000);
       return;
     }
   } else if (entry.type == "double") {

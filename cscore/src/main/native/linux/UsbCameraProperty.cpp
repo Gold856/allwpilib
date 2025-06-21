@@ -256,7 +256,7 @@ std::unique_ptr<UsbCameraProperty> UsbCameraProperty::DeviceQuery(int fd,
         continue;
       }
       if (prop->intMenu) {
-        prop->enumChoices[i] = fmt::to_string(qmenu.value);
+        prop->enumChoices[i] = std::format("{}", qmenu.value);
       } else {
         prop->enumChoices[i] = reinterpret_cast<const char*>(qmenu.name);
       }

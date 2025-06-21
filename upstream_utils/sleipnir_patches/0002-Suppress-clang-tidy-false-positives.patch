@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Mon, 10 Feb 2025 11:37:02 -0800
-Subject: [PATCH 6/8] Suppress clang-tidy false positives
+Subject: [PATCH 2/4] Suppress clang-tidy false positives
 
 ---
  include/sleipnir/autodiff/variable.hpp | 2 +-

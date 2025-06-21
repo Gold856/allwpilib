@@ -158,10 +158,7 @@ class AdjointExpressionGraph {
         }
       }
     } else {
-      for (size_t i = 0; i < m_top_list.size(); ++i) {
-        const auto& col = m_col_list[i];
-        const auto& node = m_top_list[i];
-
+      for (const auto& [col, node] : std::views::zip(m_col_list, m_top_list)) {
         // Append adjoints of wrt to sparse matrix triplets
         if (col != -1 && node->adjoint != 0.0) {
           triplets.emplace_back(row, col, node->adjoint);

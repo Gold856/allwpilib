@@ -14,6 +14,23 @@
 
 //! @cond Doxygen_Suppress
 
+template <class R>
+  requires std::derived_from<R, Eigen::DenseBase<R>> ||
+               std::derived_from<R, Eigen::SparseCompressedBase<R>>
+constexpr std::range_format std::format_kind<R> = std::range_format::disabled;
+
+// MSVC won't compile without these
+template <typename Scalar, int Rows, int Cols, int Options, int MaxRows,
+          int MaxCols>
+constexpr std::range_format std::format_kind<
+    Eigen::Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols>> =
+    std::range_format::disabled;
+template <typename Scalar, int Rows, int Cols, int Options, int MaxRows,
+          int MaxCols>
+constexpr std::range_format std::format_kind<
+    Eigen::Array<Scalar, Rows, Cols, Options, MaxRows, MaxCols>> =
+    std::range_format::disabled;
+
 /**
  * Formatter for classes derived from Eigen::DenseBase<Derived> or
  * Eigen::SparseCompressedBase<Derived>.
