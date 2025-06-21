@@ -36,7 +36,6 @@ repoRootNameOverride {
 includeOtherLibs {
   ^FRC_FPGA_ChipObject/
   ^FRC_NetworkCommunication/
-  ^fmt/
   ^gtest/
   ^i2clib/
   ^llvm/

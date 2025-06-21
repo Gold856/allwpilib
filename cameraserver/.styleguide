@@ -12,7 +12,6 @@ repoRootNameOverride {
 }
 
 includeOtherLibs {
-  ^fmt/
   ^gtest/
   ^hal/
   ^networktables/

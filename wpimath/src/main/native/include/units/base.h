@@ -177,12 +177,12 @@ namespace units
  * @param		abbrev - abbreviated unit name, e.g. 'm'
  * @note		When UNIT_LIB_DISABLE_FMT is defined and UNIT_LIB_ENABLE_IOSTREAM isn't defined, the macro does not generate any code
  */
-#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
+#if __has_include(<format>) && !defined(UNIT_LIB_DISABLE_FMT)
 	#define UNIT_ADD_IO(namespaceName, nameSingular, abbrev)\
 	}\
 	template <>\
-	struct fmt::formatter<units::namespaceName::nameSingular ## _t> \
-		: fmt::formatter<double> \
+	struct std::formatter<units::namespaceName::nameSingular ## _t> \
+		: std::formatter<double> \
 	{\
 		template <typename FmtContext>\
 		auto format(\
@@ -190,8 +190,8 @@ namespace units
 				FmtContext& ctx) const\
 		{\
 			auto out = ctx.out();\
-			out = fmt::formatter<double>::format(obj(), ctx);\
-			return fmt::format_to(out, " " #abbrev);\
+			out = std::formatter<double>::format(obj(), ctx);\
+			return std::format_to(out, " " #abbrev);\
 		}\
 	};\
 	namespace units\
@@ -2880,9 +2880,9 @@ namespace units
 	}
 #endif
 }
-#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
+#if __has_include(<format>) && !defined(UNIT_LIB_DISABLE_FMT)
 template <>
-struct fmt::formatter<units::dimensionless::dB_t> : fmt::formatter<double>
+struct std::formatter<units::dimensionless::dB_t> : std::formatter<double>
 {
 	template <typename FmtContext>
 	auto format(
@@ -2890,8 +2890,8 @@ struct fmt::formatter<units::dimensionless::dB_t> : fmt::formatter<double>
 			FmtContext& ctx) const
 	{
 		auto out = ctx.out();
-		out = fmt::formatter<double>::format(obj(), ctx);
-		return fmt::format_to(out, " dB");
+		out = std::formatter<double>::format(obj(), ctx);
+		return std::format_to(out, " dB");
 	}
 };
 #endif
@@ -3446,6 +3446,6 @@ namespace units::literals {}
 using namespace units::literals;
 #endif  // UNIT_HAS_LITERAL_SUPPORT
 
-#if __has_include(<fmt/format.h>) && !defined(UNIT_LIB_DISABLE_FMT)
+#if __has_include(<format>) && !defined(UNIT_LIB_DISABLE_FMT)
 #include "units/formatter.h"
 #endif

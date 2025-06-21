@@ -226,7 +226,7 @@ void MyHttpConnection::SendFileResponse(int code, std::string_view codeText,
 }
 
 void MyHttpConnection::ProcessRequest() {
-  // fmt::print(stderr, "HTTP request: '{}'\n", m_request.GetUrl());
+  // wpi::print(stderr, "HTTP request: '{}'\n", m_request.GetUrl());
   wpi::UrlParser url{m_request.GetUrl(),
                      m_request.GetMethod() == wpi::HTTP_CONNECT};
   if (!url.IsValid()) {
@@ -239,7 +239,7 @@ void MyHttpConnection::ProcessRequest() {
   if (url.HasPath()) {
     path = url.GetPath();
   }
-  // fmt::print(stderr, "path: \"{}\"\n", path);
+  // wpi::print(stderr, "path: \"{}\"\n", path);
 
   wpi::SmallString<128> pathBuf;
   bool error;
@@ -253,7 +253,7 @@ void MyHttpConnection::ProcessRequest() {
   if (url.HasQuery()) {
     query = url.GetQuery();
   }
-  // fmt::print(stderr, "query: \"{}\"\n", query);
+  // wpi::print(stderr, "query: \"{}\"\n", query);
   HttpQueryMap qmap{query};
 
   const bool isGET = m_request.GetMethod() == wpi::HTTP_GET;

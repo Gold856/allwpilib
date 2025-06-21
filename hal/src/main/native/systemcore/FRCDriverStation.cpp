@@ -28,6 +28,7 @@
 #include <wpi/mutex.h>
 #include <wpi/print.h>
 #include <wpi/timestamp.h>
+#include <wpi/print.h>
 
 #include "HALInitializer.h"
 #include "SystemServerInternal.h"
@@ -413,7 +414,7 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
     errorInfo.SetLocation(location);
     errorInfo.SetCallStack(callStack);
 
-    fmt::print("{}\n", errorInfo.GetCallStack());
+    wpi::println("{}", errorInfo.GetCallStack());
 
     systemServerDs->errorInfoPublisher.Set(errorInfo);
 

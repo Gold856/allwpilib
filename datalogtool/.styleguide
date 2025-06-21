@@ -20,7 +20,6 @@ repoRootNameOverride {
 
 includeOtherLibs {
   ^GLFW
-  ^fmt/
   ^glass/
   ^imgui
   ^libssh/

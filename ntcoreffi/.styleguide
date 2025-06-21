@@ -15,7 +15,6 @@ repoRootNameOverride {
 }
 
 includeOtherLibs {
-  ^fmt/
   ^gmock/
   ^gtest/
   ^networktables/

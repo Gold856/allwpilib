@@ -344,7 +344,7 @@ void stress2() {
   }
 
   std::this_thread::sleep_for(10s);
-  fmt::print("isDone: {}", isDone.load());
+  wpi::print("isDone: {}", isDone.load());
 }
 
 void latency() {

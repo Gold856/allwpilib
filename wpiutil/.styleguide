@@ -46,7 +46,6 @@ repoRootNameOverride {
 
 includeOtherLibs {
   ^catch2/
-  ^fmt/
   ^gmock/
   ^gtest/
   ^upb/

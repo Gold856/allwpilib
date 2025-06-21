@@ -20,7 +20,6 @@ repoRootNameOverride {
 includeOtherLibs {
   ^cameraserver/
   ^cscore
-  ^fmt/
   ^frc/
   ^gtest/
   ^hal/

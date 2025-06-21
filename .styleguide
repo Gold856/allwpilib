@@ -40,7 +40,6 @@ includeOtherLibs {
   ^Eigen/
   ^cameraserver/
   ^cscore
-  ^fmt/
   ^glass/
   ^gtest/
   ^hal/
