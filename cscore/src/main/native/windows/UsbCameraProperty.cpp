@@ -4,6 +4,8 @@
 
 #include "UsbCameraProperty.h"
 
+#include <strmif.h>
+
 #include <fmt/format.h>
 
 #include "ComPtr.h"
@@ -133,7 +135,8 @@ bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock,
 
   lock.unlock();
   if (SUCCEEDED(pProcAmp->Set(tagCameraControl, newValue,
-                              CameraControl_Flags_Manual))) {
+                              isAutoProp ? CameraControl_Flags_Auto
+                                         : CameraControl_Flags_Manual))) {
     lock.lock();
     return true;
   }

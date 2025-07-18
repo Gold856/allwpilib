@@ -535,7 +535,11 @@ void UsbCameraImpl::DeviceAddProperty(std::string_view name_, TagProperty tag,
                                       IAM* pProcAmp) {
   // First see if properties exist
   bool isValid = false;
-  auto property = std::make_unique<UsbCameraProperty>(name_, tag, false,
+  long value = 0, flags = 0;  // NOLINT(runtime/int)
+  // https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-iamvideoprocamp-get
+  //  https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-iamcameracontrol-get
+  pProcAmp->Get(tag, &value, &flags);
+  auto property = std::make_unique<UsbCameraProperty>(name_, tag, flags == 0x1,
                                                       pProcAmp, &isValid);
   if (isValid) {
     DeviceCacheProperty(std::move(property), m_sourceReader.Get());
