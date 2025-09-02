@@ -23,6 +23,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
+import io.avaje.jsonb.Json;
 import java.util.Objects;
 
 /**
@@ -32,6 +33,7 @@ import java.util.Objects;
  * return 361 degrees. This allows algorithms that wouldn't want to see a discontinuity in the
  * rotations as it sweeps past from 360 to 0 on the second time around.
  */
+@Json
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation2d
@@ -85,8 +87,11 @@ public class Rotation2d
    */
   public static final Rotation2d k180deg = kPi;
 
+  @Json.Ignore
   private final double m_value;
+  @Json.Ignore
   private final double m_cos;
+  @Json.Ignore
   private final double m_sin;
 
   /** Constructs a Rotation2d with a default angle of 0 degrees. */
@@ -102,6 +107,7 @@ public class Rotation2d
    * @param value The value of the angle in radians.
    */
   @JsonCreator
+  @Json.Creator
   public Rotation2d(@JsonProperty(required = true, value = "radians") double value) {
     m_value = value;
     m_cos = Math.cos(value);
@@ -302,6 +308,7 @@ public class Rotation2d
    * @see edu.wpi.first.math.MathUtil#angleModulus(double) to constrain the angle within (-π, π]
    */
   @JsonProperty
+  @Json.Property("value")
   public double getRadians() {
     return m_value;
   }

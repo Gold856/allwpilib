@@ -9,10 +9,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.apriltag.jni.AprilTagJNI;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.util.RawFrame;
+import io.avaje.jsonb.Json;
 import java.util.Objects;
 
 /** Represents an AprilTag's metadata. */
 @SuppressWarnings("MemberName")
+@Json
 public class AprilTag {
   /** The tag's ID. */
   @JsonProperty(value = "ID")

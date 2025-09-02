@@ -4,76 +4,88 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.path.TravelingSalesman;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.profile.GCProfiler;
 import org.openjdk.jmh.runner.Runner;
-import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import org.openjdk.jmh.runner.options.TimeValue;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.proto.Geometry3D.ProtobufPose3d;
+import io.avaje.jsonb.JsonType;
+import io.avaje.jsonb.Jsonb;
+import us.hebi.quickbuf.JsonSource;
 
 public class Main {
-  private static final Pose2d[] poses = {
-    new Pose2d(-1, 1, Rotation2d.kCW_90deg),
-    new Pose2d(-1, 2, Rotation2d.kCCW_90deg),
-    new Pose2d(0, 0, Rotation2d.kZero),
-    new Pose2d(0, 3, Rotation2d.kCW_90deg),
-    new Pose2d(1, 1, Rotation2d.kCCW_90deg),
-    new Pose2d(1, 2, Rotation2d.kCCW_90deg),
-  };
-  private static final int iterations = 100;
+  public Main() {
+  }
+  @State(Scope.Thread)
+  public static class JSONState {
+    public ObjectReader reader = new ObjectMapper().readerFor(Pose3d.class);
+    public JsonType<Pose3d> builder = Jsonb.builder().build().type(Pose3d.class);
+  }
 
-  private static final TravelingSalesman transformTraveler =
-      new TravelingSalesman(
-          (pose1, pose2) -> {
-            var transform = pose2.minus(pose1);
-            return Math.hypot(transform.getX(), transform.getY());
-          });
-  private static final TravelingSalesman twistTraveler =
-      new TravelingSalesman(
-          (pose1, pose2) -> {
-            var twist = pose1.log(pose2);
-            return Math.hypot(twist.dx, twist.dy);
-          });
 
   /**
-   * Main function.
+   * Main initialization function. Do not perform any initialization here.
    *
-   * @param args The (unused) arguments to the program.
+   * <p>
+   * If you change your main robot class, change the parameter type.
    */
-  public static void main(String... args) throws RunnerException {
-    Options opt =
-        new OptionsBuilder()
-            .include(Main.class.getSimpleName())
-            .addProfiler(GCProfiler.class)
-            .forks(1)
-            .warmupIterations(2)
-            .warmupTime(TimeValue.seconds(3))
-            .measurementIterations(3)
-            .measurementTime(TimeValue.seconds(3))
-            .build();
+  public static void main(String... args) {
+    if (!HAL.initialize(500, 0)) {
+      throw new IllegalStateException("Failed to initialize. Terminating");
+    }
+    try {
+      Options opt = new OptionsBuilder()
+          .include(Main.class.getSimpleName())
+          .addProfiler(GCProfiler.class)
+          .forks(2)
+          .warmupIterations(4)
+          .measurementIterations(4)
+          .build();
 
-    new Runner(opt).run();
+      new Runner(opt).run();
+    } catch (Exception e) {
+    }
   }
 
   @Benchmark
   @BenchmarkMode(Mode.AverageTime)
   @OutputTimeUnit(TimeUnit.MICROSECONDS)
-  public Pose2d[] transform() {
-    return transformTraveler.solve(poses, iterations);
+  public Pose3d quickbufPose3d() throws IOException {
+    return Pose3d.proto.unpack(
+        ProtobufPose3d.parseFrom(
+            JsonSource.newInstance(
+                "{\"translation\":{\"x\":0,\"y\":0,\"z\":0},\"rotation\":{\"q\":{\"w\":1,\"x\":0,\"y\":0,\"z\":0}}}")));
   }
 
   @Benchmark
   @BenchmarkMode(Mode.AverageTime)
   @OutputTimeUnit(TimeUnit.MICROSECONDS)
-  public Pose2d[] twist() {
-    return twistTraveler.solve(poses, iterations);
+  public Pose3d jacksonPose3d(JSONState state) throws IOException {
+    return state.reader.readValue(
+        "{\"translation\":{\"x\":0,\"y\":0,\"z\":0},\"rotation\":{\"quaternion\":{\"W\":1,\"X\":0,\"Y\":0,\"Z\":0}}}");
+  }
+
+
+  @Benchmark
+  @BenchmarkMode(Mode.AverageTime)
+  @OutputTimeUnit(TimeUnit.MICROSECONDS)
+  public Pose3d avajePose3d(JSONState state) throws IOException {
+    return state.builder.fromJson(
+        "{\"translation\":{\"x\":0,\"y\":0,\"z\":0},\"rotation\":{\"quaternion\":{\"W\":1,\"X\":0,\"Y\":0,\"Z\":0}}}");
   }
 }

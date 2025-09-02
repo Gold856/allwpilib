@@ -21,12 +21,14 @@ import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
+import io.avaje.jsonb.Json;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Objects;
 
 /** Represents a 3D pose containing translational and rotational elements. */
+@Json
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, StructSerializable {
@@ -37,7 +39,9 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    */
   public static final Pose3d kZero = new Pose3d();
 
+  @Json.Property("translation")
   private final Translation3d m_translation;
+  @Json.Property("rotation")
   private final Rotation3d m_rotation;
 
   /** Constructs a pose at the origin facing toward the positive X axis. */
@@ -53,6 +57,7 @@ public class Pose3d implements Interpolatable<Pose3d>, ProtobufSerializable, Str
    * @param rotation The rotational component of the pose.
    */
   @JsonCreator
+  @Json.Creator
   public Pose3d(
       @JsonProperty(required = true, value = "translation") Translation3d translation,
       @JsonProperty(required = true, value = "rotation") Rotation3d rotation) {

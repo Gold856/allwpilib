@@ -24,9 +24,11 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
+import io.avaje.jsonb.Json;
 import java.util.Objects;
 
 /** A rotation in a 3D coordinate frame represented by a quaternion. */
+@Json
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation3d
@@ -38,6 +40,9 @@ public class Rotation3d
    */
   public static final Rotation3d kZero = new Rotation3d();
 
+  // @Json.Property("quaternion")
+  // @Json.Alias("quaternion")
+  @Json.Ignore
   private final Quaternion m_q;
 
   /** Constructs a Rotation3d representing no rotation. */
@@ -51,7 +56,8 @@ public class Rotation3d
    * @param q The quaternion.
    */
   @JsonCreator
-  public Rotation3d(@JsonProperty(required = true, value = "quaternion") Quaternion q) {
+  @Json.Creator
+  public Rotation3d(@JsonProperty(required = true, value = "quaternion") @Json.Alias("quaternion") Quaternion q) {
     m_q = q.normalize();
   }
 

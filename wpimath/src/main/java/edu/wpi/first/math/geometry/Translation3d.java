@@ -20,6 +20,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.util.struct.StructSerializable;
+import io.avaje.jsonb.Json;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -32,6 +33,7 @@ import java.util.Objects;
  * origin facing in the positive X direction, forward is positive X, left is positive Y, and up is
  * positive Z.
  */
+@Json
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Translation3d
@@ -43,8 +45,11 @@ public class Translation3d
    */
   public static final Translation3d kZero = new Translation3d();
 
+  @Json.Property("x")
   private final double m_x;
+  @Json.Property("y")
   private final double m_y;
+  @Json.Property("z")
   private final double m_z;
 
   /** Constructs a Translation3d with X, Y, and Z components equal to zero. */
@@ -60,6 +65,7 @@ public class Translation3d
    * @param z The z component of the translation.
    */
   @JsonCreator
+  @Json.Creator
   public Translation3d(
       @JsonProperty(required = true, value = "x") double x,
       @JsonProperty(required = true, value = "y") double y,

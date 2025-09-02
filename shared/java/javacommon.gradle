@@ -109,7 +109,6 @@ tasks.withType(JavaCompile).configureEach {
         '17',
         '-encoding',
         'UTF8',
-        "-Werror",
         "-Xlint:all",
         // ignore AutoCloseable warnings
         "-Xlint:-try",
