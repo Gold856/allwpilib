@@ -52,12 +52,11 @@ public class Quaternion implements ProtobufSerializable, StructSerializable {
    * @param z Z component of the quaternion.
    */
   @JsonCreator
-  @Json.Creator
   public Quaternion(
-      @JsonProperty(required = true, value = "W") @Json.Alias("W") double w,
-      @JsonProperty(required = true, value = "X") @Json.Alias("X") double x,
-      @JsonProperty(required = true, value = "Y") @Json.Alias("Y") double y,
-      @JsonProperty(required = true, value = "Z") @Json.Alias("Z") double z) {
+      @JsonProperty(required = true, value = "W") double w,
+      @JsonProperty(required = true, value = "X") double x,
+      @JsonProperty(required = true, value = "Y") double y,
+      @JsonProperty(required = true, value = "Z") double z) {
     m_w = w;
     m_x = x;
     m_y = y;
