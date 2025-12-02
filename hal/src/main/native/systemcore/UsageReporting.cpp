@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/hal/UsageReporting.h"
+
 #include <stdint.h>
 
 #include <fmt/format.h>
@@ -28,7 +30,7 @@ static ::SystemServerUsageReporting* systemServerUsage;
 extern "C" {
 
 void HAL_ReportUsage(const struct WPI_String* resource,
-                        const struct WPI_String* data) {
+                     const struct WPI_String* data) {
   auto resourceStr = wpi::util::to_string_view(resource);
   auto& publisher = systemServerUsage->publishers[resourceStr];
   if (!publisher) {
