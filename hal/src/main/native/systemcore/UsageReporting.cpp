@@ -27,7 +27,7 @@ static ::SystemServerUsageReporting* systemServerUsage;
 
 extern "C" {
 
-int32_t HAL_ReportUsage(const struct WPI_String* resource,
+void HAL_ReportUsage(const struct WPI_String* resource,
                         const struct WPI_String* data) {
   auto resourceStr = wpi::util::to_string_view(resource);
   auto& publisher = systemServerUsage->publishers[resourceStr];
@@ -38,8 +38,6 @@ int32_t HAL_ReportUsage(const struct WPI_String* resource,
             .Publish();
   }
   publisher.Set(wpi::util::to_string_view(data));
-
-  return 0;
 }
 
 }  // extern "C"
