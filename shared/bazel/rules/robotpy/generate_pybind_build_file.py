@@ -75,7 +75,7 @@ class HeaderToDatConfig:
 
         args = header_to_dat_args.args[idx:]
         self.class_name = args[0]
-        self.yml_file = pathlib.Path(args[1].path).as_posix()
+        self.yml_file = pathlib.Path(args[1].path.as_posix()).as_posix()
         self.defines = defines
 
         include_root = str(args[3]).replace("\\", "/")
@@ -93,10 +93,10 @@ class HeaderToDatConfig:
             root_dir = pathlib.Path.cwd().absolute()
             self.include_file = (
                 pathlib.Path(args[2]).absolute().relative_to(root_dir).as_posix()
-            )
+            ).as_posix()
             self.include_root = (
                 pathlib.Path(args[3]).absolute().relative_to(root_dir).as_posix()
-            )
+            ).as_posix()
         # type casters         = 4
         # dat file             = 5
         # d file               = 6
@@ -136,7 +136,7 @@ class GenLibInitPyConfig:
     def __init__(self, item: BuildTarget):
         self.output_file = item.args[0].name
         self.modules = item.args[1:]
-        self.install_path = item.install_path
+        self.install_path = item.install_path.as_posix()
 
 
 class GenPkgConfConfig:
@@ -150,7 +150,7 @@ class GenPkgConfConfig:
 
         assert 0 == len(item.args[6:])
 
-        self.install_path = item.install_path
+        self.install_path = item.install_path.as_posix()
 
 
 class GenModInitHpp:
@@ -191,7 +191,7 @@ class BazelExtensionModule:
     ):
         self.name = extension_module.name
         self.package_name = extension_module.package_name
-        self.install_path = extension_module.install_path
+        self.install_path = extension_module.install_path.as_posix()
 
         self.extension_name_transforms: list[tuple[str, str]] = []
         self.generation_data = self._extract_header_generation(
@@ -316,7 +316,7 @@ def generate_pybind_build_file(
     pkgcfgs: list[pathlib.Path],
     project_file: pathlib.Path,
     package_root_file: str,
-    stripped_include_prefix: str,
+    stripped_include_prefix: pathlib.Path,
     yml_prefix: str | None,
     output_file: pathlib.Path,
 ):
@@ -325,7 +325,7 @@ def generate_pybind_build_file(
 
     hack_pkgconfig(pkgcfgs)
 
-    extension_modules = []
+    extension_modules: list[BazelExtensionModule] = []
     entry_points = collections.defaultdict(list)
 
     pyproject = PyProject(project_file)
@@ -456,7 +456,7 @@ def generate_pybind_build_file(
                 publish_casters_targets=publish_casters_targets,
                 python_deps=sorted(python_deps),
                 all_local_native_deps=all_local_native_deps,
-                stripped_include_prefix=stripped_include_prefix,
+                stripped_include_prefix=stripped_include_prefix.as_posix(),
                 strip_path_prefixes=strip_path_prefixes,
                 yml_prefix=yml_prefix,
                 package_root_file=package_root_file,
@@ -474,7 +474,9 @@ def main():
     parser.add_argument("--project_file", type=pathlib.Path, required=True)
     parser.add_argument("--output_file", type=pathlib.Path, required=True)
     parser.add_argument(
-        "--stripped_include_prefix", type=str, default="src/main/python"
+        "--stripped_include_prefix",
+        type=pathlib.Path,
+        default=pathlib.Path("src/main/python"),
     )
     parser.add_argument("--yml_prefix", type=str)
     parser.add_argument("--package_root_file", type=str)
