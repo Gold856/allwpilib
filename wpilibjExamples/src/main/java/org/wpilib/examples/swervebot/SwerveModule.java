@@ -110,10 +110,9 @@ public class SwerveModule {
   public void setDesiredState(SwerveModuleState desiredState) {
     var encoderRotation = new Rotation2d(m_turningEncoder.getDistance());
 
-    // Optimize the reference state to avoid spinning further than 90 degrees, then
-    // scale speed by cosine of angle error. This scales down movement perpendicular to the desired
-    // direction of travel that can occur when modules change directions. This results in smoother
-    // driving.
+    // Optimize the reference state to avoid spinning further than 90 degrees, then scale speed by
+    // cosine of angle error. This scales down movement perpendicular to the desired direction of
+    // travel that can occur when modules change directions. This results in smoother driving.
     SwerveModuleState state = desiredState.optimize(encoderRotation).cosineScale(encoderRotation);
 
     // Calculate the drive output from the drive PID controller.
