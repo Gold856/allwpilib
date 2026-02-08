@@ -54,7 +54,7 @@ def create_pybind_library(
         name = install_path + extension_name,
         srcs = extra_srcs + generated_srcs,
         deps = [":{}_pybind_library".format(name)] + semiwrap_header,
-        dynamic_deps = dynamic_deps,
+        dynamic_deps=[],
         copts = select({
             "@bazel_tools//src/conditions:darwin": [
                 "-Wno-deprecated-declarations",
