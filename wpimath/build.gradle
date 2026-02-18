@@ -94,6 +94,9 @@ dependencies {
     api "com.fasterxml.jackson.core:jackson-core:2.19.2"
     api "com.fasterxml.jackson.core:jackson-databind:2.19.2"
     api "us.hebi.quickbuf:quickbuf-runtime:1.4"
+    implementation project(":wpiannotations")
+    annotationProcessor project(':javacPlugin')
+    testAnnotationProcessor project(':javacPlugin')
 }
 
 sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"

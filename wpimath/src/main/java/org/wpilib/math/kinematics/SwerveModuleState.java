@@ -7,6 +7,8 @@ package org.wpilib.math.kinematics;
 import static org.wpilib.units.Units.MetersPerSecond;
 
 import java.util.Objects;
+
+import org.wpilib.annotation.NoDiscard;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.interpolation.Interpolatable;
 import org.wpilib.math.kinematics.proto.SwerveModuleStateProto;
@@ -16,6 +18,7 @@ import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
 /** Represents the state of one swerve module. */
+@NoDiscard
 public class SwerveModuleState
     implements Interpolatable<SwerveModuleState>,
         Comparable<SwerveModuleState>,
