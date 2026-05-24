@@ -143,8 +143,6 @@ cc_test(
     srcs = glob(["src/test/native/**/*.cpp"]),
     tags = [
         "exclusive",
-        "no-asan",
-        "no-tsan",
     ],
     deps = [
         ":datalog",

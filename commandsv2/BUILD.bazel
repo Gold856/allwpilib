@@ -134,10 +134,6 @@ cc_test(
         "src/test/native/**/*.cpp",
         "src/test/native/**/*.hpp",
     ]),
-    tags = [
-        "no-tsan",
-        "no-ubsan",
-    ],
     deps = [
         ":commandsv2",
         "//thirdparty/catch2",

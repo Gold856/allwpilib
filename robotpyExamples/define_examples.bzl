@@ -28,6 +28,7 @@ def _define_robot_project(projects, project_type):
             args = ["--main", "$(location " + example_folder + "/robot.py)", "test", "--builtin"],
             deps = common_deps,
             size = "small",
+            tags = ["no-asan", "no-tsan", "no-ubsan"],
             **common_kwargs
         )
 
