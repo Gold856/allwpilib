@@ -10,14 +10,14 @@
 #include <string_view>
 #include <vector>
 
-#include <libssh/libssh.h>
-#include <libssh/sftp.h>
+#include <libssh2.h>
+#include <libssh2_sftp.h>
 
 namespace sftp {
 
 struct Attributes {
   Attributes() = default;
-  explicit Attributes(sftp_attributes&& attr);
+  explicit Attributes(char* name, size_t len, LIBSSH2_SFTP_ATTRIBUTES&& attr);
 
   std::string name;
   uint32_t flags = 0;
@@ -31,24 +31,21 @@ struct Attributes {
 class Exception : public std::runtime_error {
  public:
   explicit Exception(const std::string& msg) : std::runtime_error{msg} {}
-  explicit Exception(sftp_session sftp);
+  explicit Exception(LIBSSH2_SFTP* sftp);
 
-  int err = 0;
+  unsigned long err = 0;
 };
 
 class File {
  public:
   File() = default;
-  explicit File(sftp_file&& handle) : m_handle{handle} {}
+  explicit File(LIBSSH2_SFTP_HANDLE* handle) : m_handle{handle} {}
   ~File();
 
   Attributes Stat() const;
 
-  void SetNonblocking() { sftp_file_set_nonblocking(m_handle); }
-  void SetBlocking() { sftp_file_set_blocking(m_handle); }
-
-  size_t Read(void* buf, uint32_t count);
-  size_t Write(std::span<const uint8_t> data);
+  size_t Read(char* buf, uint32_t count);
+  size_t Write(std::span<const char> data);
 
   void Seek(uint64_t offset);
   uint64_t Tell() const;
@@ -56,13 +53,8 @@ class File {
 
   void Sync();
 
-  std::string_view GetName() const { return m_handle->name; }
-  uint64_t GetOffset() const { return m_handle->offset; }
-  bool IsEof() const { return m_handle->eof; }
-  bool IsNonblocking() const { return m_handle->nonblocking; }
-
  private:
-  sftp_file m_handle{nullptr};
+  LIBSSH2_SFTP_HANDLE* m_handle{nullptr};
 };
 
 /**
@@ -123,11 +115,11 @@ class Session {
    * @param mode permissions to use if a new file is created
    * @return File
    */
-  File Open(const std::string& filename, int accesstype, mode_t mode);
+  File Open(const std::string& filename, int accesstype, long mode);
 
  private:
-  ssh_session m_session{nullptr};
-  sftp_session m_sftp{nullptr};
+  LIBSSH2_SESSION* m_session{nullptr};
+  LIBSSH2_SFTP* m_sftp{nullptr};
   std::string m_host;
 
   int m_port;

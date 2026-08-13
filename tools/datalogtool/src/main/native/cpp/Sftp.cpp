@@ -4,77 +4,85 @@
 
 #include "Sftp.hpp"
 
+#ifdef _WIN32
+#include <winsock2.h>
+#include <Ws2tcpip.h>
+#endif
 #include <string>
 #include <utility>
 #include <vector>
 
+#include <libssh2.h>
+#include <libssh2_sftp.h>
+
 using namespace sftp;
 
-Attributes::Attributes(sftp_attributes&& attr)
-    : name{attr->name}, flags{attr->flags}, type{attr->type}, size{attr->size} {
-  sftp_attributes_free(attr);
+Attributes::Attributes(char* name, size_t len, LIBSSH2_SFTP_ATTRIBUTES&& attr)
+    : name{name, len}, flags{attr.flags}, size{attr.filesize} {
+  // sftp_attributes_free(attr);
 }
 
-static std::string GetError(sftp_session sftp) {
-  switch (sftp_get_error(sftp)) {
-    case SSH_FX_EOF:
-      return "end of file";
-    case SSH_FX_NO_SUCH_FILE:
-      return "no such file";
-    case SSH_FX_PERMISSION_DENIED:
-      return "permission denied";
-    case SSH_FX_FAILURE:
-      return "SFTP failure";
-    case SSH_FX_BAD_MESSAGE:
-      return "SFTP bad message";
-    case SSH_FX_NO_CONNECTION:
-      return "SFTP no connection";
-    case SSH_FX_CONNECTION_LOST:
-      return "SFTP connection lost";
-    case SSH_FX_OP_UNSUPPORTED:
-      return "SFTP operation unsupported";
-    case SSH_FX_INVALID_HANDLE:
-      return "SFTP invalid handle";
-    case SSH_FX_NO_SUCH_PATH:
-      return "no such path";
-    case SSH_FX_FILE_ALREADY_EXISTS:
-      return "file already exists";
-    case SSH_FX_WRITE_PROTECT:
-      return "write protected filesystem";
-    case SSH_FX_NO_MEDIA:
-      return "no media inserted";
+static std::string GetError(LIBSSH2_SFTP* sftp) {
+  switch (libssh2_sftp_last_error(sftp)) {
+    // case SSH_FX_EOF:
+    //   return "end of file";
+    // case SSH_FX_NO_SUCH_FILE:
+    //   return "no such file";
+    // case SSH_FX_PERMISSION_DENIED:
+    //   return "permission denied";
+    // case SSH_FX_FAILURE:
+    //   return "SFTP failure";
+    // case SSH_FX_BAD_MESSAGE:
+    //   return "SFTP bad message";
+    // case SSH_FX_NO_CONNECTION:
+    //   return "SFTP no connection";
+    // case SSH_FX_CONNECTION_LOST:
+    //   return "SFTP connection lost";
+    // case SSH_FX_OP_UNSUPPORTED:
+    //   return "SFTP operation unsupported";
+    // case SSH_FX_INVALID_HANDLE:
+    //   return "SFTP invalid handle";
+    // case SSH_FX_NO_SUCH_PATH:
+    //   return "no such path";
+    // case SSH_FX_FILE_ALREADY_EXISTS:
+    //   return "file already exists";
+    // case SSH_FX_WRITE_PROTECT:
+    //   return "write protected filesystem";
+    // case SSH_FX_NO_MEDIA:
+    //   return "no media inserted";
     default:
-      return ssh_get_error(sftp->session);
+      // libssh2_session_last_error(sftp);
+      return ;
   }
 }
 
-Exception::Exception(sftp_session sftp)
-    : runtime_error{GetError(sftp)}, err{sftp_get_error(sftp)} {}
+Exception::Exception(LIBSSH2_SFTP* sftp)
+    : runtime_error{GetError(sftp)}, err{libssh2_sftp_last_error(sftp)} {}
 
 File::~File() {
   if (m_handle) {
-    sftp_close(m_handle);
+    libssh2_sftp_close_handle(m_handle);
   }
 }
 
 Attributes File::Stat() const {
-  sftp_attributes attr = sftp_fstat(m_handle);
-  if (!attr) {
+  LIBSSH2_SFTP_ATTRIBUTES attr;
+  if (!libssh2_sftp_fstat(m_handle, &attr)) {
     throw Exception{m_handle->sftp};
   }
-  return Attributes{std::move(attr)};
+  return Attributes{&attr};
 }
 
-size_t File::Read(void* buf, uint32_t count) {
-  auto rv = sftp_read(m_handle, buf, count);
+size_t File::Read(char* buf, uint32_t count) {
+  auto rv = libssh2_sftp_read(m_handle, buf, count);
   if (rv < 0) {
     throw Exception{m_handle->sftp};
   }
   return rv;
 }
 
-size_t File::Write(std::span<const uint8_t> data) {
-  auto rv = sftp_write(m_handle, data.data(), data.size());
+size_t File::Write(std::span<const char> data) {
+  auto rv = libssh2_sftp_write(m_handle, data.data(), data.size());
   if (rv < 0) {
     throw Exception{m_handle->sftp};
   }
@@ -82,21 +90,19 @@ size_t File::Write(std::span<const uint8_t> data) {
 }
 
 void File::Seek(uint64_t offset) {
-  if (sftp_seek64(m_handle, offset) < 0) {
-    throw Exception{m_handle->sftp};
-  }
+  libssh2_sftp_seek64(m_handle, offset);
 }
 
 uint64_t File::Tell() const {
-  return sftp_tell64(m_handle);
+  return libssh2_sftp_tell64(m_handle);
 }
 
 void File::Rewind() {
-  sftp_rewind(m_handle);
+  libssh2_sftp_rewind(m_handle);
 }
 
 void File::Sync() {
-  if (sftp_fsync(m_handle) < 0) {
+  if (libssh2_sftp_fsync(m_handle) < 0) {
     throw Exception{m_handle->sftp};
   }
 }
@@ -105,94 +111,107 @@ Session::Session(std::string_view host, int port, std::string_view user,
                  std::string_view pass)
     : m_host{host}, m_port{port}, m_username{user}, m_password{pass} {
   // Create a new SSH session.
-  m_session = ssh_new();
+  m_session = libssh2_session_init();
   if (!m_session) {
     throw Exception{"The SSH session could not be allocated."};
   }
-
-  // Set the host, user, and port.
-  ssh_options_set(m_session, SSH_OPTIONS_HOST, m_host.c_str());
-  ssh_options_set(m_session, SSH_OPTIONS_USER, m_username.c_str());
-  ssh_options_set(m_session, SSH_OPTIONS_PORT, &m_port);
-
+#ifdef _WIN32
+  WSAData wsaData;
+  WORD wVersionRequested = MAKEWORD(2, 2);
+  WSAStartup(wVersionRequested, &wsaData);
+#endif
   // Set timeout to 3 seconds.
   int64_t timeout = 3L;
-  ssh_options_set(m_session, SSH_OPTIONS_TIMEOUT, &timeout);
+  libssh2_session_set_timeout(m_session, timeout);
 
-  // Set other miscellaneous options.
-  ssh_options_set(m_session, SSH_OPTIONS_STRICTHOSTKEYCHECK, "no");
+  // // Set other miscellaneous options.
+  // ssh_options_set(m_session, SSH_OPTIONS_STRICTHOSTKEYCHECK, "no");
 }
 
 Session::~Session() {
   if (m_sftp) {
-    sftp_free(m_sftp);
+    libssh2_sftp_shutdown(m_sftp);
   }
   if (m_session) {
-    ssh_free(m_session);
+    libssh2_session_free(m_session);
   }
 }
 
 void Session::Connect() {
+  int sock = socket(AF_INET, SOCK_STREAM, 0);
+  struct addrinfo* info;
+  int status = getaddrinfo(m_host.c_str(), std::to_string(m_port).c_str(),
+                           nullptr, &info);
+  int conn = connect(sock, info[0].ai_addr, info[0].ai_addrlen);
   // Connect to the server.
-  int rc = ssh_connect(m_session);
-  if (rc != SSH_OK) {
-    throw Exception{ssh_get_error(m_session)};
+  int rc = libssh2_session_handshake(m_session, sock);
+  if (rc != 0) {
+    char* msg;
+    int len;
+    libssh2_session_last_error(m_session, &msg, &len, 0);
+    throw Exception{{msg, (size_t)len}};
   }
 
   // Authenticate with password.
-  rc = ssh_userauth_password(m_session, nullptr, m_password.c_str());
-  if (rc != SSH_AUTH_SUCCESS) {
-    throw Exception{ssh_get_error(m_session)};
+  libssh2_userauth_password_ex(m_session, m_username.c_str(),
+                               m_username.length(), m_password.c_str(),
+                               m_password.length(), nullptr);
+  if (rc != 0) {
+    char* msg;
+    int len;
+    libssh2_session_last_error(m_session, &msg, &len, 0);
+    throw Exception{{msg, (size_t)len}};
   }
 
-  // Allocate the SFTP session.
-  m_sftp = sftp_new(m_session);
-  if (!m_sftp) {
-    throw Exception{ssh_get_error(m_session)};
-  }
-
-  // Initialize.
-  rc = sftp_init(m_sftp);
-  if (rc != SSH_OK) {
-    sftp_free(m_sftp);
+  // Initialize the SFTP session.
+  m_sftp = libssh2_sftp_init(m_session);
+  if (rc != 0) {
+    libssh2_sftp_shutdown(m_sftp);
     m_sftp = nullptr;
-    throw Exception{ssh_get_error(m_session)};
+    char* msg;
+    int len;
+    libssh2_session_last_error(m_session, &msg, &len, 0);
+    throw Exception{{msg, (size_t)len}};
   }
 }
 
 void Session::Disconnect() {
   if (m_sftp) {
-    sftp_free(m_sftp);
+    libssh2_sftp_shutdown(m_sftp);
     m_sftp = nullptr;
   }
-  ssh_disconnect(m_session);
+  // TODO: null safe?
+  libssh2_session_disconnect(m_session, nullptr);
 }
 
 std::vector<Attributes> Session::ReadDir(const std::string& path) {
-  sftp_dir dir = sftp_opendir(m_sftp, path.c_str());
+  auto dir = libssh2_sftp_opendir(m_sftp, path.c_str());
   if (!dir) {
     throw Exception{m_sftp};
   }
 
   std::vector<Attributes> rv;
-  while (sftp_attributes attr = sftp_readdir(m_sftp, dir)) {
-    rv.emplace_back(std::move(attr));
+  char buf[1000];
+  LIBSSH2_SFTP_ATTRIBUTES attr;
+  while (auto len = libssh2_sftp_readdir(dir, buf, 1000, &attr)) {
+    rv.emplace_back(buf, (size_t)len, std::move(attr));
   }
 
-  sftp_closedir(dir);
+  libssh2_sftp_closedir(dir);
   return rv;
 }
 
 void Session::Unlink(const std::string& filename) {
-  if (sftp_unlink(m_sftp, filename.c_str()) < 0) {
+  if (libssh2_sftp_unlink(m_sftp, filename.c_str()) < 0) {
     throw Exception{m_sftp};
   }
 }
 
-File Session::Open(const std::string& filename, int accesstype, mode_t mode) {
-  sftp_file f = sftp_open(m_sftp, filename.c_str(), accesstype, mode);
+File Session::Open(const std::string& filename, int accesstype, long mode) {
+  LIBSSH2_SFTP_HANDLE* f =
+      libssh2_sftp_open(m_sftp, filename.c_str(), accesstype, mode);
   if (!f) {
     throw Exception{m_sftp};
   }
-  return File{std::move(f)};
+  return File{f};
 }

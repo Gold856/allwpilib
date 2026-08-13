@@ -158,7 +158,7 @@ if(WPILIB_WITH_DOCS)
     add_doxygen_docs()
 endif()
 
-find_package(LIBSSH CONFIG 0.7.1)
+find_package(libssh2 CONFIG)
 
 get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 
@@ -346,7 +346,7 @@ if(WPILIB_WITH_GUI)
     if(WPILIB_WITH_EXECUTABLES)
         add_subdirectory(tools/outlineviewer)
         add_subdirectory(tools/sysid)
-        if(LIBSSH_FOUND)
+        if(libssh2_FOUND)
             add_subdirectory(tools/datalogtool)
         endif()
     endif()

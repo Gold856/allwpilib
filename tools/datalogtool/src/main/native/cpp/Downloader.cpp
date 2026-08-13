@@ -20,7 +20,7 @@
 
 #include <imgui.h>
 #include <imgui_stdlib.h>
-#include <libssh/sftp.h>
+#include <libssh2_sftp.h>
 
 #include "Sftp.hpp"
 #include "wpi/glass/Storage.hpp"
@@ -277,7 +277,7 @@ void Downloader::ThreadMain() {
   std::unique_ptr<sftp::Session> session;
 
   static constexpr size_t BUF_SIZE = 32 * 1024;
-  std::unique_ptr<uint8_t[]> copyBuf = std::make_unique<uint8_t[]>(BUF_SIZE);
+  std::unique_ptr<char[]> copyBuf = std::make_unique<char[]>(BUF_SIZE);
 
   std::unique_lock lock{m_mutex};
   while (m_state != STATE_EXIT) {
