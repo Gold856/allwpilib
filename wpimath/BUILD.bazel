@@ -304,6 +304,7 @@ cc_test(
     size = "medium",
     srcs = glob([
         "src/test/native/cpp/**/*.cpp",
+        "src/test/native/cpp/**/*.h",
         "src/test/native/cpp/**/*.hpp",
     ]),
     tags = [
