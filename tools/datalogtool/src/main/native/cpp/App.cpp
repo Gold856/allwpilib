@@ -9,7 +9,7 @@
 
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <libssh/libssh.h>
+#include <libssh2.h>
 
 #include "Downloader.hpp"
 #include "Exporter.hpp"
@@ -130,7 +130,7 @@ static void DisplayGui() {
 }
 
 void Application(std::string_view saveDir) {
-  ssh_init();
+  libssh2_init(0);
 
   gui::CreateContext();
   wpi::glass::CreateContext();
@@ -163,5 +163,5 @@ void Application(std::string_view saveDir) {
   gui::DestroyContext();
 
   gDownloader.reset();
-  ssh_finalize();
+  libssh2_exit();
 }
