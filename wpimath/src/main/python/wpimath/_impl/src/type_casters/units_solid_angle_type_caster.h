@@ -1,6 +1,6 @@
 #pragma once
 
-#include <wpi/units/solid_angle.h>
+#include <wpi/units/solid_angle.hpp>
 
 namespace pybind11 {
 namespace detail {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <wpi/units/spectral_flux.h>
+#include <wpi/units/spectral_flux.hpp>
 
 namespace pybind11 {
 namespace detail {

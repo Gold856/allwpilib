@@ -7,9 +7,8 @@ import re
 import subprocess
 import sys
 
-
-for f in sorted(pathlib.Path(sys.argv[1]).glob("*.h")):
-    if f.name == "core.h":
+for f in sorted(pathlib.Path(sys.argv[1]).glob("*.hpp")):
+    if f.name == "core.hpp":
         continue
 
     names = []
@@ -56,16 +55,7 @@ for f in sorted(pathlib.Path(sys.argv[1]).glob("*.h")):
             ofp.write("namespace pybind11 {\n")
             ofp.write("namespace detail {\n")
 
-            # "wpimath.units." renames:
-            #   luxes -> lux
-            #   nauticalMiles -> nautical_miles
-            #   astronicalUnits -> astronomical_units
-            #   nauticalLeagues -> nautical_leagues
-            #   metric_tons -> tonnes
-            #   mbars -> millibars
-            #   rads -> radiation_absorbed_dose
-            #   moles -> mols
-            # We also need to disambiguiate the different pounds units:
+            # We need to disambiguiate the different pounds units:
             #   pounds (mass) -> pounds_mass
             #   pounds (force) -> pounds_force
             for name in names:
@@ -74,9 +64,7 @@ for f in sorted(pathlib.Path(sys.argv[1]).glob("*.h")):
                 if name == "pounds":
                     code_name = f.stem + "::" + name
                     py_name = name + "_" + f.stem
-                s = (
-                    inspect.cleandoc(
-                        f"""
+                s = inspect.cleandoc(f"""
 
                     template <> struct handle_type_name<wpi::units::{code_name}<>> {{
                       static constexpr auto name = _("wpimath.units.{py_name}");
@@ -86,13 +74,7 @@ for f in sorted(pathlib.Path(sys.argv[1]).glob("*.h")):
                       static constexpr auto name = _("wpimath.units.{py_name}");
                     }};
 
-                """
-                    )
-                    + "\n"
-                )
-                if name == "foot_pounds" and f.name == "torque.h":
-                    # Comment out non-blank lines
-                    s = re.sub(r"(?:(?<=\n)|^)([^\n])", r"// \1", s)
+                """) + "\n"
                 ofp.write(s)
                 ofp.write("\n")
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <wpi/units/volume.h>
+#include <wpi/units/volume.hpp>
 
 namespace pybind11 {
 namespace detail {

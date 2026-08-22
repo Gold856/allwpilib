@@ -1,6 +1,6 @@
 #pragma once
 
-#include <wpi/units/power.h>
+#include <wpi/units/power.hpp>
 
 namespace pybind11 {
 namespace detail {
@@ -50,6 +50,30 @@ template <> struct handle_type_name<wpi::units::horsepower<>> {
 
 template <> struct handle_type_name<wpi::units::horsepower_> {
   static constexpr auto name = _("wpimath.units.horsepower");
+};
+
+template <> struct handle_type_name<wpi::units::metric_horsepower<>> {
+  static constexpr auto name = _("wpimath.units.metric_horsepower");
+};
+
+template <> struct handle_type_name<wpi::units::metric_horsepower_> {
+  static constexpr auto name = _("wpimath.units.metric_horsepower");
+};
+
+template <> struct handle_type_name<wpi::units::electrical_horsepower<>> {
+  static constexpr auto name = _("wpimath.units.electrical_horsepower");
+};
+
+template <> struct handle_type_name<wpi::units::electrical_horsepower_> {
+  static constexpr auto name = _("wpimath.units.electrical_horsepower");
+};
+
+template <> struct handle_type_name<wpi::units::tons_of_refrigeration<>> {
+  static constexpr auto name = _("wpimath.units.tons_of_refrigeration");
+};
+
+template <> struct handle_type_name<wpi::units::tons_of_refrigeration_> {
+  static constexpr auto name = _("wpimath.units.tons_of_refrigeration");
 };
 
 } // namespace detail

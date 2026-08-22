@@ -1,6 +1,6 @@
 #pragma once
 
-#include <wpi/units/time.h>
+#include <wpi/units/time.hpp>
 
 namespace pybind11 {
 namespace detail {
@@ -98,6 +98,38 @@ template <> struct handle_type_name<wpi::units::gregorian_years<>> {
 
 template <> struct handle_type_name<wpi::units::gregorian_years_> {
   static constexpr auto name = _("wpimath.units.gregorian_years");
+};
+
+template <> struct handle_type_name<wpi::units::fortnights<>> {
+  static constexpr auto name = _("wpimath.units.fortnights");
+};
+
+template <> struct handle_type_name<wpi::units::fortnights_> {
+  static constexpr auto name = _("wpimath.units.fortnights");
+};
+
+template <> struct handle_type_name<wpi::units::decades<>> {
+  static constexpr auto name = _("wpimath.units.decades");
+};
+
+template <> struct handle_type_name<wpi::units::decades_> {
+  static constexpr auto name = _("wpimath.units.decades");
+};
+
+template <> struct handle_type_name<wpi::units::centuries<>> {
+  static constexpr auto name = _("wpimath.units.centuries");
+};
+
+template <> struct handle_type_name<wpi::units::centuries_> {
+  static constexpr auto name = _("wpimath.units.centuries");
+};
+
+template <> struct handle_type_name<wpi::units::millennia<>> {
+  static constexpr auto name = _("wpimath.units.millennia");
+};
+
+template <> struct handle_type_name<wpi::units::millennia_> {
+  static constexpr auto name = _("wpimath.units.millennia");
 };
 
 } // namespace detail

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <wpi/units/substance.h>
+#include <wpi/units/substance.hpp>
 
 namespace pybind11 {
 namespace detail {
@@ -42,6 +42,14 @@ template <> struct handle_type_name<wpi::units::kilomols<>> {
 
 template <> struct handle_type_name<wpi::units::kilomols_> {
   static constexpr auto name = _("wpimath.units.kilomols");
+};
+
+template <> struct handle_type_name<wpi::units::pound_moles<>> {
+  static constexpr auto name = _("wpimath.units.pound_moles");
+};
+
+template <> struct handle_type_name<wpi::units::pound_moles_> {
+  static constexpr auto name = _("wpimath.units.pound_moles");
 };
 
 } // namespace detail

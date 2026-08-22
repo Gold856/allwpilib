@@ -1,6 +1,6 @@
 #pragma once
 
-#include <wpi/units/spectral_radiance.h>
+#include <wpi/units/spectral_radiance.hpp>
 
 namespace pybind11 {
 namespace detail {

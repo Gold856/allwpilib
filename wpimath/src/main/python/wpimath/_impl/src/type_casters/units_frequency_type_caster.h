@@ -1,6 +1,6 @@
 #pragma once
 
-#include <wpi/units/frequency.h>
+#include <wpi/units/frequency.hpp>
 
 namespace pybind11 {
 namespace detail {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <wpi/units/torque.h>
+#include <wpi/units/torque.hpp>
 
 namespace pybind11 {
 namespace detail {
@@ -12,13 +12,13 @@ template <> struct handle_type_name<wpi::units::newton_meters_> {
   static constexpr auto name = _("wpimath.units.newton_meters");
 };
 
-// template <> struct handle_type_name<wpi::units::foot_pounds<>> {
-//   static constexpr auto name = _("wpimath.units.foot_pounds");
-// };
+template <> struct handle_type_name<wpi::units::pound_feet<>> {
+  static constexpr auto name = _("wpimath.units.pound_feet");
+};
 
-// template <> struct handle_type_name<wpi::units::foot_pounds_> {
-//   static constexpr auto name = _("wpimath.units.foot_pounds");
-// };
+template <> struct handle_type_name<wpi::units::pound_feet_> {
+  static constexpr auto name = _("wpimath.units.pound_feet");
+};
 
 template <> struct handle_type_name<wpi::units::foot_poundals<>> {
   static constexpr auto name = _("wpimath.units.foot_poundals");

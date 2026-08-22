@@ -1,6 +1,6 @@
 #pragma once
 
-#include <wpi/units/length.h>
+#include <wpi/units/length.hpp>
 
 namespace pybind11 {
 namespace detail {
@@ -186,6 +186,62 @@ template <> struct handle_type_name<wpi::units::yards<>> {
 
 template <> struct handle_type_name<wpi::units::yards_> {
   static constexpr auto name = _("wpimath.units.yards");
+};
+
+template <> struct handle_type_name<wpi::units::rods<>> {
+  static constexpr auto name = _("wpimath.units.rods");
+};
+
+template <> struct handle_type_name<wpi::units::rods_> {
+  static constexpr auto name = _("wpimath.units.rods");
+};
+
+template <> struct handle_type_name<wpi::units::links<>> {
+  static constexpr auto name = _("wpimath.units.links");
+};
+
+template <> struct handle_type_name<wpi::units::links_> {
+  static constexpr auto name = _("wpimath.units.links");
+};
+
+template <> struct handle_type_name<wpi::units::barleycorns<>> {
+  static constexpr auto name = _("wpimath.units.barleycorns");
+};
+
+template <> struct handle_type_name<wpi::units::barleycorns_> {
+  static constexpr auto name = _("wpimath.units.barleycorns");
+};
+
+template <> struct handle_type_name<wpi::units::nails<>> {
+  static constexpr auto name = _("wpimath.units.nails");
+};
+
+template <> struct handle_type_name<wpi::units::nails_> {
+  static constexpr auto name = _("wpimath.units.nails");
+};
+
+template <> struct handle_type_name<wpi::units::spans<>> {
+  static constexpr auto name = _("wpimath.units.spans");
+};
+
+template <> struct handle_type_name<wpi::units::spans_> {
+  static constexpr auto name = _("wpimath.units.spans");
+};
+
+template <> struct handle_type_name<wpi::units::picas<>> {
+  static constexpr auto name = _("wpimath.units.picas");
+};
+
+template <> struct handle_type_name<wpi::units::picas_> {
+  static constexpr auto name = _("wpimath.units.picas");
+};
+
+template <> struct handle_type_name<wpi::units::points<>> {
+  static constexpr auto name = _("wpimath.units.points");
+};
+
+template <> struct handle_type_name<wpi::units::points_> {
+  static constexpr auto name = _("wpimath.units.points");
 };
 
 } // namespace detail

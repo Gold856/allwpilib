@@ -1,6 +1,6 @@
 #pragma once
 
-#include <wpi/units/magnetic_field_strength.h>
+#include <wpi/units/magnetic_field_strength.hpp>
 
 namespace pybind11 {
 namespace detail {

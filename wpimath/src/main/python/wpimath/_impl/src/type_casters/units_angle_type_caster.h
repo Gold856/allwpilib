@@ -1,6 +1,6 @@
 #pragma once
 
-#include <wpi/units/angle.h>
+#include <wpi/units/angle.hpp>
 
 namespace pybind11 {
 namespace detail {
@@ -90,6 +90,22 @@ template <> struct handle_type_name<wpi::units::gradians<>> {
 
 template <> struct handle_type_name<wpi::units::gradians_> {
   static constexpr auto name = _("wpimath.units.gradians");
+};
+
+template <> struct handle_type_name<wpi::units::angular_mils<>> {
+  static constexpr auto name = _("wpimath.units.angular_mils");
+};
+
+template <> struct handle_type_name<wpi::units::angular_mils_> {
+  static constexpr auto name = _("wpimath.units.angular_mils");
+};
+
+template <> struct handle_type_name<wpi::units::compass_points<>> {
+  static constexpr auto name = _("wpimath.units.compass_points");
+};
+
+template <> struct handle_type_name<wpi::units::compass_points_> {
+  static constexpr auto name = _("wpimath.units.compass_points");
 };
 
 } // namespace detail

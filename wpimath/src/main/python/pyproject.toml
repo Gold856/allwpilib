@@ -134,8 +134,10 @@ default_arg_cast = false
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_angle_type_caster.h"
 types = [
+    "wpi::units::angular_mils",
     "wpi::units::arcminutes",
     "wpi::units::arcseconds",
+    "wpi::units::compass_points",
     "wpi::units::degrees",
     "wpi::units::gradians",
     "wpi::units::kiloradians",
@@ -151,8 +153,10 @@ default_arg_cast = true
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_angle_type_caster.h"
 types = [
+    "wpi::units::angular_mils_",
     "wpi::units::arcminutes_",
     "wpi::units::arcseconds_",
+    "wpi::units::compass_points_",
     "wpi::units::degrees_",
     "wpi::units::gradians_",
     "wpi::units::kiloradians_",
@@ -234,11 +238,13 @@ header = "units_area_type_caster.h"
 types = [
     "wpi::units::acres",
     "wpi::units::hectares",
+    "wpi::units::roods",
     "wpi::units::square_feet",
     "wpi::units::square_inches",
     "wpi::units::square_kilometers",
     "wpi::units::square_meters",
     "wpi::units::square_miles",
+    "wpi::units::square_rods",
 ]
 default_arg_cast = true
 
@@ -247,11 +253,13 @@ header = "units_area_type_caster.h"
 types = [
     "wpi::units::acres_",
     "wpi::units::hectares_",
+    "wpi::units::roods_",
     "wpi::units::square_feet_",
     "wpi::units::square_inches_",
     "wpi::units::square_kilometers_",
     "wpi::units::square_meters_",
     "wpi::units::square_miles_",
+    "wpi::units::square_rods_",
 ]
 default_arg_cast = false
 
@@ -280,6 +288,7 @@ default_arg_cast = false
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_charge_type_caster.h"
 types = [
+    "wpi::units::abcoulombs",
     "wpi::units::ampere_hours",
     "wpi::units::coulombs",
     "wpi::units::kiloampere_hours",
@@ -290,12 +299,14 @@ types = [
     "wpi::units::millicoulombs",
     "wpi::units::nanoampere_hours",
     "wpi::units::nanocoulombs",
+    "wpi::units::statcoulombs",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_charge_type_caster.h"
 types = [
+    "wpi::units::abcoulombs_",
     "wpi::units::ampere_hours_",
     "wpi::units::coulombs_",
     "wpi::units::kiloampere_hours_",
@@ -306,6 +317,7 @@ types = [
     "wpi::units::millicoulombs_",
     "wpi::units::nanoampere_hours_",
     "wpi::units::nanocoulombs_",
+    "wpi::units::statcoulombs_",
 ]
 default_arg_cast = false
 
@@ -354,38 +366,92 @@ default_arg_cast = false
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_current_type_caster.h"
 types = [
+    "wpi::units::abamperes",
     "wpi::units::amperes",
     "wpi::units::kiloamperes",
     "wpi::units::microamperes",
     "wpi::units::milliamperes",
     "wpi::units::nanoamperes",
+    "wpi::units::statamperes",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_current_type_caster.h"
 types = [
+    "wpi::units::abamperes_",
     "wpi::units::amperes_",
     "wpi::units::kiloamperes_",
     "wpi::units::microamperes_",
     "wpi::units::milliamperes_",
     "wpi::units::nanoamperes_",
+    "wpi::units::statamperes_",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_data_type_caster.h"
 types = [
+    "wpi::units::bits",
+    "wpi::units::bytes",
     "wpi::units::exabits",
     "wpi::units::exabytes",
+    "wpi::units::exbibits",
+    "wpi::units::exbibytes",
+    "wpi::units::gibibits",
+    "wpi::units::gibibytes",
+    "wpi::units::gigabits",
+    "wpi::units::gigabytes",
+    "wpi::units::kibibits",
+    "wpi::units::kibibytes",
+    "wpi::units::kilobits",
+    "wpi::units::kilobytes",
+    "wpi::units::mebibits",
+    "wpi::units::mebibytes",
+    "wpi::units::megabits",
+    "wpi::units::megabytes",
+    "wpi::units::nibbles",
+    "wpi::units::pebibits",
+    "wpi::units::pebibytes",
+    "wpi::units::petabits",
+    "wpi::units::petabytes",
+    "wpi::units::tebibits",
+    "wpi::units::tebibytes",
+    "wpi::units::terabits",
+    "wpi::units::terabytes",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_data_type_caster.h"
 types = [
+    "wpi::units::bits_",
+    "wpi::units::bytes_",
     "wpi::units::exabits_",
     "wpi::units::exabytes_",
+    "wpi::units::exbibits_",
+    "wpi::units::exbibytes_",
+    "wpi::units::gibibits_",
+    "wpi::units::gibibytes_",
+    "wpi::units::gigabits_",
+    "wpi::units::gigabytes_",
+    "wpi::units::kibibits_",
+    "wpi::units::kibibytes_",
+    "wpi::units::kilobits_",
+    "wpi::units::kilobytes_",
+    "wpi::units::mebibits_",
+    "wpi::units::mebibytes_",
+    "wpi::units::megabits_",
+    "wpi::units::megabytes_",
+    "wpi::units::nibbles_",
+    "wpi::units::pebibits_",
+    "wpi::units::pebibytes_",
+    "wpi::units::petabits_",
+    "wpi::units::petabytes_",
+    "wpi::units::tebibits_",
+    "wpi::units::tebibytes_",
+    "wpi::units::terabits_",
+    "wpi::units::terabytes_",
 ]
 default_arg_cast = false
 
@@ -444,6 +510,8 @@ types = [
     "wpi::units::british_thermal_units_59",
     "wpi::units::british_thermal_units_iso",
     "wpi::units::calories",
+    "wpi::units::calories_it",
+    "wpi::units::ergs",
     "wpi::units::foot_pounds",
     "wpi::units::joules",
     "wpi::units::kilocalories",
@@ -456,6 +524,7 @@ types = [
     "wpi::units::nanocalories",
     "wpi::units::nanojoules",
     "wpi::units::therms",
+    "wpi::units::tons_of_tnt",
     "wpi::units::watt_hours",
 ]
 default_arg_cast = true
@@ -467,6 +536,8 @@ types = [
     "wpi::units::british_thermal_units_59_",
     "wpi::units::british_thermal_units_iso_",
     "wpi::units::calories_",
+    "wpi::units::calories_it_",
+    "wpi::units::ergs_",
     "wpi::units::foot_pounds_",
     "wpi::units::joules_",
     "wpi::units::kilocalories_",
@@ -479,6 +550,7 @@ types = [
     "wpi::units::nanocalories_",
     "wpi::units::nanojoules_",
     "wpi::units::therms_",
+    "wpi::units::tons_of_tnt_",
     "wpi::units::watt_hours_",
 ]
 default_arg_cast = false
@@ -509,14 +581,20 @@ default_arg_cast = false
 header = "units_force_type_caster.h"
 types = [
     "wpi::units::dynes",
+    "wpi::units::grams_force",
     "wpi::units::kilonewtons",
     "wpi::units::kiloponds",
+    "wpi::units::kips",
+    "wpi::units::long_tons_force",
     "wpi::units::micronewtons",
     "wpi::units::millinewtons",
     "wpi::units::nanonewtons",
     "wpi::units::newtons",
+    "wpi::units::ounces_force",
     "wpi::units::poundals",
     "wpi::units::force::pounds",
+    "wpi::units::short_tons_force",
+    "wpi::units::sthenes",
 ]
 default_arg_cast = true
 
@@ -524,14 +602,20 @@ default_arg_cast = true
 header = "units_force_type_caster.h"
 types = [
     "wpi::units::dynes_",
+    "wpi::units::grams_force_",
     "wpi::units::kilonewtons_",
     "wpi::units::kiloponds_",
+    "wpi::units::kips_",
+    "wpi::units::long_tons_force_",
     "wpi::units::micronewtons_",
     "wpi::units::millinewtons_",
     "wpi::units::nanonewtons_",
     "wpi::units::newtons_",
+    "wpi::units::ounces_force_",
     "wpi::units::poundals_",
     "wpi::units::force::pounds_",
+    "wpi::units::short_tons_force_",
+    "wpi::units::sthenes_",
 ]
 default_arg_cast = false
 
@@ -680,6 +764,7 @@ header = "units_length_type_caster.h"
 types = [
     "wpi::units::angstroms",
     "wpi::units::astronomical_units",
+    "wpi::units::barleycorns",
     "wpi::units::centimeters",
     "wpi::units::chains",
     "wpi::units::cubits",
@@ -691,15 +776,21 @@ types = [
     "wpi::units::kilometers",
     "wpi::units::leagues",
     "wpi::units::lightyears",
+    "wpi::units::links",
     "wpi::units::meters",
     "wpi::units::micrometers",
     "wpi::units::miles",
     "wpi::units::millimeters",
     "wpi::units::mils",
+    "wpi::units::nails",
     "wpi::units::nanometers",
     "wpi::units::nautical_leagues",
     "wpi::units::nautical_miles",
     "wpi::units::parsecs",
+    "wpi::units::picas",
+    "wpi::units::points",
+    "wpi::units::rods",
+    "wpi::units::spans",
     "wpi::units::yards",
 ]
 default_arg_cast = true
@@ -709,6 +800,7 @@ header = "units_length_type_caster.h"
 types = [
     "wpi::units::angstroms_",
     "wpi::units::astronomical_units_",
+    "wpi::units::barleycorns_",
     "wpi::units::centimeters_",
     "wpi::units::chains_",
     "wpi::units::cubits_",
@@ -720,15 +812,21 @@ types = [
     "wpi::units::kilometers_",
     "wpi::units::leagues_",
     "wpi::units::lightyears_",
+    "wpi::units::links_",
     "wpi::units::meters_",
     "wpi::units::micrometers_",
     "wpi::units::miles_",
     "wpi::units::millimeters_",
     "wpi::units::mils_",
+    "wpi::units::nails_",
     "wpi::units::nanometers_",
     "wpi::units::nautical_leagues_",
     "wpi::units::nautical_miles_",
     "wpi::units::parsecs_",
+    "wpi::units::picas_",
+    "wpi::units::points_",
+    "wpi::units::rods_",
+    "wpi::units::spans_",
     "wpi::units::yards_",
 ]
 default_arg_cast = false
@@ -864,38 +962,52 @@ default_arg_cast = false
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_mass_type_caster.h"
 types = [
+    "wpi::units::avoirdupois_drams",
     "wpi::units::carats",
+    "wpi::units::grains",
     "wpi::units::grams",
+    "wpi::units::hundredweights",
     "wpi::units::kilograms",
     "wpi::units::long_tons",
     "wpi::units::micrograms",
     "wpi::units::milligrams",
     "wpi::units::nanograms",
     "wpi::units::ounces",
+    "wpi::units::pennyweights",
     "wpi::units::mass::pounds",
+    "wpi::units::short_hundredweights",
     "wpi::units::short_tons",
     "wpi::units::slugs",
     "wpi::units::stone",
     "wpi::units::tonnes",
+    "wpi::units::troy_ounces",
+    "wpi::units::troy_pounds",
 ]
 default_arg_cast = true
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_mass_type_caster.h"
 types = [
+    "wpi::units::avoirdupois_drams_",
     "wpi::units::carats_",
+    "wpi::units::grains_",
     "wpi::units::grams_",
+    "wpi::units::hundredweights_",
     "wpi::units::kilograms_",
     "wpi::units::long_tons_",
     "wpi::units::micrograms_",
     "wpi::units::milligrams_",
     "wpi::units::nanograms_",
     "wpi::units::ounces_",
+    "wpi::units::pennyweights_",
     "wpi::units::mass::pounds_",
+    "wpi::units::short_hundredweights_",
     "wpi::units::short_tons_",
     "wpi::units::slugs_",
     "wpi::units::stone_",
     "wpi::units::tonnes_",
+    "wpi::units::troy_ounces_",
+    "wpi::units::troy_pounds_",
 ]
 default_arg_cast = false
 
@@ -916,11 +1028,14 @@ default_arg_cast = false
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_power_type_caster.h"
 types = [
+    "wpi::units::electrical_horsepower",
     "wpi::units::horsepower",
     "wpi::units::kilowatts",
+    "wpi::units::metric_horsepower",
     "wpi::units::microwatts",
     "wpi::units::milliwatts",
     "wpi::units::nanowatts",
+    "wpi::units::tons_of_refrigeration",
     "wpi::units::watts",
 ]
 default_arg_cast = true
@@ -928,11 +1043,14 @@ default_arg_cast = true
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_power_type_caster.h"
 types = [
+    "wpi::units::electrical_horsepower_",
     "wpi::units::horsepower_",
     "wpi::units::kilowatts_",
+    "wpi::units::metric_horsepower_",
     "wpi::units::microwatts_",
     "wpi::units::milliwatts_",
     "wpi::units::nanowatts_",
+    "wpi::units::tons_of_refrigeration_",
     "wpi::units::watts_",
 ]
 default_arg_cast = false
@@ -942,15 +1060,23 @@ header = "units_pressure_type_caster.h"
 types = [
     "wpi::units::atmospheres",
     "wpi::units::bars",
+    "wpi::units::baryes",
+    "wpi::units::centimeters_of_water",
     "wpi::units::inches_of_mercury",
+    "wpi::units::inches_of_water",
     "wpi::units::kilopascals",
+    "wpi::units::kips_per_square_inch",
     "wpi::units::micropascals",
     "wpi::units::millibars",
     "wpi::units::millimeters_of_mercury",
+    "wpi::units::millimeters_of_water",
     "wpi::units::millipascals",
     "wpi::units::nanopascals",
     "wpi::units::pascals",
+    "wpi::units::piezes",
+    "wpi::units::pounds_per_square_foot",
     "wpi::units::pounds_per_square_inch",
+    "wpi::units::technical_atmospheres",
     "wpi::units::torrs",
 ]
 default_arg_cast = true
@@ -960,15 +1086,23 @@ header = "units_pressure_type_caster.h"
 types = [
     "wpi::units::atmospheres_",
     "wpi::units::bars_",
+    "wpi::units::baryes_",
+    "wpi::units::centimeters_of_water_",
     "wpi::units::inches_of_mercury_",
+    "wpi::units::inches_of_water_",
     "wpi::units::kilopascals_",
+    "wpi::units::kips_per_square_inch_",
     "wpi::units::micropascals_",
     "wpi::units::millibars_",
     "wpi::units::millimeters_of_mercury_",
+    "wpi::units::millimeters_of_water_",
     "wpi::units::millipascals_",
     "wpi::units::nanopascals_",
     "wpi::units::pascals_",
+    "wpi::units::piezes_",
+    "wpi::units::pounds_per_square_foot_",
     "wpi::units::pounds_per_square_inch_",
+    "wpi::units::technical_atmospheres_",
     "wpi::units::torrs_",
 ]
 default_arg_cast = false
@@ -1036,6 +1170,7 @@ types = [
     "wpi::units::nanograys",
     "wpi::units::nanosieverts",
     "wpi::units::radiation_absorbed_dose",
+    "wpi::units::roentgens_equivalent_man",
     "wpi::units::rutherfords",
     "wpi::units::sieverts",
 ]
@@ -1060,6 +1195,7 @@ types = [
     "wpi::units::nanograys_",
     "wpi::units::nanosieverts_",
     "wpi::units::radiation_absorbed_dose_",
+    "wpi::units::roentgens_equivalent_man_",
     "wpi::units::rutherfords_",
     "wpi::units::sieverts_",
 ]
@@ -1187,6 +1323,7 @@ types = [
     "wpi::units::millimols",
     "wpi::units::mols",
     "wpi::units::nanomols",
+    "wpi::units::pound_moles",
 ]
 default_arg_cast = true
 
@@ -1198,6 +1335,7 @@ types = [
     "wpi::units::millimols_",
     "wpi::units::mols_",
     "wpi::units::nanomols_",
+    "wpi::units::pound_moles_",
 ]
 default_arg_cast = false
 
@@ -1270,12 +1408,16 @@ default_arg_cast = false
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_time_type_caster.h"
 types = [
+    "wpi::units::centuries",
     "wpi::units::days",
+    "wpi::units::decades",
+    "wpi::units::fortnights",
     "wpi::units::gregorian_years",
     "wpi::units::hours",
     "wpi::units::julian_years",
     "wpi::units::kiloseconds",
     "wpi::units::microseconds",
+    "wpi::units::millennia",
     "wpi::units::milliseconds",
     "wpi::units::minutes",
     "wpi::units::nanoseconds",
@@ -1288,12 +1430,16 @@ default_arg_cast = true
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_time_type_caster.h"
 types = [
+    "wpi::units::centuries_",
     "wpi::units::days_",
+    "wpi::units::decades_",
+    "wpi::units::fortnights_",
     "wpi::units::gregorian_years_",
     "wpi::units::hours_",
     "wpi::units::julian_years_",
     "wpi::units::kiloseconds_",
     "wpi::units::microseconds_",
+    "wpi::units::millennia_",
     "wpi::units::milliseconds_",
     "wpi::units::minutes_",
     "wpi::units::nanoseconds_",
@@ -1307,10 +1453,10 @@ default_arg_cast = false
 header = "units_torque_type_caster.h"
 types = [
     "wpi::units::foot_poundals",
-    "wpi::units::foot_pounds",
     "wpi::units::inch_pounds",
     "wpi::units::meter_kilograms",
     "wpi::units::newton_meters",
+    "wpi::units::pound_feet",
 ]
 default_arg_cast = true
 
@@ -1318,19 +1464,23 @@ default_arg_cast = true
 header = "units_torque_type_caster.h"
 types = [
     "wpi::units::foot_poundals_",
-    "wpi::units::foot_pounds_",
     "wpi::units::inch_pounds_",
     "wpi::units::meter_kilograms_",
     "wpi::units::newton_meters_",
+    "wpi::units::pound_feet_",
 ]
 default_arg_cast = false
 
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_velocity_type_caster.h"
 types = [
+    "wpi::units::feet_per_minute",
     "wpi::units::feet_per_second",
+    "wpi::units::inches_per_second",
     "wpi::units::kilometers_per_hour",
+    "wpi::units::kilometers_per_second",
     "wpi::units::knots",
+    "wpi::units::meters_per_minute",
     "wpi::units::meters_per_second",
     "wpi::units::miles_per_hour",
 ]
@@ -1339,11 +1489,39 @@ default_arg_cast = true
 [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
 header = "units_velocity_type_caster.h"
 types = [
+    "wpi::units::feet_per_minute_",
     "wpi::units::feet_per_second_",
+    "wpi::units::inches_per_second_",
     "wpi::units::kilometers_per_hour_",
+    "wpi::units::kilometers_per_second_",
     "wpi::units::knots_",
+    "wpi::units::meters_per_minute_",
     "wpi::units::meters_per_second_",
     "wpi::units::miles_per_hour_",
+]
+default_arg_cast = false
+
+[[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
+header = "units_viscosity_type_caster.h"
+types = [
+    "wpi::units::centipoise",
+    "wpi::units::centistokes",
+    "wpi::units::pascal_seconds",
+    "wpi::units::poise",
+    "wpi::units::square_meters_per_second",
+    "wpi::units::stokes",
+]
+default_arg_cast = true
+
+[[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
+header = "units_viscosity_type_caster.h"
+types = [
+    "wpi::units::centipoise_",
+    "wpi::units::centistokes_",
+    "wpi::units::pascal_seconds_",
+    "wpi::units::poise_",
+    "wpi::units::square_meters_per_second_",
+    "wpi::units::stokes_",
 ]
 default_arg_cast = false
 
@@ -1448,6 +1626,34 @@ types = [
     "wpi::units::strikes_",
     "wpi::units::tablespoons_",
     "wpi::units::teaspoons_",
+]
+default_arg_cast = false
+
+[[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
+header = "units_volume_flow_rate_type_caster.h"
+types = [
+    "wpi::units::cubic_feet_per_minute",
+    "wpi::units::cubic_feet_per_second",
+    "wpi::units::cubic_meters_per_hour",
+    "wpi::units::cubic_meters_per_second",
+    "wpi::units::gallons_per_hour",
+    "wpi::units::gallons_per_minute",
+    "wpi::units::liters_per_minute",
+    "wpi::units::liters_per_second",
+]
+default_arg_cast = true
+
+[[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
+header = "units_volume_flow_rate_type_caster.h"
+types = [
+    "wpi::units::cubic_feet_per_minute_",
+    "wpi::units::cubic_feet_per_second_",
+    "wpi::units::cubic_meters_per_hour_",
+    "wpi::units::cubic_meters_per_second_",
+    "wpi::units::gallons_per_hour_",
+    "wpi::units::gallons_per_minute_",
+    "wpi::units::liters_per_minute_",
+    "wpi::units::liters_per_second_",
 ]
 default_arg_cast = false
 

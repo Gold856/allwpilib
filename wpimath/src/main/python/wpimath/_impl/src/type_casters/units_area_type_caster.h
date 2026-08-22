@@ -1,6 +1,6 @@
 #pragma once
 
-#include <wpi/units/area.h>
+#include <wpi/units/area.hpp>
 
 namespace pybind11 {
 namespace detail {
@@ -58,6 +58,22 @@ template <> struct handle_type_name<wpi::units::acres<>> {
 
 template <> struct handle_type_name<wpi::units::acres_> {
   static constexpr auto name = _("wpimath.units.acres");
+};
+
+template <> struct handle_type_name<wpi::units::roods<>> {
+  static constexpr auto name = _("wpimath.units.roods");
+};
+
+template <> struct handle_type_name<wpi::units::roods_> {
+  static constexpr auto name = _("wpimath.units.roods");
+};
+
+template <> struct handle_type_name<wpi::units::square_rods<>> {
+  static constexpr auto name = _("wpimath.units.square_rods");
+};
+
+template <> struct handle_type_name<wpi::units::square_rods_> {
+  static constexpr auto name = _("wpimath.units.square_rods");
 };
 
 } // namespace detail

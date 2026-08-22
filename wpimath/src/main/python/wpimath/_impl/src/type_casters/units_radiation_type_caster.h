@@ -1,6 +1,6 @@
 #pragma once
 
-#include <wpi/units/radiation.h>
+#include <wpi/units/radiation.hpp>
 
 namespace pybind11 {
 namespace detail {
@@ -146,6 +146,14 @@ template <> struct handle_type_name<wpi::units::radiation_absorbed_dose<>> {
 
 template <> struct handle_type_name<wpi::units::radiation_absorbed_dose_> {
   static constexpr auto name = _("wpimath.units.radiation_absorbed_dose");
+};
+
+template <> struct handle_type_name<wpi::units::roentgens_equivalent_man<>> {
+  static constexpr auto name = _("wpimath.units.roentgens_equivalent_man");
+};
+
+template <> struct handle_type_name<wpi::units::roentgens_equivalent_man_> {
+  static constexpr auto name = _("wpimath.units.roentgens_equivalent_man");
 };
 
 } // namespace detail

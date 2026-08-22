@@ -1,6 +1,6 @@
 #pragma once
 
-#include <wpi/units/acceleration.h>
+#include <wpi/units/acceleration.hpp>
 
 namespace pybind11 {
 namespace detail {

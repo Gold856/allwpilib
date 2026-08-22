@@ -1,6 +1,6 @@
 #pragma once
 
-#include <wpi/units/jerk.h>
+#include <wpi/units/jerk.hpp>
 
 namespace pybind11 {
 namespace detail {

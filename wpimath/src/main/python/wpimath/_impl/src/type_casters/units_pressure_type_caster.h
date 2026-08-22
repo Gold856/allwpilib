@@ -1,6 +1,6 @@
 #pragma once
 
-#include <wpi/units/pressure.h>
+#include <wpi/units/pressure.hpp>
 
 namespace pybind11 {
 namespace detail {
@@ -98,6 +98,70 @@ template <> struct handle_type_name<wpi::units::inches_of_mercury<>> {
 
 template <> struct handle_type_name<wpi::units::inches_of_mercury_> {
   static constexpr auto name = _("wpimath.units.inches_of_mercury");
+};
+
+template <> struct handle_type_name<wpi::units::technical_atmospheres<>> {
+  static constexpr auto name = _("wpimath.units.technical_atmospheres");
+};
+
+template <> struct handle_type_name<wpi::units::technical_atmospheres_> {
+  static constexpr auto name = _("wpimath.units.technical_atmospheres");
+};
+
+template <> struct handle_type_name<wpi::units::pounds_per_square_foot<>> {
+  static constexpr auto name = _("wpimath.units.pounds_per_square_foot");
+};
+
+template <> struct handle_type_name<wpi::units::pounds_per_square_foot_> {
+  static constexpr auto name = _("wpimath.units.pounds_per_square_foot");
+};
+
+template <> struct handle_type_name<wpi::units::kips_per_square_inch<>> {
+  static constexpr auto name = _("wpimath.units.kips_per_square_inch");
+};
+
+template <> struct handle_type_name<wpi::units::kips_per_square_inch_> {
+  static constexpr auto name = _("wpimath.units.kips_per_square_inch");
+};
+
+template <> struct handle_type_name<wpi::units::baryes<>> {
+  static constexpr auto name = _("wpimath.units.baryes");
+};
+
+template <> struct handle_type_name<wpi::units::baryes_> {
+  static constexpr auto name = _("wpimath.units.baryes");
+};
+
+template <> struct handle_type_name<wpi::units::piezes<>> {
+  static constexpr auto name = _("wpimath.units.piezes");
+};
+
+template <> struct handle_type_name<wpi::units::piezes_> {
+  static constexpr auto name = _("wpimath.units.piezes");
+};
+
+template <> struct handle_type_name<wpi::units::centimeters_of_water<>> {
+  static constexpr auto name = _("wpimath.units.centimeters_of_water");
+};
+
+template <> struct handle_type_name<wpi::units::centimeters_of_water_> {
+  static constexpr auto name = _("wpimath.units.centimeters_of_water");
+};
+
+template <> struct handle_type_name<wpi::units::millimeters_of_water<>> {
+  static constexpr auto name = _("wpimath.units.millimeters_of_water");
+};
+
+template <> struct handle_type_name<wpi::units::millimeters_of_water_> {
+  static constexpr auto name = _("wpimath.units.millimeters_of_water");
+};
+
+template <> struct handle_type_name<wpi::units::inches_of_water<>> {
+  static constexpr auto name = _("wpimath.units.inches_of_water");
+};
+
+template <> struct handle_type_name<wpi::units::inches_of_water_> {
+  static constexpr auto name = _("wpimath.units.inches_of_water");
 };
 
 } // namespace detail

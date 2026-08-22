@@ -1,6 +1,6 @@
 #pragma once
 
-#include <wpi/units/mass.h>
+#include <wpi/units/mass.hpp>
 
 namespace pybind11 {
 namespace detail {
@@ -106,6 +106,62 @@ template <> struct handle_type_name<wpi::units::slugs<>> {
 
 template <> struct handle_type_name<wpi::units::slugs_> {
   static constexpr auto name = _("wpimath.units.slugs");
+};
+
+template <> struct handle_type_name<wpi::units::grains<>> {
+  static constexpr auto name = _("wpimath.units.grains");
+};
+
+template <> struct handle_type_name<wpi::units::grains_> {
+  static constexpr auto name = _("wpimath.units.grains");
+};
+
+template <> struct handle_type_name<wpi::units::avoirdupois_drams<>> {
+  static constexpr auto name = _("wpimath.units.avoirdupois_drams");
+};
+
+template <> struct handle_type_name<wpi::units::avoirdupois_drams_> {
+  static constexpr auto name = _("wpimath.units.avoirdupois_drams");
+};
+
+template <> struct handle_type_name<wpi::units::pennyweights<>> {
+  static constexpr auto name = _("wpimath.units.pennyweights");
+};
+
+template <> struct handle_type_name<wpi::units::pennyweights_> {
+  static constexpr auto name = _("wpimath.units.pennyweights");
+};
+
+template <> struct handle_type_name<wpi::units::troy_ounces<>> {
+  static constexpr auto name = _("wpimath.units.troy_ounces");
+};
+
+template <> struct handle_type_name<wpi::units::troy_ounces_> {
+  static constexpr auto name = _("wpimath.units.troy_ounces");
+};
+
+template <> struct handle_type_name<wpi::units::troy_pounds<>> {
+  static constexpr auto name = _("wpimath.units.troy_pounds");
+};
+
+template <> struct handle_type_name<wpi::units::troy_pounds_> {
+  static constexpr auto name = _("wpimath.units.troy_pounds");
+};
+
+template <> struct handle_type_name<wpi::units::hundredweights<>> {
+  static constexpr auto name = _("wpimath.units.hundredweights");
+};
+
+template <> struct handle_type_name<wpi::units::hundredweights_> {
+  static constexpr auto name = _("wpimath.units.hundredweights");
+};
+
+template <> struct handle_type_name<wpi::units::short_hundredweights<>> {
+  static constexpr auto name = _("wpimath.units.short_hundredweights");
+};
+
+template <> struct handle_type_name<wpi::units::short_hundredweights_> {
+  static constexpr auto name = _("wpimath.units.short_hundredweights");
 };
 
 } // namespace detail

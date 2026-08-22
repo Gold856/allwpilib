@@ -1,6 +1,6 @@
 #pragma once
 
-#include <wpi/units/charge.h>
+#include <wpi/units/charge.hpp>
 
 namespace pybind11 {
 namespace detail {
@@ -82,6 +82,22 @@ template <> struct handle_type_name<wpi::units::kiloampere_hours<>> {
 
 template <> struct handle_type_name<wpi::units::kiloampere_hours_> {
   static constexpr auto name = _("wpimath.units.kiloampere_hours");
+};
+
+template <> struct handle_type_name<wpi::units::abcoulombs<>> {
+  static constexpr auto name = _("wpimath.units.abcoulombs");
+};
+
+template <> struct handle_type_name<wpi::units::abcoulombs_> {
+  static constexpr auto name = _("wpimath.units.abcoulombs");
+};
+
+template <> struct handle_type_name<wpi::units::statcoulombs<>> {
+  static constexpr auto name = _("wpimath.units.statcoulombs");
+};
+
+template <> struct handle_type_name<wpi::units::statcoulombs_> {
+  static constexpr auto name = _("wpimath.units.statcoulombs");
 };
 
 } // namespace detail

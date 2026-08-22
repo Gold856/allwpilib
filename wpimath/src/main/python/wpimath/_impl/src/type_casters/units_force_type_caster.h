@@ -1,6 +1,6 @@
 #pragma once
 
-#include <wpi/units/force.h>
+#include <wpi/units/force.hpp>
 
 namespace pybind11 {
 namespace detail {
@@ -74,6 +74,54 @@ template <> struct handle_type_name<wpi::units::poundals<>> {
 
 template <> struct handle_type_name<wpi::units::poundals_> {
   static constexpr auto name = _("wpimath.units.poundals");
+};
+
+template <> struct handle_type_name<wpi::units::kips<>> {
+  static constexpr auto name = _("wpimath.units.kips");
+};
+
+template <> struct handle_type_name<wpi::units::kips_> {
+  static constexpr auto name = _("wpimath.units.kips");
+};
+
+template <> struct handle_type_name<wpi::units::ounces_force<>> {
+  static constexpr auto name = _("wpimath.units.ounces_force");
+};
+
+template <> struct handle_type_name<wpi::units::ounces_force_> {
+  static constexpr auto name = _("wpimath.units.ounces_force");
+};
+
+template <> struct handle_type_name<wpi::units::grams_force<>> {
+  static constexpr auto name = _("wpimath.units.grams_force");
+};
+
+template <> struct handle_type_name<wpi::units::grams_force_> {
+  static constexpr auto name = _("wpimath.units.grams_force");
+};
+
+template <> struct handle_type_name<wpi::units::short_tons_force<>> {
+  static constexpr auto name = _("wpimath.units.short_tons_force");
+};
+
+template <> struct handle_type_name<wpi::units::short_tons_force_> {
+  static constexpr auto name = _("wpimath.units.short_tons_force");
+};
+
+template <> struct handle_type_name<wpi::units::long_tons_force<>> {
+  static constexpr auto name = _("wpimath.units.long_tons_force");
+};
+
+template <> struct handle_type_name<wpi::units::long_tons_force_> {
+  static constexpr auto name = _("wpimath.units.long_tons_force");
+};
+
+template <> struct handle_type_name<wpi::units::sthenes<>> {
+  static constexpr auto name = _("wpimath.units.sthenes");
+};
+
+template <> struct handle_type_name<wpi::units::sthenes_> {
+  static constexpr auto name = _("wpimath.units.sthenes");
 };
 
 } // namespace detail

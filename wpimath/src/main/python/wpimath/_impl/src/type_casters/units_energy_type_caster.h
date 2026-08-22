@@ -1,6 +1,6 @@
 #pragma once
 
-#include <wpi/units/energy.h>
+#include <wpi/units/energy.hpp>
 
 namespace pybind11 {
 namespace detail {
@@ -138,6 +138,30 @@ template <> struct handle_type_name<wpi::units::foot_pounds<>> {
 
 template <> struct handle_type_name<wpi::units::foot_pounds_> {
   static constexpr auto name = _("wpimath.units.foot_pounds");
+};
+
+template <> struct handle_type_name<wpi::units::ergs<>> {
+  static constexpr auto name = _("wpimath.units.ergs");
+};
+
+template <> struct handle_type_name<wpi::units::ergs_> {
+  static constexpr auto name = _("wpimath.units.ergs");
+};
+
+template <> struct handle_type_name<wpi::units::calories_it<>> {
+  static constexpr auto name = _("wpimath.units.calories_it");
+};
+
+template <> struct handle_type_name<wpi::units::calories_it_> {
+  static constexpr auto name = _("wpimath.units.calories_it");
+};
+
+template <> struct handle_type_name<wpi::units::tons_of_tnt<>> {
+  static constexpr auto name = _("wpimath.units.tons_of_tnt");
+};
+
+template <> struct handle_type_name<wpi::units::tons_of_tnt_> {
+  static constexpr auto name = _("wpimath.units.tons_of_tnt");
 };
 
 } // namespace detail

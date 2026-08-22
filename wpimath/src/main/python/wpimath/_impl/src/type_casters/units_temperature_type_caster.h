@@ -1,6 +1,6 @@
 #pragma once
 
-#include <wpi/units/temperature.h>
+#include <wpi/units/temperature.hpp>
 
 namespace pybind11 {
 namespace detail {
