@@ -15,6 +15,7 @@
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/geometry/Translation3d.hpp"
 #include "wpi/units/angle.hpp"
+#include "wpi/units/concentration.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
@@ -57,6 +58,17 @@ TEST_CASE("MathUtilTest ApplyDeadbandUnits", "[wpimath]") {
   // < 0
   CHECK_UNITS_EQ(-20_rad, wpi::math::ApplyDeadband<wpi::units::radians<>>(
                               -20_rad, 1_rad, 20_rad));
+}
+
+TEST_CASE("MathUtilTest ApplyDeadbandDimensionlessUnits", "[wpimath]") {
+  // < 0
+  CHECK_UNITS_EQ(-100_pct, wpi::math::ApplyDeadband<wpi::units::percent<>>(
+                               -100_pct, 1_pct, 100_pct));
+  CHECK_UNITS_EQ(-100_pct, wpi::math::ApplyDeadband<wpi::units::percent<>>(
+                               -100_pct, 1_pct));
+
+  CHECK_UNITS_EQ(25_pct, wpi::math::ApplyDeadband<wpi::units::percent<>>(
+                             25_pct, 2_pct, 25_pct));
 }
 
 TEST_CASE("MathUtilTest ApplyDeadbandLargeMaxMagnitude", "[wpimath]") {
@@ -192,6 +204,22 @@ TEST_CASE("MathUtilTest CopyDirectionPowWithUnits", "[wpimath]") {
   CHECK_UNITS_EQ(wpi::units::meters_per_second<>{-0.5 * 0.5 * 10},
                  wpi::math::CopyDirectionPow<wpi::units::meters_per_second<>>(
                      -5_mps, 2.0, 10_mps));
+}
+
+TEST_CASE("MathUtilTest CopyDirectionPowWithDimensionUnits", "[wpimath]") {
+  CHECK_UNITS_EQ(
+      0_pct, wpi::math::CopyDirectionPow<wpi::units::percent<>>(0_pct, 2.0));
+  CHECK_UNITS_EQ(100_pct, wpi::math::CopyDirectionPow<wpi::units::percent<>>(
+                              100_pct, 2.0));
+  CHECK_UNITS_EQ(-100_pct, wpi::math::CopyDirectionPow<wpi::units::percent<>>(
+                               -100_pct, 2.0));
+
+  CHECK_UNITS_EQ(
+      wpi::units::percent<>{0.5 * 0.5 * 10},
+      wpi::math::CopyDirectionPow<wpi::units::percent<>>(5_pct, 2.0, 10_pct));
+  CHECK_UNITS_EQ(
+      wpi::units::percent<>{-0.5 * 0.5 * 10},
+      wpi::math::CopyDirectionPow<wpi::units::percent<>>(-5_pct, 2.0, 10_pct));
 }
 
 TEST_CASE("MathUtilTest CopyDirectionPow2d", "[wpimath]") {
