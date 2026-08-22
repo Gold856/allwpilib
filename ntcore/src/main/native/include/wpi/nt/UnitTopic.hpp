@@ -87,7 +87,7 @@ class UnitSubscriber : public Subscriber {
    * @return value
    */
   ValueType Get(ParamType defaultValue) const {
-    return T{::wpi::nt::GetDouble(m_subHandle, defaultValue.value())};
+    return T{::wpi::nt::GetDouble(m_subHandle, defaultValue.raw())};
   }
 
   /**
@@ -109,7 +109,7 @@ class UnitSubscriber : public Subscriber {
    */
   TimestampedValueType GetAtomic(ParamType defaultValue) const {
     auto doubleVal =
-        ::wpi::nt::GetAtomicDouble(m_subHandle, defaultValue.value());
+        ::wpi::nt::GetAtomicDouble(m_subHandle, defaultValue.raw());
     return {doubleVal.time, doubleVal.serverTime, doubleVal.value};
   }
 
@@ -176,7 +176,7 @@ class UnitPublisher : public Publisher {
    * @param time timestamp; 0 indicates current NT time should be used
    */
   void Set(ParamType value, int64_t time = 0) {
-    ::wpi::nt::SetDouble(m_pubHandle, value.value(), time);
+    ::wpi::nt::SetDouble(m_pubHandle, value.raw(), time);
   }
 
   /**
@@ -187,7 +187,7 @@ class UnitPublisher : public Publisher {
    * @param value value
    */
   void SetDefault(ParamType value) {
-    ::wpi::nt::SetDefaultDouble(m_pubHandle, value.value());
+    ::wpi::nt::SetDefaultDouble(m_pubHandle, value.raw());
   }
 
   /**

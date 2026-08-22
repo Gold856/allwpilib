@@ -5,6 +5,7 @@
 #pragma once
 
 #include "wpi/math/trajectory/TrapezoidProfile.hpp"
+#include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/struct/Struct.hpp"
 
@@ -13,15 +14,14 @@
 // wpi::math::TrapezoidProfile<wpi::units::radians_>
 
 template <class Distance>
-  requires wpi::units::length_unit<Distance> ||
-           wpi::units::angle_unit<Distance> ||
+  requires wpi::units::Length<Distance> || wpi::units::Angle<Distance> ||
            wpi::units::traits::is_dimensionless_unit<Distance>::value
 struct wpi::util::Struct<
     wpi::math::detail::TrapezoidProfileConstraints<Distance>> {
   static constexpr std::string_view GetTypeName() {
-    if constexpr (wpi::units::length_unit<Distance>) {
+    if constexpr (wpi::units::Length<Distance>) {
       return "TrapezoidProfileConstraintsMeters";
-    } else if constexpr (wpi::units::angle_unit<Distance>) {
+    } else if constexpr (wpi::units::Angle<Distance>) {
       return "TrapezoidProfileConstraintsRadians";
     } else {
       return "TrapezoidProfileConstraints";

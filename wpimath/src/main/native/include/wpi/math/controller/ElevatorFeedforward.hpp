@@ -7,6 +7,7 @@
 #include <gcem.hpp>
 
 #include "wpi/math/util/MathShared.hpp"
+#include "wpi/units/acceleration.hpp"
 #include "wpi/units/core.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
