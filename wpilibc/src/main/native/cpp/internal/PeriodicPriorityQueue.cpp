@@ -47,7 +47,7 @@ PeriodicPriorityQueue::Callback::Callback(std::function<void()> func,
 PeriodicPriorityQueue::Callback::Callback(std::function<void()> func,
                                           std::chrono::nanoseconds startTime,
                                           wpi::units::seconds<> period)
-    : Callback{std::move(func), startTime, period, wpi::units::second_t{0}} {}
+    : Callback{std::move(func), startTime, period, 0_s} {}
 
 void PeriodicPriorityQueue::Add(std::function<void()> func,
                                 std::chrono::nanoseconds startTime,

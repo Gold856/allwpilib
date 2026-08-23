@@ -693,7 +693,7 @@ TEST_CASE("LEDPatternTest Breathe", "[wpilibc]") {
   wpi::util::Color midGray{0.5, 0.5, 0.5};
   std::array<AddressableLED::LEDData, 1> buffer;
   auto white = LEDPattern::Solid(wpi::util::Color::WHITE);
-  auto pattern = white.Breathe(wpi::units::nanosecond_t{4});
+  auto pattern = white.Breathe(4_ns);
 
   static int64_t now = 0;
   WPI_SetNowImpl([] { return now; });
