@@ -323,11 +323,11 @@ TEST_CASE_METHOD(DataLogTelemetryBackendTest,
 TEST_CASE_METHOD(DataLogTelemetryBackendTest,
                  "DataLogTelemetryBackendTest LogsStructAndProtobufDataTypes",
                  "[wpilibc][telemetry]") {
-  const wpi::math::Translation2d value{wpi::units::meter_t{1.25},
-                                       wpi::units::meter_t{2.5}};
+  const wpi::math::Translation2d value{wpi::units::meters<>{1.25},
+                                       wpi::units::meters<>{2.5}};
   const std::array<wpi::math::Translation2d, 2> array{
-      value, wpi::math::Translation2d{wpi::units::meter_t{3.75},
-                                      wpi::units::meter_t{4.5}}};
+      value, wpi::math::Translation2d{wpi::units::meters<>{3.75},
+                                      wpi::units::meters<>{4.5}}};
   wpi::util::ProtobufMessage<wpi::math::Translation2d> msg;
   const std::string structType{std::string_view{
       wpi::util::GetStructTypeString<wpi::math::Translation2d>()}};

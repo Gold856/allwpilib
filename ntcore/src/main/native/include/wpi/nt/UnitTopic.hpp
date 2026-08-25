@@ -21,7 +21,7 @@ class UnitTopic;
 /**
  * Timestamped unit.
  *
- * @tparam T unit type, e.g. wpi::units::meter_t
+ * @tparam T unit type, e.g. wpi::units::meters<>
  */
 template <typename T>
 struct TimestampedUnit {
@@ -49,7 +49,7 @@ struct TimestampedUnit {
 /**
  * NetworkTables unit-typed subscriber.
  *
- * @tparam T unit type, e.g. wpi::units::meter_t
+ * @tparam T unit type, e.g. wpi::units::meters<>
  */
 template <typename T>
 class UnitSubscriber : public Subscriber {
@@ -148,7 +148,7 @@ class UnitSubscriber : public Subscriber {
 /**
  * NetworkTables unit-typed publisher.
  *
- * @tparam T unit type, e.g. wpi::units::meter_t
+ * @tparam T unit type, e.g. wpi::units::meters<>
  */
 template <typename T>
 class UnitPublisher : public Publisher {
@@ -205,7 +205,7 @@ class UnitPublisher : public Publisher {
  *
  * @note Unlike NetworkTableEntry, the entry goes away when this is destroyed.
  *
- * @tparam T unit type, e.g. wpi::units::meter_t
+ * @tparam T unit type, e.g. wpi::units::meters<>
  */
 template <typename T>
 class UnitEntry final : public UnitSubscriber<T>, public UnitPublisher<T> {
@@ -265,7 +265,7 @@ class UnitEntry final : public UnitSubscriber<T>, public UnitPublisher<T> {
  * correct behavior the publisher and subscriber must use the same unit type,
  * but this can be checked at runtime using IsMatchingUnit().
  *
- * @tparam T unit type, e.g. wpi::units::meter_t
+ * @tparam T unit type, e.g. wpi::units::meters<>
  */
 template <typename T>
 class UnitTopic final : public Topic {

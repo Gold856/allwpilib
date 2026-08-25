@@ -58,7 +58,7 @@ struct UnitsTunableTest {
 };
 
 struct UnitMemberComplex : public ComplexTunable {
-  wpi::units::meters<> distance{1.0};
+  wpi::units::meters_<> distance{1.0};
 
   std::string_view GetTunableType() const override { return "UnitComplex"; }
 
@@ -90,7 +90,7 @@ TEST_CASE_METHOD(UnitsTunableTest,
 }
 TEST_CASE_METHOD(UnitsTunableTest, "UnitsTunableTest PublishAndTune",
                  "[wpimath][tunable]") {
-  wpi::tunables::Tunable<wpi::units::meters<>> distance{6_m};
+  wpi::tunables::Tunable<wpi::units::meters_<>> distance{6_m};
   wpi::tunables::Publish("distance", distance);
   auto distanceUid = backend->GetUid("/distance");
   REQUIRE(distanceUid);
