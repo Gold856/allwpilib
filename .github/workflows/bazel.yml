@@ -102,7 +102,7 @@ jobs:
           if [ "${{ runner.os }}" = "Windows" ]; then
             bazel --output_user_root=D:\\bazelroot ${ACTION} ${TARGETS} --config=ci -c opt --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER='${{ matrix.classifier }}' --execution_log_compact_file="${{ matrix.name }} Exec Log.log"
           else
-            bazel ${ACTION} ${TARGETS} --config=ci -c opt --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER='${{ matrix.classifier }}' --execution_log_compact_file="${{ matrix.name }} Exec Log.log"
+            bazel ${ACTION} ${TARGETS} --config=ci -c opt --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER='${{ matrix.classifier }}' --execution_log_compact_file="${{ matrix.name }} Exec Log.binpb.zst"
           fi
         shell: bash
 
