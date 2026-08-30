@@ -100,7 +100,7 @@ jobs:
             TARGETS=...
           fi
           if [ "${{ runner.os }}" = "Windows" ]; then
-            bazel --output_user_root=D:\\bazelroot ${ACTION} ${TARGETS} --config=ci -c opt --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER='${{ matrix.classifier }}' --execution_log_compact_file="${{ matrix.name }} Exec Log.log"
+            bazel --output_user_root=D:\\bazelroot ${ACTION} ${TARGETS} --config=ci -c opt --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER='${{ matrix.classifier }}' --execution_log_compact_file="${{ matrix.name }} Exec Log.binpb.zst"
           else
             bazel ${ACTION} ${TARGETS} --config=ci -c opt --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER='${{ matrix.classifier }}' --execution_log_compact_file="${{ matrix.name }} Exec Log.binpb.zst"
           fi
@@ -122,7 +122,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         with:
           archive: false
-          path: "${{ matrix.name }} Exec Log.log"
+          path: "${{ matrix.name }} Exec Log.binpb.zst"
       - name: Check disk free space
         if: always()
         run: df -h
