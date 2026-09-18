@@ -192,8 +192,6 @@ cc_test(
     ]),
     tags = [
         "exclusive-if-local",
-        "no-asan",
-        "no-tsan",
     ],
     deps = [
         ":ntcore",

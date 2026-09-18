@@ -97,6 +97,6 @@ def robotpy_project(
         args = main_option + ["test"] + test_options,
         deps = test_deps + executable_deps,
         size = size,
-        tags = tags,
+        tags = tags + ["no-asan", "no-tsan", "no-ubsan"],
         **kwargs
     )

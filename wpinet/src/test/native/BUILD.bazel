@@ -22,7 +22,6 @@ cc_test(
             "cpp/MulticastTest.cpp",
         ],
     ),
-    tags = ["no-asan"],
     deps = [
         ":main",
         "//thirdparty/catch2",
@@ -36,7 +35,6 @@ cc_test(
     size = "small",
     srcs = ["cpp/MulticastTest.cpp"],
     tags = [
-        "no-asan",
         "no-remote-exec",  # requires avahi-daemon
     ],
     deps = [
