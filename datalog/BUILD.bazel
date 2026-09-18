@@ -141,10 +141,6 @@ cc_test(
     name = "datalog-cpp-test",
     size = "small",
     srcs = glob(["src/test/native/**/*.cpp"]),
-    tags = [
-        "no-asan",
-        "no-tsan",
-    ],
     deps = [
         ":datalog",
         "//thirdparty/catch2",
