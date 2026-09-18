@@ -40,10 +40,6 @@ cc_test(
     name = "tunables-cpp-test",
     size = "small",
     srcs = glob(["src/test/native/**/*.cpp"]),
-    tags = [
-        "no-asan",
-        "no-tsan",
-    ],
     deps = [
         ":tunables",
         "//thirdparty/catch2",
