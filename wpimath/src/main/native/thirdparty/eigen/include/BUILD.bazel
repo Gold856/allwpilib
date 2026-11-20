@@ -44,15 +44,15 @@ license(
 HDRS = glob(
     [
         "Eigen/**",
-        "unsupported/Eigen/**",
+        "contrib/Eigen/**",
     ],
     exclude = [
         # We don't want any documentation files.
         "**/*.md",
         "**/*.txt",
-        "unsupported/Eigen/NonLinearOptimization",
-        #"unsupported/Eigen/MatrixFunctions",
-        "unsupported/Eigen/Polynomials",
+        "contrib/Eigen/NonLinearOptimization",
+        #"contrib/Eigen/MatrixFunctions",
+        "contrib/Eigen/Polynomials",
     ],
 )
 

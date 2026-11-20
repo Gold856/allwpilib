@@ -64,15 +64,15 @@ index 0000000000000000000000000000000000000000..38ce6cb417485fb37cafaf1e0f536e7a
 +HDRS = glob(
 +    [
 +        "Eigen/**",
-+        "unsupported/Eigen/**",
++        "contrib/Eigen/**",
 +    ],
 +    exclude = [
 +        # We don't want any documentation files.
 +        "**/*.md",
 +        "**/*.txt",
-+        "unsupported/Eigen/NonLinearOptimization",
-+        #"unsupported/Eigen/MatrixFunctions",
-+        "unsupported/Eigen/Polynomials",
++        "contrib/Eigen/NonLinearOptimization",
++        #"contrib/Eigen/MatrixFunctions",
++        "contrib/Eigen/Polynomials",
 +    ],
 +)
 +

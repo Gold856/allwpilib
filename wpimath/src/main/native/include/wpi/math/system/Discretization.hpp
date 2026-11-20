@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <unsupported/Eigen/MatrixFunctions>
+#include <contrib/Eigen/MatrixFunctions>
 
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/units/time.hpp"

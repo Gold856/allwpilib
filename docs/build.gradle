@@ -132,7 +132,7 @@ doxygen.sourceSets.main {
 
     // Save space by excluding eigen
     exclude 'Eigen/**'
-    exclude 'unsupported/**'
+    exclude 'contrib/**'
 
     exclude '**/.clang-tidy'
     exclude '**/.clang-format'

@@ -6,7 +6,7 @@
 
 #include <Eigen/Core>
 #include <benchmark/benchmark.h>
-#include <unsupported/Eigen/MatrixFunctions>
+#include <contrib/Eigen/MatrixFunctions>
 
 inline void BM_MatrixExp(benchmark::State& state) {
   // NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)

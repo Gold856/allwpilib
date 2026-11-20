@@ -102,7 +102,7 @@ def comment_out_invalid_includes(filename: Path, include_roots: list[Path]):
     include_roots -- list of search paths for includes
     """
     # Read header
-    with open(filename) as f:
+    with open(filename, encoding="utf-8") as f:
         old_contents = f.read()
 
     new_contents = ""

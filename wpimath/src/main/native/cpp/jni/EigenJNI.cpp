@@ -5,7 +5,7 @@
 #include <jni.h>
 
 #include <Eigen/Core>
-#include <unsupported/Eigen/MatrixFunctions>
+#include <contrib/Eigen/MatrixFunctions>
 
 #include "org_wpilib_math_jni_EigenJNI.h"
 #include "wpi/util/jni_util.hpp"

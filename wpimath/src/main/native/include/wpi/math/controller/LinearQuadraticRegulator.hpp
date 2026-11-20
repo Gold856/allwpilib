@@ -10,7 +10,7 @@
 #include <string>
 
 #include <Eigen/Cholesky>
-#include <unsupported/Eigen/MatrixFunctions>
+#include <contrib/Eigen/MatrixFunctions>
 
 #include "wpi/math/fmt/Eigen.hpp"
 #include "wpi/math/linalg/DARE.hpp"

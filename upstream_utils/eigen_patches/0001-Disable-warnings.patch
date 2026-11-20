@@ -8,10 +8,10 @@ Subject: [PATCH 1/4] Disable warnings
  1 file changed, 9 insertions(+)
 
 diff --git a/Eigen/src/Core/util/DisableStupidWarnings.h b/Eigen/src/Core/util/DisableStupidWarnings.h
-index ab0c542d0e24c6ecb77abfc535c8232774cba6d5..031d75a4c8b715dafe7158fdc5c42cd4fb069235 100644
+index b993f2d6eb751916325413f70dc906edbbd8f4d3..7faf2b0c3d7da7b0418651e7dbe82c2ce699bf83 100644
 --- a/Eigen/src/Core/util/DisableStupidWarnings.h
 +++ b/Eigen/src/Core/util/DisableStupidWarnings.h
-@@ -81,6 +81,15 @@
+@@ -71,6 +71,15 @@
  // See: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89325
  #pragma GCC diagnostic ignored "-Wattributes"
  #endif

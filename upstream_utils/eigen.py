@@ -35,7 +35,7 @@ def eigen_inclusions(dp: Path, f: str):
         return False
 
     # Exclude MKL support
-    if "MKL" in f:
+    if "MKL" in f and f != "MKL_support.h":
         return False
 
     # Exclude HIP CUDA support
@@ -89,15 +89,15 @@ def eigen_inclusions(dp: Path, f: str):
     return False
 
 
-def unsupported_inclusions(dp: Path, f: str):
-    """Returns true if the given file in the "unsupported" include directory of
-    the Eigen git repo should be copied into allwpilib
+def contrib_inclusions(dp: Path, f: str):
+    """Returns true if the given file in the "contrib" include directory of the
+    Eigen git repo should be copied into allwpilib
 
     Keyword arguments:
     dp -- directory path
     f -- filename
     """
-    if not has_prefix(dp, Path("unsupported")):
+    if not has_prefix(dp, Path("contrib")):
         return False
 
     abspath = dp / f
@@ -123,9 +123,9 @@ def copy_upstream_src(wpilib_root: Path):
         wpimath / "src/main/native/thirdparty/eigen/include",
     )
 
-    # Copy unsupported headers into allwpilib
-    unsupported_files = walk_cwd_and_copy_if(
-        unsupported_inclusions,
+    # Copy contrib headers into allwpilib
+    contrib_files = walk_cwd_and_copy_if(
+        contrib_inclusions,
         wpimath / "src/main/native/thirdparty/eigen/include",
     )
 
@@ -133,7 +133,7 @@ def copy_upstream_src(wpilib_root: Path):
         comment_out_invalid_includes(
             f, [wpimath / "src/main/native/thirdparty/eigen/include"]
         )
-    for f in unsupported_files:
+    for f in contrib_files:
         comment_out_invalid_includes(
             f, [wpimath / "src/main/native/thirdparty/eigen/include"]
         )
@@ -156,7 +156,7 @@ def copy_upstream_src(wpilib_root: Path):
 def main():
     name = "eigen"
     url = "https://gitlab.com/libeigen/eigen.git"
-    tag = "5.0.1"
+    tag = "57f0bf4a2cdb02c82ff814995e6afad90cbd83a7"
 
     eigen = Lib(name, url, tag, copy_upstream_src)
     eigen.main()

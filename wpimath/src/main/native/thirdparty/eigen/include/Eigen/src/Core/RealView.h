@@ -6,6 +6,7 @@
 // This Source Code Form is subject to the terms of the Mozilla
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// SPDX-License-Identifier: MPL-2.0
 
 #ifndef EIGEN_REALVIEW_H
 #define EIGEN_REALVIEW_H
@@ -17,20 +18,16 @@ namespace Eigen {
 
 namespace internal {
 
-// Vectorized assignment to RealView requires array-oriented access to the real and imaginary components.
+// Write access and vectorization requires array-oriented access to the real and imaginary components.
 // From https://en.cppreference.com/w/cpp/numeric/complex.html:
 // For any pointer to an element of an array of std::complex<T> named p and any valid array index i,
 // reinterpret_cast<T*>(p)[2 * i] is the real part of the complex number p[i], and
 // reinterpret_cast<T*>(p)[2 * i + 1] is the imaginary part of the complex number p[i].
 
-template <typename ComplexScalar>
+template <typename T>
 struct complex_array_access : std::false_type {};
-template <>
-struct complex_array_access<std::complex<float>> : std::true_type {};
-template <>
-struct complex_array_access<std::complex<double>> : std::true_type {};
-template <>
-struct complex_array_access<std::complex<long double>> : std::true_type {};
+template <typename T>
+struct complex_array_access<std::complex<T>> : std::true_type {};
 
 template <typename Xpr>
 struct traits<RealView<Xpr>> : public traits<Xpr> {
@@ -40,13 +37,19 @@ struct traits<RealView<Xpr>> : public traits<Xpr> {
     if (size_as_int == Dynamic) return Dynamic;
     return times_two ? (2 * size_as_int) : size_as_int;
   }
+
   using Base = traits<Xpr>;
   using ComplexScalar = typename Base::Scalar;
   using Scalar = typename NumTraits<ComplexScalar>::Real;
-  static constexpr int ActualDirectAccessBit = complex_array_access<ComplexScalar>::value ? DirectAccessBit : 0;
+
+  static constexpr bool ArrayAccess = complex_array_access<ComplexScalar>::value;
+  // Real and imaginary parts interleave with a uniform stride only when the complex coefficients are adjacent.
+  static constexpr int ActualDirectAccessBit =
+      ArrayAccess && inner_stride_at_compile_time<Xpr>::value == 1 ? DirectAccessBit : 0;
+  static constexpr int ActualLvalueBit = !std::is_const<Xpr>::value && ArrayAccess ? LvalueBit : 0;
   static constexpr int ActualPacketAccessBit = packet_traits<Scalar>::Vectorizable ? PacketAccessBit : 0;
   static constexpr int FlagMask =
-      ActualDirectAccessBit | ActualPacketAccessBit | HereditaryBits | LinearAccessBit | LvalueBit;
+      ActualDirectAccessBit | ActualLvalueBit | ActualPacketAccessBit | HereditaryBits | LinearAccessBit;
   static constexpr int BaseFlags = int(evaluator<Xpr>::Flags) | int(Base::Flags);
   static constexpr int Flags = BaseFlags & FlagMask;
   static constexpr bool IsRowMajor = Flags & RowMajorBit;
@@ -56,8 +59,8 @@ struct traits<RealView<Xpr>> : public traits<Xpr> {
   static constexpr int MaxRowsAtCompileTime = double_size(Base::MaxRowsAtCompileTime, !IsRowMajor);
   static constexpr int MaxColsAtCompileTime = double_size(Base::MaxColsAtCompileTime, IsRowMajor);
   static constexpr int MaxSizeAtCompileTime = size_at_compile_time(MaxRowsAtCompileTime, MaxColsAtCompileTime);
-  static constexpr int OuterStrideAtCompileTime = double_size(outer_stride_at_compile_time<Xpr>::ret, true);
-  static constexpr int InnerStrideAtCompileTime = inner_stride_at_compile_time<Xpr>::ret;
+  static constexpr int OuterStrideAtCompileTime = double_size(outer_stride_at_compile_time<Xpr>::value, true);
+  static constexpr int InnerStrideAtCompileTime = inner_stride_at_compile_time<Xpr>::value;
 };
 
 template <typename Xpr>
@@ -66,55 +69,66 @@ struct evaluator<RealView<Xpr>> : private evaluator<Xpr> {
   using XprType = RealView<Xpr>;
   using ExpressionTraits = traits<XprType>;
   using ComplexScalar = typename ExpressionTraits::ComplexScalar;
-  using ComplexCoeffReturnType = typename BaseEvaluator::CoeffReturnType;
   using Scalar = typename ExpressionTraits::Scalar;
 
-  static constexpr bool IsRowMajor = ExpressionTraits::IsRowMajor;
   static constexpr int Flags = ExpressionTraits::Flags;
   static constexpr int CoeffReadCost = BaseEvaluator::CoeffReadCost;
   static constexpr int Alignment = BaseEvaluator::Alignment;
+  static constexpr bool IsRowMajor = ExpressionTraits::IsRowMajor;
+  // DenseCoeffsBase::CoeffReturnType is a reference for LvalueBit as well as DirectAccessBit; returning a value
+  // there would dangle.
+  static constexpr bool CoeffByReference = (Flags & (LvalueBit | DirectAccessBit)) != 0;
+
+  using ComplexCoeffReturnType = std::conditional_t<CoeffByReference, const ComplexScalar&, ComplexScalar>;
+  using CoeffReturnType = std::conditional_t<CoeffByReference, const Scalar&, Scalar>;
 
   EIGEN_DEVICE_FUNC explicit evaluator(XprType realView) : BaseEvaluator(realView.m_xpr) {}
 
-  template <bool Enable = std::is_reference<ComplexCoeffReturnType>::value, typename = std::enable_if_t<!Enable>>
+  template <bool Enable = CoeffByReference, std::enable_if_t<!Enable, bool> = true>
   constexpr EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar coeff(Index row, Index col) const {
-    ComplexCoeffReturnType cscalar = BaseEvaluator::coeff(IsRowMajor ? row : row / 2, IsRowMajor ? col / 2 : col);
-    Index p = (IsRowMajor ? col : row) & 1;
-    return p ? numext::real(cscalar) : numext::imag(cscalar);
+    Index r = IsRowMajor ? row : row / 2;
+    Index c = IsRowMajor ? col / 2 : col;
+    bool p = (IsRowMajor ? col : row) & 1;
+    ComplexScalar ccoeff = BaseEvaluator::coeff(r, c);
+    return p ? numext::imag(ccoeff) : numext::real(ccoeff);
   }
-
-  template <bool Enable = std::is_reference<ComplexCoeffReturnType>::value, typename = std::enable_if_t<Enable>>
-  constexpr EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const Scalar& coeff(Index row, Index col) const {
-    ComplexCoeffReturnType cscalar = BaseEvaluator::coeff(IsRowMajor ? row : row / 2, IsRowMajor ? col / 2 : col);
+  template <bool Enable = CoeffByReference, std::enable_if_t<Enable, bool> = true>
+  constexpr EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE CoeffReturnType coeff(Index row, Index col) const {
+    Index r = IsRowMajor ? row : row / 2;
+    Index c = IsRowMajor ? col / 2 : col;
     Index p = (IsRowMajor ? col : row) & 1;
-    return reinterpret_cast<const Scalar(&)[2]>(cscalar)[p];
+    ComplexCoeffReturnType ccoeff = BaseEvaluator::coeff(r, c);
+    return reinterpret_cast<const Scalar(&)[2]>(ccoeff)[p];
   }
-
-  constexpr EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar& coeffRef(Index row, Index col) {
-    ComplexScalar& cscalar = BaseEvaluator::coeffRef(IsRowMajor ? row : row / 2, IsRowMajor ? col / 2 : col);
-    Index p = (IsRowMajor ? col : row) & 1;
-    return reinterpret_cast<Scalar(&)[2]>(cscalar)[p];
-  }
-
-  template <bool Enable = std::is_reference<ComplexCoeffReturnType>::value, typename = std::enable_if_t<!Enable>>
+  template <bool Enable = CoeffByReference, std::enable_if_t<!Enable, bool> = true>
   constexpr EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar coeff(Index index) const {
-    ComplexCoeffReturnType cscalar = BaseEvaluator::coeff(index / 2);
-    Index p = index & 1;
-    return p ? numext::real(cscalar) : numext::imag(cscalar);
+    ComplexScalar ccoeff = BaseEvaluator::coeff(index / 2);
+    bool p = index & 1;
+    return p ? numext::imag(ccoeff) : numext::real(ccoeff);
   }
-
-  template <bool Enable = std::is_reference<ComplexCoeffReturnType>::value, typename = std::enable_if_t<Enable>>
-  constexpr EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const Scalar& coeff(Index index) const {
-    ComplexCoeffReturnType cscalar = BaseEvaluator::coeff(index / 2);
+  template <bool Enable = CoeffByReference, std::enable_if_t<Enable, bool> = true>
+  constexpr EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE CoeffReturnType coeff(Index index) const {
+    ComplexCoeffReturnType ccoeff = BaseEvaluator::coeff(index / 2);
     Index p = index & 1;
-    return reinterpret_cast<const Scalar(&)[2]>(cscalar)[p];
+    return reinterpret_cast<const Scalar(&)[2]>(ccoeff)[p];
   }
-
+  constexpr EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar& coeffRef(Index row, Index col) {
+    Index r = IsRowMajor ? row : row / 2;
+    Index c = IsRowMajor ? col / 2 : col;
+    Index p = (IsRowMajor ? col : row) & 1;
+    ComplexScalar& ccoeffRef = BaseEvaluator::coeffRef(r, c);
+    return reinterpret_cast<Scalar(&)[2]>(ccoeffRef)[p];
+  }
   constexpr EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar& coeffRef(Index index) {
-    ComplexScalar& cscalar = BaseEvaluator::coeffRef(index / 2);
+    ComplexScalar& ccoeffRef = BaseEvaluator::coeffRef(index / 2);
     Index p = index & 1;
-    return reinterpret_cast<Scalar(&)[2]>(cscalar)[p];
+    return reinterpret_cast<Scalar(&)[2]>(ccoeffRef)[p];
   }
+
+  // If the first index is odd (imaginary), discard the first scalar
+  // in 'result' and assign the missing scalar.
+  // This operation is safe as the real component of the first scalar must exist.
+  // The complex load then starts one real scalar before the requested address, so it cannot keep an aligned mode.
 
   template <int LoadMode, typename PacketType>
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE PacketType packet(Index row, Index col) const {
@@ -122,12 +136,21 @@ struct evaluator<RealView<Xpr>> : private evaluator<Xpr> {
     using ComplexPacket = typename find_packet_by_size<ComplexScalar, RealPacketSize / 2>::type;
     EIGEN_STATIC_ASSERT((find_packet_by_size<ComplexScalar, RealPacketSize / 2>::value),
                         MISSING COMPATIBLE COMPLEX PACKET TYPE)
-    eigen_assert(((IsRowMajor ? col : row) % 2 == 0) && "the inner index must be even");
-
-    Index crow = IsRowMajor ? row : row / 2;
-    Index ccol = IsRowMajor ? col / 2 : col;
-    ComplexPacket cpacket = BaseEvaluator::template packet<LoadMode, ComplexPacket>(crow, ccol);
-    return preinterpret<PacketType, ComplexPacket>(cpacket);
+    Index r = IsRowMajor ? row : row / 2;
+    Index c = IsRowMajor ? col / 2 : col;
+    bool p = (IsRowMajor ? col : row) & 1;
+    ComplexPacket cresult = p ? BaseEvaluator::template packet<Unaligned, ComplexPacket>(r, c)
+                              : BaseEvaluator::template packet<LoadMode, ComplexPacket>(r, c);
+    PacketType result = preinterpret<PacketType>(cresult);
+    if (p) {
+      Scalar aux[RealPacketSize + 1];
+      pstoreu(aux, result);
+      Index lastr = IsRowMajor ? row : row + RealPacketSize - 1;
+      Index lastc = IsRowMajor ? col + RealPacketSize - 1 : col;
+      aux[RealPacketSize] = coeff(lastr, lastc);
+      result = ploadu<PacketType>(aux + 1);
+    }
+    return result;
   }
 
   template <int LoadMode, typename PacketType>
@@ -136,12 +159,24 @@ struct evaluator<RealView<Xpr>> : private evaluator<Xpr> {
     using ComplexPacket = typename find_packet_by_size<ComplexScalar, RealPacketSize / 2>::type;
     EIGEN_STATIC_ASSERT((find_packet_by_size<ComplexScalar, RealPacketSize / 2>::value),
                         MISSING COMPATIBLE COMPLEX PACKET TYPE)
-    eigen_assert((index % 2 == 0) && "the index must be even");
-
-    Index cindex = index / 2;
-    ComplexPacket cpacket = BaseEvaluator::template packet<LoadMode, ComplexPacket>(cindex);
-    return preinterpret<PacketType, ComplexPacket>(cpacket);
+    bool p = index & 1;
+    ComplexPacket cresult = p ? BaseEvaluator::template packet<Unaligned, ComplexPacket>(index / 2)
+                              : BaseEvaluator::template packet<LoadMode, ComplexPacket>(index / 2);
+    PacketType result = preinterpret<PacketType>(cresult);
+    if (p) {
+      Scalar aux[RealPacketSize + 1];
+      pstoreu(aux, result);
+      aux[RealPacketSize] = coeff(index + RealPacketSize - 1);
+      result = ploadu<PacketType>(aux + 1);
+    }
+    return result;
   }
+
+  // The requested real packet segment forms the half-open interval [begin, end), where 'end' = 'begin' + 'count'.
+  // In order to access the underlying complex array, even indices must be aligned with the real components
+  // of the complex scalars. 'begin' and 'count' must be modified as follows:
+  // a) 'begin' must be rounded down to the nearest even number; and
+  // b) 'end' must be rounded up to the nearest even number.
 
   template <int LoadMode, typename PacketType>
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE PacketType packetSegment(Index row, Index col, Index begin, Index count) const {
@@ -149,15 +184,28 @@ struct evaluator<RealView<Xpr>> : private evaluator<Xpr> {
     using ComplexPacket = typename find_packet_by_size<ComplexScalar, RealPacketSize / 2>::type;
     EIGEN_STATIC_ASSERT((find_packet_by_size<ComplexScalar, RealPacketSize / 2>::value),
                         MISSING COMPATIBLE COMPLEX PACKET TYPE)
-    eigen_assert(((IsRowMajor ? col : row) % 2 == 0) && "the inner index must be even");
-    eigen_assert((begin % 2 == 0) && (count % 2 == 0) && "begin and count must be even");
-
-    Index crow = IsRowMajor ? row : row / 2;
-    Index ccol = IsRowMajor ? col / 2 : col;
-    Index cbegin = begin / 2;
-    Index ccount = count / 2;
-    ComplexPacket cpacket = BaseEvaluator::template packetSegment<LoadMode, ComplexPacket>(crow, ccol, cbegin, ccount);
-    return preinterpret<PacketType, ComplexPacket>(cpacket);
+    Index actualBegin = numext::round_down(begin, 2);
+    Index actualEnd = numext::round_down(begin + count + 1, 2);
+    Index actualCount = actualEnd - actualBegin;
+    Index r = IsRowMajor ? row : row / 2;
+    Index c = IsRowMajor ? col / 2 : col;
+    bool p = (IsRowMajor ? col : row) & 1;
+    ComplexPacket cresult =
+        p ? BaseEvaluator::template packetSegment<Unaligned, ComplexPacket>(r, c, actualBegin / 2, actualCount / 2)
+          : BaseEvaluator::template packetSegment<LoadMode, ComplexPacket>(r, c, actualBegin / 2, actualCount / 2);
+    PacketType result = preinterpret<PacketType>(cresult);
+    if (p) {
+      Scalar aux[RealPacketSize + 1] = {};
+      pstoreu(aux, result);
+      // aux[actualEnd] is in the segment only when begin + count is even; otherwise it lies past the end.
+      if (actualEnd == begin + count) {
+        Index lastr = IsRowMajor ? row : row + actualEnd - 1;
+        Index lastc = IsRowMajor ? col + actualEnd - 1 : col;
+        aux[actualEnd] = coeff(lastr, lastc);
+      }
+      result = ploadu<PacketType>(aux + 1);
+    }
+    return result;
   }
 
   template <int LoadMode, typename PacketType>
@@ -166,14 +214,85 @@ struct evaluator<RealView<Xpr>> : private evaluator<Xpr> {
     using ComplexPacket = typename find_packet_by_size<ComplexScalar, RealPacketSize / 2>::type;
     EIGEN_STATIC_ASSERT((find_packet_by_size<ComplexScalar, RealPacketSize / 2>::value),
                         MISSING COMPATIBLE COMPLEX PACKET TYPE)
-    eigen_assert((index % 2 == 0) && "the index must be even");
-    eigen_assert((begin % 2 == 0) && (count % 2 == 0) && "begin and count must be even");
+    Index actualBegin = numext::round_down(begin, 2);
+    Index actualEnd = numext::round_down(begin + count + 1, 2);
+    Index actualCount = actualEnd - actualBegin;
+    bool p = index & 1;
+    ComplexPacket cresult =
+        p ? BaseEvaluator::template packetSegment<Unaligned, ComplexPacket>(index / 2, actualBegin / 2, actualCount / 2)
+          : BaseEvaluator::template packetSegment<LoadMode, ComplexPacket>(index / 2, actualBegin / 2, actualCount / 2);
+    PacketType result = preinterpret<PacketType>(cresult);
+    if (p) {
+      Scalar aux[RealPacketSize + 1] = {};
+      pstoreu(aux, result);
+      if (actualEnd == begin + count) aux[actualEnd] = coeff(index + actualEnd - 1);
+      result = ploadu<PacketType>(aux + 1);
+    }
+    return result;
+  }
 
-    Index cindex = index / 2;
-    Index cbegin = begin / 2;
-    Index ccount = count / 2;
-    ComplexPacket cpacket = BaseEvaluator::template packetSegment<LoadMode, ComplexPacket>(cindex, cbegin, ccount);
-    return preinterpret<PacketType, ComplexPacket>(cpacket);
+  // Stores of whole complex coefficients go to the underlying evaluator as complex packets; a store that starts or ends
+  // inside a coefficient (an odd real index or count) falls back to scalar stores. The swap kernel requires these.
+
+  template <int StoreMode, typename PacketType>
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void writePacket(Index row, Index col, const PacketType& x) {
+    constexpr int RealPacketSize = unpacket_traits<PacketType>::size;
+    using ComplexPacket = typename find_packet_by_size<ComplexScalar, RealPacketSize / 2>::type;
+    if (((IsRowMajor ? col : row) & 1) == 0) {
+      BaseEvaluator::template writePacket<StoreMode, ComplexPacket>(
+          IsRowMajor ? row : row / 2, IsRowMajor ? col / 2 : col, preinterpret<ComplexPacket>(x));
+    } else {
+      writePacketSegment<StoreMode, PacketType>(row, col, x, 0, RealPacketSize);
+    }
+  }
+
+  template <int StoreMode, typename PacketType>
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void writePacket(Index index, const PacketType& x) {
+    constexpr int RealPacketSize = unpacket_traits<PacketType>::size;
+    using ComplexPacket = typename find_packet_by_size<ComplexScalar, RealPacketSize / 2>::type;
+    if ((index & 1) == 0) {
+      BaseEvaluator::template writePacket<StoreMode, ComplexPacket>(index / 2, preinterpret<ComplexPacket>(x));
+    } else {
+      writePacketSegment<StoreMode, PacketType>(index, x, 0, RealPacketSize);
+    }
+  }
+
+  template <int StoreMode, typename PacketType>
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void writePacketSegment(Index row, Index col, const PacketType& x, Index begin,
+                                                                Index count) {
+    constexpr int RealPacketSize = unpacket_traits<PacketType>::size;
+    using ComplexPacket = typename find_packet_by_size<ComplexScalar, RealPacketSize / 2>::type;
+    EIGEN_STATIC_ASSERT((find_packet_by_size<ComplexScalar, RealPacketSize / 2>::value),
+                        MISSING COMPATIBLE COMPLEX PACKET TYPE)
+    const Index inner = IsRowMajor ? col : row;
+    if (((inner | begin | count) & 1) == 0) {
+      const Index r = IsRowMajor ? row : row / 2;
+      const Index c = IsRowMajor ? col / 2 : col;
+      BaseEvaluator::template writePacketSegment<StoreMode, ComplexPacket>(r, c, preinterpret<ComplexPacket>(x),
+                                                                           begin / 2, count / 2);
+    } else {
+      Scalar aux[RealPacketSize];
+      pstoreu(aux, x);
+      for (Index i = begin; i < begin + count; ++i)
+        coeffRef(IsRowMajor ? row : row + i, IsRowMajor ? col + i : col) = aux[i];
+    }
+  }
+
+  template <int StoreMode, typename PacketType>
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void writePacketSegment(Index index, const PacketType& x, Index begin,
+                                                                Index count) {
+    constexpr int RealPacketSize = unpacket_traits<PacketType>::size;
+    using ComplexPacket = typename find_packet_by_size<ComplexScalar, RealPacketSize / 2>::type;
+    EIGEN_STATIC_ASSERT((find_packet_by_size<ComplexScalar, RealPacketSize / 2>::value),
+                        MISSING COMPATIBLE COMPLEX PACKET TYPE)
+    if (((index | begin | count) & 1) == 0) {
+      BaseEvaluator::template writePacketSegment<StoreMode, ComplexPacket>(index / 2, preinterpret<ComplexPacket>(x),
+                                                                           begin / 2, count / 2);
+    } else {
+      Scalar aux[RealPacketSize];
+      pstoreu(aux, x);
+      for (Index i = begin; i < begin + count; ++i) coeffRef(index + i) = aux[i];
+    }
   }
 };
 
@@ -197,8 +316,44 @@ class RealView : public internal::dense_xpr_base<RealView<Xpr>>::type {
     m_xpr.resize(Xpr::IsRowMajor ? rows : rows / 2, Xpr::IsRowMajor ? cols / 2 : cols);
   }
   EIGEN_DEVICE_FUNC void resize(Index size) { m_xpr.resize(size / 2); }
-  EIGEN_DEVICE_FUNC Scalar* data() { return reinterpret_cast<Scalar*>(m_xpr.data()); }
+  using ScalarWithConstIfNotLvalue = std::conditional_t<internal::is_lvalue<Xpr>::value, Scalar, const Scalar>;
+  EIGEN_DEVICE_FUNC ScalarWithConstIfNotLvalue* data() {
+    return reinterpret_cast<ScalarWithConstIfNotLvalue*>(m_xpr.data());
+  }
   EIGEN_DEVICE_FUNC const Scalar* data() const { return reinterpret_cast<const Scalar*>(m_xpr.data()); }
+
+  // The product kernels take operand addresses through coeffRef() of a const reference, as MapBase and
+  // CwiseUnaryViewImpl allow for direct access. Declaring any coeffRef() hides the base class's, so all four are here,
+  // with the base class's bounds checks and, for the single-index overloads, the requirement of linear access (as in
+  // MapBase's EIGEN_STATIC_ASSERT_INDEX_BASED_ACCESS).
+  //
+  // They reinterpret the complex scalar as two adjacent reals, which only complex_array_access scalars permit, so the
+  // const overloads require DirectAccessBit and the non-const ones LvalueBit; other complex scalars get neither.
+  template <bool Enable = (int(ExpressionTraits::Flags) & DirectAccessBit) != 0, std::enable_if_t<Enable, bool> = true>
+  EIGEN_DEVICE_FUNC const Scalar& coeffRef(Index row, Index col) const {
+    eigen_internal_assert(row >= 0 && row < rows() && col >= 0 && col < cols());
+    return data()[ExpressionTraits::IsRowMajor ? row * outerStride() + col * innerStride()
+                                               : col * outerStride() + row * innerStride()];
+  }
+  template <bool Enable = (int(ExpressionTraits::Flags) & DirectAccessBit) != 0, std::enable_if_t<Enable, bool> = true>
+  EIGEN_DEVICE_FUNC const Scalar& coeffRef(Index index) const {
+    EIGEN_STATIC_ASSERT((int(ExpressionTraits::Flags) & LinearAccessBit) || RealView::IsVectorAtCompileTime,
+                        YOU_ARE_TRYING_TO_USE_AN_INDEX_BASED_ACCESSOR_ON_AN_EXPRESSION_THAT_DOES_NOT_SUPPORT_THAT)
+    eigen_internal_assert(index >= 0 && index < size());
+    return data()[index * innerStride()];
+  }
+  template <bool Enable = (int(ExpressionTraits::Flags) & LvalueBit) != 0, std::enable_if_t<Enable, bool> = true>
+  EIGEN_DEVICE_FUNC Scalar& coeffRef(Index row, Index col) {
+    eigen_internal_assert(row >= 0 && row < rows() && col >= 0 && col < cols());
+    return internal::evaluator<RealView>(*this).coeffRef(row, col);
+  }
+  template <bool Enable = (int(ExpressionTraits::Flags) & LvalueBit) != 0, std::enable_if_t<Enable, bool> = true>
+  EIGEN_DEVICE_FUNC Scalar& coeffRef(Index index) {
+    EIGEN_STATIC_ASSERT((int(ExpressionTraits::Flags) & LinearAccessBit) || RealView::IsVectorAtCompileTime,
+                        YOU_ARE_TRYING_TO_USE_AN_INDEX_BASED_ACCESSOR_ON_AN_EXPRESSION_THAT_DOES_NOT_SUPPORT_THAT)
+    eigen_internal_assert(index >= 0 && index < size());
+    return internal::evaluator<RealView>(*this).coeffRef(index);
+  }
 
   EIGEN_DEVICE_FUNC RealView(const RealView&) = default;
 
@@ -211,7 +366,7 @@ class RealView : public internal::dense_xpr_base<RealView<Xpr>>::type {
   EIGEN_DEVICE_FUNC RealView& operator=(const DenseBase<OtherDerived>& other);
 
  protected:
-  friend struct internal::evaluator<RealView<Xpr>>;
+  friend struct internal::evaluator<RealView>;
   Xpr& m_xpr;
 };
 

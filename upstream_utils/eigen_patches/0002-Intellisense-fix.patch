@@ -8,10 +8,10 @@ Subject: [PATCH 2/4] Intellisense fix
  1 file changed, 7 insertions(+)
 
 diff --git a/Eigen/src/Core/util/ConfigureVectorization.h b/Eigen/src/Core/util/ConfigureVectorization.h
-index c2546a083898154a1d4bd741722a5544cbdb1d92..8b5cc16b2092a73804af87ed7f59722ae3fdab0c 100644
+index c5b7171044e649ef8008c35e7a15f38078074a5c..ea04bf46cff16a43267c791fa08e127dda8dca57 100644
 --- a/Eigen/src/Core/util/ConfigureVectorization.h
 +++ b/Eigen/src/Core/util/ConfigureVectorization.h
-@@ -178,6 +178,13 @@
+@@ -223,6 +223,13 @@
  
  //----------------------------------------------------------------------
  
